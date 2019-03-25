@@ -164,7 +164,7 @@ void ArmorDetectionNode::ExecuteLoop() {
         float pitch, yaw;
         gimbal_control_.Transform(target_3d, pitch, yaw);
 
-        gimbal_angle_.yaw_mode = true;
+        gimbal_angle_.yaw_mode = true; //0 means absolute, 1 means relative
         gimbal_angle_.pitch_mode = false;
         gimbal_angle_.yaw_angle = yaw * 0.7;
         gimbal_angle_.pitch_angle = pitch;
@@ -175,7 +175,7 @@ void ArmorDetectionNode::ExecuteLoop() {
       } else if(undetected_count_ != 0) {
 
         gimbal_angle_.yaw_mode = true;
-        gimbal_angle_.pitch_mode = false;
+        gimbal_angle_.pitch_mode = true;
         gimbal_angle_.yaw_angle = 0;
         gimbal_angle_.pitch_angle = 0;
 

@@ -411,6 +411,7 @@ void ConstraintSet::CalcControlInfo(const ArmorInfo & armor, cv::Point3f &target
                distortion_coeffs_,
                rvec,
                tvec);
+  //std::cout << "tvec:" << tvec << std::endl; 
   target_3d = cv::Point3f(tvec);
 
 }
