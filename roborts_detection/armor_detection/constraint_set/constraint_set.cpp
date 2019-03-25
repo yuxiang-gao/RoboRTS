@@ -238,10 +238,11 @@ void ConstraintSet::FilterLights(std::vector<cv::RotatedRect> &lights) {
     auto light_aspect_ratio =
         std::max(light.size.width, light.size.height) / std::min(light.size.width, light.size.height);
     //https://stackoverflow.com/questions/15956124/minarearect-angles-unsure-about-the-angle-returned/21427814#21427814
-    if(light.size.width < light.size.height) {
-      angle = light.angle; // -light.angle
+    angle = light.angle;
+    /*if(light.size.width < light.size.height) {
+      angle = -light.angle;
     } else
-      angle = light.angle; // light.angle + 90
+      angle = light.angle + 90;*/
     //std::cout << "light angle: " << angle << std::endl;
     //std::cout << "light_aspect_ratio: " << light_aspect_ratio << std::endl;
     //std::cout << "light_area: " << light.size.area() << std::endl;
@@ -284,8 +285,8 @@ void ConstraintSet::PossibleArmors(const std::vector<cv::RotatedRect> &lights, s
 
       float light1_angle = light1.angle; //light1.size.width < light1.size.height ? -light1.angle : light1.angle + 90
       float light2_angle = light2.angle; //light2.size.width < light2.size.height ? -light2.angle : light2.angle + 90
-      std::cout << "light1_angle: " << light1_angle << std::endl;
-      std::cout << "light2_angle: " << light2_angle << std::endl;
+      //std::cout << "light1_angle: " << light1_angle << std::endl;
+      //std::cout << "light2_angle: " << light2_angle << std::endl;
 
       if (enable_debug_) {
         std::cout << "*******************************" << std::endl;
