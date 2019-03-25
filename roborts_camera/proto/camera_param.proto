@@ -36,6 +36,8 @@ message Camera {
   optional bool auto_gain = 12;////1 open, 0 close
 
   optional uint32 contrast = 13;
+
+  optional bool flip = 14; //1 flip, 0 dont flip
 }
 
 message Cameras {

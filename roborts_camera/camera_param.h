@@ -63,6 +63,8 @@ struct CameraInfo {
   bool auto_gain;
   //! contrast
   unsigned int contrast;
+  //! whether to flip image (along x and y)
+  bool flip;
 
   //! camera information in form of ROS sensor_msgs
   sensor_msgs::CameraInfoPtr ros_camera_info;

@@ -50,6 +50,9 @@ void CameraNode::Update(const unsigned int index) {
   bool camera_info_send = false;
   while(running_) {
     camera_driver_[index]->StartReadCamera(img);
+    if(camera_param_.GetCameraParam()[index].flip) {
+       cv::flip(img, img, -1);
+    }
     if(!img.empty()) {
       sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();
       img_msg->header.frame_id = camera_param_.GetCameraParam()[index].camera_name;

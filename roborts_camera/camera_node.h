@@ -72,7 +72,8 @@ class CameraNode{
   std::vector<ros::NodeHandle> nhs_;
   //! ROS image transport camera publisher to publish image data
   std::vector<image_transport::CameraPublisher> img_pubs_;
-
+  //! whether flip the image
+  std::vector<bool> isFlips_;
 };
 } //namespace roborts_camera
 

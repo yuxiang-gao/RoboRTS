@@ -63,6 +63,8 @@ void CameraParam::LoadCameraParam() {
     //constrast
     cameras_param_[index].contrast = camera_info.camera(index).contrast();
 
+    // flip
+    cameras_param_[index].flip = camera_info.camera(index).flip();
     //camera matrix
     int camera_m_size = camera_info.camera(index).camera_matrix().data().size();
     double camera_m[camera_m_size];
