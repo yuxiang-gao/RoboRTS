@@ -4,7 +4,7 @@ gui_publish_rate          : 10
 
 laser_min_range           : 0.15
 laser_max_range           : 8.0
-laser_max_beams           : 30
+laser_max_beams           : 50
 
 min_particles             : 70
 max_particles             : 5000
