@@ -168,12 +168,12 @@ int main(int argc, char **argv) { // not sure about the arguments
   AML.AddChildren(Sq2);
   
   //Sq2 children
-  PreconditionNode patrol_DZ('patrol_DZ', blackboard,
+  PreconditionNode patrol_DZ("patrol_DZ", blackboard,
                    precondition_function = startOfRound(), // true if start of round
                    abort_type = AbortType::NONE); 
   patrol_DZ.AddChildren({roborts_decision::PatrolBehavior,roborts_decision::GoalBehavior}); // R1 patrols and R2 to DZ
 
-  PreconditionNode engage_reload('engage_reload', blackboard,
+  PreconditionNode engage_reload("engage_reload", blackboard,
                    precondition_function = startOfRoundAndDz() // true if start of round and activated by one of the robots
                    abort_type = AbortType::NONE);
   engage_reload.AddChildren({roborts_decision::ChaseBehavior,roborts_decision::GoalBehavior}); // R1 engages and R2 to reload
