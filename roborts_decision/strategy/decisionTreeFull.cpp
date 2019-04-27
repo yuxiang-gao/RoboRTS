@@ -2,12 +2,12 @@
 
 #include "executor/chassis_executor.h"
 
-#include "example_behavior/back_boot_area_behavior.h"
-#include "example_behavior/escape_behavior.h"
-#include "example_behavior/chase_behavior.h"
-#include "example_behavior/search_behavior.h"
-#include "example_behavior/patrol_behavior.h"
-#include "example_behavior/goal_behavior.h"
+#include "strategy/back_boot_area_action.h"
+#include "strategy/escape_action.h"
+#include "strategy/chase_action.h"
+#include "strategy/search_action.h"
+#include "strategy/patrol_action.h"
+#include "strategy/goal_action.h"
 
 #include "behaviour_tree/behaviour_tree.h"
 #include "../blackboard/blackboard.h"
@@ -100,6 +100,11 @@ int main(int argc, char **argv) { // not sure about the arguments
   SelectorNode root_node("root_node", blackboard);
   rootNode.SetLevel=0;
   rootNode.SetParent(NULL);
+  PatrolAction patrol_act(chassis_executor, blackboard)
+  ChaseAction chase_act(chassis_executor,blackboard)
+  GoalAction reload_act(chassis_executor, blackboard)
+  GoalAction DZ_act(chassis_executor, blackboard)
+  EscapeAction escape_act(chassis_executor, blackboard)
   // root children
   PreconditionNode ammo_right("AMR", blackboard,
                    precondition_function = localizeRight(), //true if ammo robot R1 at right of arena
@@ -115,11 +120,11 @@ int main(int argc, char **argv) { // not sure about the arguments
   PreconditionNode DZ_hide("DZ_hide", blackboard,
                    precondition_function = startOfRound(), // true if start of round
                    abort_type = AbortType::NONE); 
-  DZ_hide.AddChildren({roborts_decision::GoalBehavior, roborts_decision::escape_behavior }); // R1 to defense zone and R2 hides
+  DZ_hide.AddChildren({DZ_act, escape_act }); // R1 to defense zone and R2 hides
   PreconditionNode patrol_reload("patrol_reload", blackboard,
                    precondition_function = startOfRoundAndDZ() // true if start of round and DZ is activated by one of the robots
                    abort_type = AbortType::NONE);
-  patrol_reload.AddChildren({roborts_decision::PatrolBehavior,roborts_decision::GoalBehavior}); // R1 patrols and R2 to reload
+  patrol_reload.AddChildren({patrol_act,reload_act}); // R1 patrols and R2 to reload
 
   SelectorNode DZ("DZ", blackboard);
   SelectorNode combat('engage', blackboard);
@@ -130,12 +135,12 @@ int main(int argc, char **argv) { // not sure about the arguments
   PreconditionNode DZ_R2("DZ_R2", blackboard,
                    precondition_function = ifDZ_R2(), // true if 1_2_min_mark && (((R12_engage || !R12_engage) && R1_HP>=R2_HP) || (R1_engage & !R2_engage))
                    abort_type = AbortType::NONE);
-  DZ_R2.AddChildren(roborts_decision::GoalBehavior); // move R2 to DZ (modify goal_behavior)
+  DZ_R2.AddChildren(DZ_act); // move R2 to DZ (modify goal_behavior)
   
   PreconditionNode DZ_R1("DZ_R1", blackboard,
                    precondition_function = ifDZ_R1(), // true if 1_2_min_mark && (((R12_engage || !R12_engage) && R1_HP<R2_HP) || (!R1_engage & R2_engage))
                    abort_type = AbortType::NONE);
-  DZ_R1.AddChildren(roborts_decision::GoalBehavior); // move R1 to DZ (modify goal_behavior)
+  DZ_R1.AddChildren(DZ_act); // move R1 to DZ (modify goal_behavior)
   
   DZ.AddChildren({DZ_R1, DZ_R2});
   
@@ -143,22 +148,26 @@ int main(int argc, char **argv) { // not sure about the arguments
   PreconditionNode engage("engage", blackboard,
                    precondition_function = ifengage(), // true if goodHP && is_ammo && is_enenmy
                    abort_type = AbortType::NONE);
-  engage.AddChildren(roborts_decision::ChaseBehavior); // chase the enemy
+  
+  engage.AddChildren(chase_act); // chase the enemy
   
   PreconditionNode patrol("patrol", blackboard,
                    precondition_function = ifpatrol(), // true if goodHP && is_ammo && !is_enenmy
                    abort_type = AbortType::NONE);
-  patrol.AddChildren(roborts_decision::PatrolBehavior); // patrol
+  
+  patrol.AddChildren(patrol_act); // patrol
   
   PreconditionNode reload("reload", blackboard,
                    precondition_function = ifreload(), // true if goodHP && !is_ammo
                    abort_type = AbortType::NONE);
-  reload.AddChildren(roborts_decision::GoalBehavior); // move robot to DZ, update new_goal
+  
+  reload.AddChildren(reload_act); // move robot to DZ, update new_goal
   
   PreconditionNode hide("hide", blackboard,
                    precondition_function = ifhide(), // true if !goodHP
                    abort_type = AbortType::NONE);
-  hide.AddChildren(roborts_decision::EscapeBehavior); // may have to modify
+  
+  hide.AddChildren(escape_act); // may have to modify
   
   combat.AddChildren({engage, patrol, reload, hide})
   
@@ -171,12 +180,12 @@ int main(int argc, char **argv) { // not sure about the arguments
   PreconditionNode patrol_DZ("patrol_DZ", blackboard,
                    precondition_function = startOfRound(), // true if start of round
                    abort_type = AbortType::NONE); 
-  patrol_DZ.AddChildren({roborts_decision::PatrolBehavior,roborts_decision::GoalBehavior}); // R1 patrols and R2 to DZ
+  patrol_DZ.AddChildren({patrol_act, DZ_act}); // R1 patrols and R2 to DZ
 
   PreconditionNode engage_reload("engage_reload", blackboard,
                    precondition_function = startOfRoundAndDz() // true if start of round and activated by one of the robots
                    abort_type = AbortType::NONE);
-  engage_reload.AddChildren({roborts_decision::ChaseBehavior,roborts_decision::GoalBehavior}); // R1 engages and R2 to reload
+  engage_reload.AddChildren({chase_act,reload_act}); // R1 engages and R2 to reload
 
   Sq2.AddChildren({ patrol_DZ, engage_reload,DZ,combat})
     
