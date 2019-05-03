@@ -162,13 +162,14 @@ void RefereeSystem::RobotHeatCallback(const std::shared_ptr<roborts_sdk::cmd_pow
   robot_heat.chassis_current = raw_robot_heat->chassis_current;
   robot_heat.chassis_power = raw_robot_heat->chassis_power;
   robot_heat.chassis_power_buffer = raw_robot_heat->chassis_power_buffer;
+  robot_heat.shooter_heat = raw_robot_heat->shooter_heat0;
   ros_robot_heat_pub_.publish(robot_heat);
 }
 
 void RefereeSystem::RobotBonusCallback(const std::shared_ptr<roborts_sdk::cmd_buff_musk> raw_robot_bonus){
   roborts_msgs::RobotBonus robot_bonus;
   robot_bonus.bonus = raw_robot_bonus->power_rune_buff>>2&1;
-  ros_robot_heat_pub_.publish(robot_bonus);
+  ros_robot_bonus_pub_.publish(robot_bonus);
 }
 
 void RefereeSystem::RobotDamageCallback(const std::shared_ptr<roborts_sdk::cmd_robot_hurt> raw_robot_damage){
@@ -182,7 +183,7 @@ void RefereeSystem::RobotShootCallback(const std::shared_ptr<roborts_sdk::cmd_sh
   roborts_msgs::RobotShoot robot_shoot;
   robot_shoot.frequency = raw_robot_shoot->bullet_freq;
   robot_shoot.speed = raw_robot_shoot->bullet_speed;
-  ros_robot_damage_pub_.publish(robot_shoot);
+  ros_robot_shoot_pub_.publish(robot_shoot);
 }
 
 void RefereeSystem::ProjectileSupplyCallback(const roborts_msgs::ProjectileSupply::ConstPtr projectile_supply){
