@@ -88,16 +88,16 @@ public:
     roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config);
 
     // referee system
-    ros::NodeHandle master_nh("/master");
-    ros::NodeHandle wing_nh("/wing");
     auto wing_status = new RefereeSystemInfo();
     auto master_status = new RefereeSystemInfo();
-    master_robot_status_sub_ = master_nh.subscribe<roborts_msgs::RobotStatus>("robot_status", 100, &Blackboard::MasterRobotStatusCallback, this);
-    wing_robot_status_sub_ = wing_nh.subscribe<roborts_msgs::RobotStatus>("robot_status", 100, &Blackboard::WingRobotStatusCallback, this);
+    std::string robot_name;
+    robot_name = "master";
+    nh.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name);
+    robot_name = "wing";
+    nh.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name);
 
     if (!decision_config.simulate())
     {
-
       armor_detection_actionlib_client_.waitForServer();
 
       ROS_INFO("Armor detection module has been connected!");
@@ -113,15 +113,32 @@ public:
   ~Blackboard() = default;
 
   // referee
-  void MasterRobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status)
+
+  void RobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status, std::string id)
   {
-    master_status.robot_status = *robot_status;
+    if (id == "master")
+    {
+      master_status.robot_status = *robot_status;
+    }
+    else if (id == "wing")
+    {
+      wing_status.robot_status = *robot_status;
+    }
+    else
+    {
+      return;
+    }
   }
 
-  void WingRobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status)
-  {
-    wing_status.robot_status = *robot_status;
-  }
+  //  void MasterRobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status)
+  // {
+  //   master_status.robot_status = *robot_status;
+  // }
+
+  // void WingRobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status)
+  // {
+  //   wing_status.robot_status = *robot_status;
+  // }
 
   // Enemy
   void ArmorDetectionFeedbackCallback(const roborts_msgs::ArmorDetectionFeedbackConstPtr &feedback)
@@ -274,10 +291,6 @@ private:
 
   //! Enenmy detection
   ros::Subscriber enemy_sub_;
-
-  //! Referee System
-  ros::Subscriber master_robot_status_sub_;
-  ros::Subscriber wing_robot_status_sub_;
 
   //! Goal info
   geometry_msgs::PoseStamped goal_;
