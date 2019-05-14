@@ -6,17 +6,20 @@
 #include "behaviour_tree/behaviour_tree.h"
 #include "blackboard/blackboard.h"
 
-#include "utils/line_iterator.h"
-
 namespace roborts_decision
 {
+
 class BackBootAreaAction : public ActionNode
 {
 public:
     BackBootAreaAction(ChassisExecutor *&chassis_executor,
-                       const Blackboard::Ptr &blackboard) : ActionNode("BackBootArea", blackboard),
+                       const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_actionC", blackboard),
                                                             chassis_executor_(chassis_executor)
 
+    {
+    }
+
+    void OnInitialize()
     {
         boot_position_.header.frame_id = "map";
 
@@ -31,40 +34,35 @@ public:
         boot_position_.pose.orientation = master_quaternion;
     }
 
-    void OnInitialize()
+    BehaviourState Update()
     {
-
-        auto robot_map_pose = blackboard_->GetRobotMapPose();
-        auto dx = boot_position_.pose.position.x - robot_map_pose.pose.position.x;
-        auto dy = boot_position_.pose.position.y - robot_map_pose.pose.position.y;
-
-        auto boot_yaw = tf::getYaw(boot_position_.pose.orientation);
-        auto robot_yaw = tf::getYaw(robot_map_pose.pose.orientation);
-
-        tf::Quaternion rot1, rot2;
-        tf::quaternionMsgToTF(boot_position_.pose.orientation, rot1);
-        tf::quaternionMsgToTF(robot_map_pose.pose.orientation, rot2);
-        auto d_yaw = rot1.angleShortestPath(rot2);
-
-        if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
+        auto executor_state = chassis_executor_->Update();
+        if (executor_state != BehaviorState::RUNNING)
         {
-            chassis_executor_->Execute(boot_position_);
+            auto robot_map_pose = blackboard_->GetRobotMapPose();
+            auto dx = boot_position_.pose.position.x - robot_map_pose.pose.position.x;
+            auto dy = boot_position_.pose.position.y - robot_map_pose.pose.position.y;
+
+            auto boot_yaw = tf::getYaw(boot_position_.pose.orientation);
+            auto robot_yaw = tf::getYaw(robot_map_pose.pose.orientation);
+
+            tf::Quaternion rot1, rot2;
+            tf::quaternionMsgToTF(boot_position_.pose.orientation, rot1);
+            tf::quaternionMsgToTF(robot_map_pose.pose.orientation, rot2);
+            auto d_yaw = rot1.angleShortestPath(rot2);
+
+            if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
+            {
+                chassis_executor_->Execute(boot_position_);
+                return BehaviourState::SUCCESS;
+            }
         }
+        return BehaviorState::RUNNING;
     }
-    BehaviorState Run()
-    {
-        auto executor_state = Update();
-        behavior_state_ = ActionNode::Run();
-        return behavior_state_;
-    }
+
     void OnTerminate(BehaviorState state)
     {
         chassis_executor_->Cancel();
-    }
-
-    BehaviorState Update()
-    {
-        return chassis_executor_->Update();
     }
 
     ~BackBootAreaBehavior() = default;
