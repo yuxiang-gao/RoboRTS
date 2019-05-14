@@ -47,16 +47,21 @@ public:
 
   BehaviourState Update()
   {
-    if (patrol_goals_.empty())
+    auto executor_state = chassis_executor_->Update();
+    if (executor_state != BehaviorState::RUNNING)
     {
-      ROS_ERROR("patrol goal is empty");
-      return BehaviourState::FAILURE;
-    }
+      if (patrol_goals_.empty())
+      {
+        ROS_ERROR("patrol goal is empty");
+        return BehaviourState::FAILURE;
+      }
 
-    ROS_INFO("send goal");
-    chassis_executor_->Execute(patrol_goals_[patrol_count_]);
-    patrol_count_ = ++patrol_count_ % point_size_;
-    return BehaviourState::SUCCESS;
+      ROS_INFO("send goal");
+      chassis_executor_->Execute(patrol_goals_[patrol_count_]);
+      patrol_count_ = ++patrol_count_ % point_size_;
+      return BehaviourState::SUCCESS;
+    }
+    return BehaviourState::RUNNING;
   }
 
   void OnTerminate(BehaviorState state)

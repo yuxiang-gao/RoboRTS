@@ -36,29 +36,28 @@ public:
 
     BehaviourState Update()
     {
-
-        auto robot_map_pose = blackboard_->GetRobotMapPose();
-        auto dx = boot_position_.pose.position.x - robot_map_pose.pose.position.x;
-        auto dy = boot_position_.pose.position.y - robot_map_pose.pose.position.y;
-
-        auto boot_yaw = tf::getYaw(boot_position_.pose.orientation);
-        auto robot_yaw = tf::getYaw(robot_map_pose.pose.orientation);
-
-        tf::Quaternion rot1, rot2;
-        tf::quaternionMsgToTF(boot_position_.pose.orientation, rot1);
-        tf::quaternionMsgToTF(robot_map_pose.pose.orientation, rot2);
-        auto d_yaw = rot1.angleShortestPath(rot2);
-
-        if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
+        auto executor_state = chassis_executor_->Update();
+        if (executor_state != BehaviorState::RUNNING)
         {
-            chassis_executor_->Execute(boot_position_);
-            return BehaviourState::SUCCESS;
+            auto robot_map_pose = blackboard_->GetRobotMapPose();
+            auto dx = boot_position_.pose.position.x - robot_map_pose.pose.position.x;
+            auto dy = boot_position_.pose.position.y - robot_map_pose.pose.position.y;
+
+            auto boot_yaw = tf::getYaw(boot_position_.pose.orientation);
+            auto robot_yaw = tf::getYaw(robot_map_pose.pose.orientation);
+
+            tf::Quaternion rot1, rot2;
+            tf::quaternionMsgToTF(boot_position_.pose.orientation, rot1);
+            tf::quaternionMsgToTF(robot_map_pose.pose.orientation, rot2);
+            auto d_yaw = rot1.angleShortestPath(rot2);
+
+            if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
+            {
+                chassis_executor_->Execute(boot_position_);
+                return BehaviourState::SUCCESS;
+            }
         }
-        else
-        {
-            return BehaviourState::FAILURE;
-        }
-        
+        return BehaviorState::RUNNING;
     }
 
     void OnTerminate(BehaviorState state)

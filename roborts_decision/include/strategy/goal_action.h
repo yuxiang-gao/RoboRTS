@@ -29,10 +29,16 @@ public:
 
   BehaviorState Update()
   {
-    if (blackboard_->IsNewGoal())
+    auto executor_state = chassis_executor_->Update();
+    if (executor_state != BehaviorState::RUNNING)
     {
-      chassis_executor_->Execute(blackboard_->GetGoal());
+      if (blackboard_->IsNewGoal())
+      {
+        chassis_executor_->Execute(blackboard_->GetGoal());
+        return BehaviourState::SUCCESS;
+      }
     }
+    return BehaviorState::RUNNING;
   }
 
   ~GoalBehavior() = default;
