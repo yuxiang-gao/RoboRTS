@@ -11,6 +11,18 @@
 #include "hop_behaviour/patrol_action.h"
 #include "hop_behaviour/goal_action.h"
 
+class HopTree
+{
+public:
+    HopTree(const std::string &proto_file_path) : blackboard_(oborts_decision::Blackboard(full_path)), chassis_executor_()
+    {
+    }
+
+protected:
+    Blackboard blackboard_;
+    roborts_decision::ChassisExecutor chassis_executor_;
+};
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "behavior_test_node");
@@ -18,6 +30,13 @@ int main(int argc, char **argv)
 
     auto chassis_executor = new roborts_decision::ChassisExecutor;
     auto blackboard = new roborts_decision::Blackboard(full_path);
+
+    roborts_decision::BackBootAreaAction back_boot_area_action(chassis_executor, blackboard);
+    roborts_decision::ChaseAction chase_action(chassis_executor, blackboard);
+    roborts_decision::SearchAction search_action(chassis_executor, blackboard);
+    roborts_decision::EscapeAction escape_action(chassis_executor, blackboard);
+    roborts_decision::PatrolAction patrol_action(chassis_executor, blackboard);
+    roborts_decision::GoalAction goal_action(chassis_executor, blackboard);
 
     SelectorNode root_node("root_node", blackboard);
     root_node.SetLevel = 0;
