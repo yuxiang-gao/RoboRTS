@@ -22,6 +22,7 @@
 #include <tf/transform_listener.h>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <boost/bind.hpp>
 
 #include "roborts_msgs/ArmorDetectionAction.h"
 //Referee System
