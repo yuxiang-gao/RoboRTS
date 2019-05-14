@@ -58,7 +58,7 @@ public:
 				chassis_executor_->Cancel();
 				cancel_goal_ = false;
 			}
-			return BehaviourState::FAILURE;d
+			return BehaviourState::FAILURE;
 		}
 		else
 		{
