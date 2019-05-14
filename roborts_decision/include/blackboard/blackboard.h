@@ -26,7 +26,7 @@
 #include "roborts_msgs/ArmorDetectionAction.h"
 
 #include "io/io.h"
-#include "../proto/decision.pb.h"
+#include "../../proto/decision.pb.h"
 #include "costmap/costmap_interface.h"
 
 namespace roborts_decision{

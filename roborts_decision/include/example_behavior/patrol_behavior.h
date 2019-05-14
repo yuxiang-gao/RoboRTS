@@ -3,12 +3,12 @@
 
 #include "io/io.h"
 
-#include "../blackboard/blackboard.h"
-#include "../executor/chassis_executor.h"
-#include "../behavior_tree/behavior_state.h"
-#include "../proto/decision.pb.h"
+#include "blackboard/blackboard.h"
+#include "executor/chassis_executor.h"
+#include "behavior_tree/behavior_state.h"
+#include "../../proto/decision.pb.h"
 
-#include "line_iterator.h"
+#include "utils/line_iterator.h"
 
 namespace roborts_decision {
 class PatrolBehavior {

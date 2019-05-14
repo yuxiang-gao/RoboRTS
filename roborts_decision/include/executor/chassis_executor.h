@@ -8,7 +8,7 @@
 #include "roborts_msgs/TwistAccel.h"
 #include "geometry_msgs/Twist.h"
 
-#include "../behavior_tree/behavior_state.h"
+#include "behavior_tree/behavior_state.h"
 
 namespace roborts_decision{
 /***

@@ -5,7 +5,7 @@
 #include "roborts_msgs/GimbalAngle.h"
 #include "roborts_msgs/GimbalRate.h"
 
-#include "../behavior_tree/behavior_state.h"
+#include "behavior_tree/behavior_state.h"
 namespace roborts_decision{
 /***
  * @brief Gimbal Executor to execute different abstracted task for gimbal module
