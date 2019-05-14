@@ -6,26 +6,20 @@
 #include <ros/ros.h>
 
 #include "executor/chassis_executor.h"
-
-
 #include "behaviour_tree/behaviour_tree.h"
 #include "blackboard/blackboard.h"
-
-#include "example_behavior/line_iterator.h"
+#include "utils/line_iterator.h"
 
 
 namespace roborts_decision {
 class GoalAction: public ActionNode {
  public:
   GoalAction(ChassisExecutor* &chassis_executor,
-               Blackboard* &blackboard) : ActionNode("goal_act", blackboard),
-      chassis_executor_(chassis_executor),
-      blackboard_(blackboard) { }
+               Blackboard* &blackboard) : ActionNode("goal_action", blackboard),
+      chassis_executor_(chassis_executor){ }
 
   void OnInitialize() {
-    if(blackboard_->IsNewGoal()){
-      chassis_executor_->Execute(blackboard_->GetGoal());
-    }
+    
   }
   
   BehaviorState Run()
@@ -40,7 +34,9 @@ class GoalAction: public ActionNode {
   }
 
   BehaviorState Update() {
-    return chassis_executor_->Update();
+    if(blackboard_->IsNewGoal()){
+      chassis_executor_->Execute(blackboard_->GetGoal());
+    }
   }
 
   ~GoalBehavior() = default;

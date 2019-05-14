@@ -3,7 +3,6 @@
 #include <ros/ros.h>
 
 #include "executor/chassis_executor.h"
-
 #include "behaviour_tree/behaviour_tree.h"
 #include "blackboard/blackboard.h"
 
@@ -12,11 +11,15 @@ namespace roborts_decision
 
 class BackBootAreaAction : public ActionNode
 {
-  public:
+public:
     BackBootAreaAction(ChassisExecutor *&chassis_executor,
-                       const Blackboard::Ptr &blackboard) : ActionNode("BackBootArea", blackboard),
+                       const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_actionC", blackboard),
                                                             chassis_executor_(chassis_executor)
 
+    {
+    }
+
+    void OnInitialize()
     {
         boot_position_.header.frame_id = "map";
 
@@ -31,7 +34,7 @@ class BackBootAreaAction : public ActionNode
         boot_position_.pose.orientation = master_quaternion;
     }
 
-    void OnInitialize()
+    BehaviourState Update()
     {
 
         auto robot_map_pose = blackboard_->GetRobotMapPose();
@@ -49,27 +52,23 @@ class BackBootAreaAction : public ActionNode
         if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
         {
             chassis_executor_->Execute(boot_position_);
+            return BehaviourState::SUCCESS;
         }
+        else
+        {
+            return BehaviourState::FAILURE;
+        }
+        
     }
-    BehaviorState Run()
-    {
-        auto executor_state = Update();
-        behavior_state_ = ActionNode::Run();
-        return behavior_state_;
-    }
+
     void OnTerminate(BehaviorState state)
     {
         chassis_executor_->Cancel();
     }
 
-    BehaviorState Update()
-    {
-        return chassis_executor_->Update();
-    }
-
     ~BackBootAreaBehavior() = default;
 
-  private:
+private:
     //! executor
     ChassisExecutor *const chassis_executor_;
     //! boot position
