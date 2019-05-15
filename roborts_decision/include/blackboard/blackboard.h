@@ -116,22 +116,42 @@ public:
 
   void RefereeSubscribe(std::string robot_name)
   {
-    std::vector<std::string> referee_topic_names = {
-        "game_status",
-        "game_result",
-        "game_survivor",
-        "field_bonus_status",
-        "field_supplier_status",
-        "robot_status",
-        "robot_heat",
-        "robot_bonus",
-        "robot_damage",
-        "robot_shoot"};
+    // std::vector<std::string> referee_topic_names = {
+    //     "game_status",
+    //     "game_result",
+    //     "game_survivor",
+    //     "field_bonus_status",
+    //     "field_supplier_status",
+    //     "robot_status",
+    //     "robot_heat",
+    //     "robot_bonus",
+    //     "robot_damage",
+    //     "robot_shoot"};
 
-    for (auto topic_name : referee_topic_names)
-    {
-      ros::Subscriber sub = nh.subscribe<topic_tools::ShapeShifter>("/" + robot_name + "/" + topic_name, 100, boost::bind(&Blackboard::RefereeCallback, this, _1, topic_name, robot_name));
-    }
+    // for (auto topic_name : referee_topic_names)
+    // {
+    //   ros::Subscriber sub = nh.subscribe<topic_tools::ShapeShifter>("/" + robot_name + "/" + topic_name, 100, boost::bind(&Blackboard::RefereeCallback, this, _1, topic_name, robot_name));
+    // }
+    nh.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::GameStatus>, this, _1, "game_status", robot_name);
+
+    nh.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::GameResult>, this, _1, "game_result", robot_name);
+
+    nh.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::GameSurvivor>, this, _1, "game_survivor", robot_name);
+
+    nh.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::BonusStatus>, this, _1, "field_bonus_status", robot_name);
+
+    nh.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::SupplierStatus>, this, _1, "field_supplier_status", robot_name);
+
+    nh.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::RobotHeat>, this, _1, "robot_heat", robot_name);
+
+    nh.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::RobotBonus>, this, _1, "robot_bonus", robot_name);
+
+    nh.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::RobotStatus>, this, _1, "robot_status", robot_name);
+
+    nh.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::RobotDamage>, this, _1, "robot_damage", robot_name);
+
+    nh.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RefereeCallback<roborts_msgs::RobotShoot>, this, _1, "robot_shoot", robot_name);
+
     // nh.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name);
     // nh.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name);
     // nh.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name);
@@ -147,39 +167,40 @@ public:
   ~Blackboard() = default;
 
   // referee
-  void RefereeCallback(const topic_tools::ShapeShifter::ConstPtr &msg, const std::string topic_name, const std::string robot_name)
+  template <class T>
+  void RefereeCallback(const T::ConstPtr &msg, const std::string topic_name, const std::string robot_name)
   {
     switch (topic_name)
     {
     case "game_status":
-      referee_info[robot_name].game_status = static_cast<roborts_msgs::GameStatus>(*msg);
+      referee_info[robot_name].game_status = *msg;
       break;
     case "game_result":
-      referee_info[robot_name].game_result = static_cast<roborts_msgs::GameResult>(*msg);
+      referee_info[robot_name].game_result = *msg;
       break;
     case "game_survivor":
-      referee_info[robot_name].game_survivor = static_cast<roborts_msgs::GameSurvivor>(*msg);
+      referee_info[robot_name].game_survivor = *msg;
       break;
     case "field_bonus_status":
-      referee_info[robot_name].bonus_status = static_cast<roborts_msgs::BonusStatus>(*msg);
+      referee_info[robot_name].bonus_status = *msg;
       break;
     case "field_supplier_status":
-      referee_info[robot_name].supplier_status = static_cast<roborts_msgs::SupplierStatus>(*msg);
+      referee_info[robot_name].supplier_status = *msg;
       break;
     case "robot_status":
-      referee_info[robot_name].robot_status = static_cast<roborts_msgs::RobotStatus>(*msg);
+      referee_info[robot_name].robot_status = *msg;
       break;
     case "robot_heat":
-      referee_info[robot_name].robot_heat = static_cast<roborts_msgs::RobotHeat>(*msg);
+      referee_info[robot_name].robot_heat = *msg;
       break;
     case "robot_bonus":
-      referee_info[robot_name].robot_bonus = static_cast<roborts_msgs::RobotBonus>(*msg);
+      referee_info[robot_name].robot_bonus = *msg;
       break;
     case "robot_damage":
-      referee_info[robot_name].robot_damage = static_cast<roborts_msgs::RobotDamage>(*msg);
+      referee_info[robot_name].robot_damage = *msg;
       break;
     case "robot_shoot":
-      referee_info[robot_name].robot_shoot = static_cast<roborts_msgs::RobotShoot>(*msg);
+      referee_info[robot_name].robot_shoot = *msg;
       break;
     }
   }
