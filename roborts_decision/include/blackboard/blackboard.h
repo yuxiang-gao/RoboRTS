@@ -152,34 +152,34 @@ public:
     switch (topic_name)
     {
     case "game_status":
-      referee_info[robot_name].game_status = *boost::const_pointer_cast<roborts_msgs::GameStatus>(msg);
+      referee_info[robot_name].game_status = static_cast<roborts_msgs::GameStatus>(*msg);
       break;
     case "game_result":
-      referee_info[robot_name].game_result = *boost::const_pointer_cast<roborts_msgs::GameResult>(msg);
+      referee_info[robot_name].game_result = static_cast<roborts_msgs::GameResult>(*msg);
       break;
     case "game_survivor":
-      referee_info[robot_name].game_survivor = *boost::const_pointer_cast<roborts_msgs::GameSurvivor>(msg);
+      referee_info[robot_name].game_survivor = static_cast<roborts_msgs::GameSurvivor>(*msg);
       break;
     case "field_bonus_status":
-      referee_info[robot_name].bonus_status = *boost::const_pointer_cast<roborts_msgs::BonusStatus>(msg);
+      referee_info[robot_name].bonus_status = static_cast<roborts_msgs::BonusStatus>(*msg);
       break;
     case "field_supplier_status":
-      referee_info[robot_name].supplier_status = *boost::const_pointer_cast<roborts_msgs::SupplierStatus>(msg);
+      referee_info[robot_name].supplier_status = static_cast<roborts_msgs::SupplierStatus>(*msg);
       break;
     case "robot_status":
-      referee_info[robot_name].robot_status = *boost::const_pointer_cast<roborts_msgs::RobotStatus>(msg);
+      referee_info[robot_name].robot_status = static_cast<roborts_msgs::RobotStatus>(*msg);
       break;
     case "robot_heat":
-      referee_info[robot_name].robot_heat = *boost::const_pointer_cast<roborts_msgs::RobotHeat>(msg);
+      referee_info[robot_name].robot_heat = static_cast<roborts_msgs::RobotHeat>(*msg);
       break;
     case "robot_bonus":
-      referee_info[robot_name].robot_bonus = *boost::const_pointer_cast<roborts_msgs::RobotBonus>(msg);
+      referee_info[robot_name].robot_bonus = static_cast<roborts_msgs::RobotBonus>(*msg);
       break;
     case "robot_damage":
-      referee_info[robot_name].robot_damage = *boost::const_pointer_cast<roborts_msgs::RobotDamage>(msg);
+      referee_info[robot_name].robot_damage = static_cast<roborts_msgs::RobotDamage>(*msg);
       break;
     case "robot_shoot":
-      referee_info[robot_name].robot_shoot = *boost::const_pointer_cast<roborts_msgs::RobotShoot>(msg);
+      referee_info[robot_name].robot_shoot = static_cast<roborts_msgs::RobotShoot>(*msg);
       break;
     }
   }
