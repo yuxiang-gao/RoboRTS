@@ -21,8 +21,10 @@
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
 #include <ros/ros.h>
+#include <topic_tools/shape_shifter.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <boost/bind.hpp>
+#include <map>
 
 #include "roborts_msgs/ArmorDetectionAction.h"
 //Referee System
@@ -44,7 +46,7 @@
 
 namespace roborts_decision
 {
-
+//! structure to store msg from referee system
 struct RefereeSystemInfo
 {
   roborts_msgs::GameStatus game_status;
@@ -65,6 +67,12 @@ public:
   typedef std::shared_ptr<Blackboard> Ptr;
   typedef roborts_costmap::CostmapInterface CostMap;
   typedef roborts_costmap::Costmap2D CostMap2D;
+  // config
+  roborts_decision::DecisionConfig decision_config;
+  // dictionary, used to store referee info for each robot
+  std::map<std::string /*robot_name*/, RefereeSystemInfo> referee_info;
+  // RefereeSystemInfo wing_status;
+  // RefereeSystemInfo master_status;
   explicit Blackboard(const std::string &proto_file_path) : enemy_detected_(false),
                                                             armor_detection_actionlib_client_("armor_detection_node_action", true)
   {
@@ -84,18 +92,13 @@ public:
     enemy_sub_ = rviz_nh.subscribe<geometry_msgs::PoseStamped>("goal", 1, &Blackboard::GoalCallback, this);
 
     ros::NodeHandle nh;
-
-    roborts_decision::DecisionConfig decision_config;
     roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config);
 
     // referee system
-    auto wing_status = new RefereeSystemInfo();
-    auto master_status = new RefereeSystemInfo();
-    std::string robot_name;
-    robot_name = "master";
-    nh.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name);
-    robot_name = "wing";
-    nh.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name);
+    referee_info["master"] = new RefereeSystemInfo();
+    referee_info["wing"] = new RefereeSystemInfo();
+    RefereeSubscribe("master");
+    RefereeSubscribe("wing");
 
     if (!decision_config.simulate())
     {
@@ -111,35 +114,85 @@ public:
     }
   }
 
+  void RefereeSubscribe(std::string robot_name)
+  {
+    std::vector<std::string> referee_topic_names = {
+        "game_status",
+        "game_result",
+        "game_survivor",
+        "field_bonus_status",
+        "field_supplier_status",
+        "robot_status",
+        "robot_heat",
+        "robot_bonus",
+        "robot_damage",
+        "robot_shoot"};
+
+    for (auto topic_name : referee_topic_names)
+    {
+      ros::Subscriber sub = nh.subscribe<topic_tools::ShapeShifter>("/" + robot_name + "/" + topic_name, 100, boost::bind(&Blackboard::RefereeCallback, this, _1, topic_name, robot_name));
+    }
+    // nh.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name);
+    // nh.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name);
+  }
+
   ~Blackboard() = default;
 
   // referee
-
-  void RobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status, std::string id)
+  void RefereeCallback(const topic_tools::ShapeShifter::ConstPtr &msg, const std::string topic_name, const std::string robot_name)
   {
-    if (id == "master")
+    switch (topic_name)
     {
-      master_status.robot_status = *robot_status;
-    }
-    else if (id == "wing")
-    {
-      wing_status.robot_status = *robot_status;
-    }
-    else
-    {
-      return;
+    case "game_status":
+      referee_info[robot_name].game_status = *msg;
+      break;
+    case "game_result":
+      referee_info[robot_name].game_result = *msg;
+      break;
+    case "game_survivor":
+      referee_info[robot_name].game_survivor = *msg;
+      break;
+    case "field_bonus_status":
+      referee_info[robot_name].bonus_status = *msg;
+      break;
+    case "field_supplier_status":
+      referee_info[robot_name].supplier_status = *msg;
+      break;
+    case "robot_status":
+      referee_info[robot_name].robot_status = *msg;
+      break;
+    case "robot_heat":
+      referee_info[robot_name].robot_heat = *msg;
+      break;
+    case "robot_bonus":
+      referee_info[robot_name].robot_bonus = *msg;
+      break;
+    case "robot_damage":
+      referee_info[robot_name].robot_damage = *msg;
+      break;
+    case "robot_shoot":
+      referee_info[robot_name].robot_shoot = *msg;
+      break;
     }
   }
 
-  //  void MasterRobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status)
+  // void RobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &data, std::string id)
   // {
-  //   master_status.robot_status = *robot_status;
+  //   referee_info[id].robot_status = *data;
   // }
 
-  // void WingRobotStatusCallback(const roborts_msgs::RobotStatus::ConstPtr &robot_status)
-  // {
-  //   wing_status.robot_status = *robot_status;
-  // }
+  int GetHP(std::string robot_name)
+  {
+    return referee_info[robot_name].robot_status.remain_hp;
+  }
 
   // Enemy
   void ArmorDetectionFeedbackCallback(const roborts_msgs::ArmorDetectionFeedbackConstPtr &feedback)
