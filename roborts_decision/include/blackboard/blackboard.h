@@ -25,6 +25,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <boost/bind.hpp>
 #include <map>
+#include <string>
 
 #include "roborts_msgs/ArmorDetectionAction.h"
 //Referee System
