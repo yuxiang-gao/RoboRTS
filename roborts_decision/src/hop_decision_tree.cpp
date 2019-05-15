@@ -10,25 +10,28 @@
 #include "hop_behaviour/search_action.h"
 #include "hop_behaviour/patrol_action.h"
 #include "hop_behaviour/goal_action.h"
+namespace roborts_decision
+{
 
 class HopTree
 {
 public:
-    HopTree(const std::string &proto_file_path) : blackboard_(oborts_decision::Blackboard(full_path)), chassis_executor_()
+    HopTree(const std::string &proto_file_path) : blackboard_ptr_(std::make_shared<Blackboard>(full_path)), chassis_executor_(std::make_shared<ChassisExecutor>())
     {
     }
 
 protected:
-    Blackboard blackboard_;
-    roborts_decision::ChassisExecutor chassis_executor_;
+    const Blackboard::Ptr blackboard_ptr_;
+    const ChassisExecutor::Ptr chassis_executor_;
 };
+} // namespace roborts_decision
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "behavior_test_node");
     std::string full_path = ros::package::getPath("roborts_decision") + "/config/decision.prototxt";
 
-    auto chassis_executor = new roborts_decision::ChassisExecutor;
+    auto chassis_executor = new roborts_decision::ChassisExecutor();
     auto blackboard = new roborts_decision::Blackboard(full_path);
 
     roborts_decision::BackBootAreaAction back_boot_area_action(chassis_executor, blackboard);

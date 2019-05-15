@@ -52,18 +52,40 @@ namespace roborts_decision
 class RefereeSystemInfo
 {
 public:
-  roborts_msgs::GameStatus game_status;
-  roborts_msgs::GameResult game_result;
-  roborts_msgs::GameSurvivor game_survivor;
-  roborts_msgs::BonusStatus bonus_status;
-  roborts_msgs::SupplierStatus supplier_status;
-  roborts_msgs::RobotStatus robot_status;
-  roborts_msgs::RobotHeat robot_heat;
-  roborts_msgs::RobotBonus robot_bonus;
-  roborts_msgs::RobotDamage robot_damage;
-  roborts_msgs::RobotShoot robot_shoot;
-  RefereeSystemInfo()
+  roborts_msgs::GameStatusPtr game_status;
+  roborts_msgs::GameResultPtr game_result;
+  roborts_msgs::GameSurvivorPtr game_survivor;
+  roborts_msgs::BonusStatusPtr bonus_status;
+  roborts_msgs::SupplierStatusPtr supplier_status;
+  roborts_msgs::RobotStatusPtr robot_status;
+  roborts_msgs::RobotHeatPtr robot_heat;
+  roborts_msgs::RobotBonusPtr robot_bonus;
+  roborts_msgs::RobotDamagePtr robot_damage;
+  roborts_msgs::RobotShootPtr robot_shoot;
+  RefereeSystemInfo() : game_status(boost::make_shared<roborts_msgs::GameStatus>()),
+                        game_result(boost::make_shared<roborts_msgs::GameResult>()),
+                        game_survivor(boost::make_shared<roborts_msgs::GameSurvivor>()),
+                        bonus_status(boost::make_shared<roborts_msgs::BonusStatus>()),
+                        supplier_status(boost::make_shared<roborts_msgs::SupplierStatus>()),
+                        robot_status(boost::make_shared<roborts_msgs::RobotStatus>()),
+                        robot_heat(boost::make_shared<roborts_msgs::RobotHeat>()),
+                        robot_bonus(boost::make_shared<roborts_msgs::RobotBonus>()),
+                        robot_damage(boost::make_shared<roborts_msgs::RobotDamage>()),
+                        robot_shoot(boost::make_shared<roborts_msgs::RobotShoot>())
   {
+  }
+  ~RefereeSystemInfo()
+  {
+    game_status.reset();
+    game_result.reset();
+    game_survivor.reset();
+    bonus_status.reset();
+    supplier_status.reset();
+    robot_status.reset();
+    robot_heat.reset();
+    robot_bonus.reset();
+    robot_damage.reset();
+    robot_shoot.reset();
   }
 };
 
@@ -71,6 +93,7 @@ class Blackboard
 {
 public:
   typedef std::shared_ptr<Blackboard> Ptr;
+  typedef std::shared_ptr<Blackboard coonst> ConstPtr;
   typedef roborts_costmap::CostmapInterface CostMap;
   typedef roborts_costmap::Costmap2D CostMap2D;
   // config
@@ -164,49 +187,49 @@ public:
 
   void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, std::string id)
   {
-    referee_info[id]->game_status = *data;
+    referee_info[id]->game_status.reset(data);
   }
 
   void GameResultCallback(const roborts_msgs::GameResultConstPtr &data, std::string id)
   {
-    referee_info[id]->game_result = *data;
+    referee_info[id]->game_result.reset(data);
   }
   void GameSurvivorCallback(const roborts_msgs::GameSurvivorConstPtr &data, std::string id)
   {
-    referee_info[id]->game_survivor = *data;
+    referee_info[id]->game_survivor.reset(data);
   }
   void BonusStatusCallback(const roborts_msgs::BonusStatusConstPtr &data, std::string id)
   {
-    referee_info[id]->bonus_status = *data;
+    referee_info[id]->bonus_status.reset(data);
   }
   void SupplierStatusCallback(const roborts_msgs::SupplierStatusConstPtr &data, std::string id)
   {
-    referee_info[id]->supplier_status = *data;
+    referee_info[id]->supplier_status.reset(data);
   }
   void RobotHeatCallback(const roborts_msgs::RobotHeatConstPtr &data, std::string id)
   {
-    referee_info[id]->robot_heat = *data;
+    referee_info[id]->robot_heat.reset(data);
   }
   void RobotBonusCallback(const roborts_msgs::RobotBonusConstPtr &data, std::string id)
   {
-    referee_info[id]->robot_bonus = *data;
+    referee_info[id]->robot_bonus.reset(data);
   }
   void RobotStatusCallback(const roborts_msgs::RobotStatusConstPtr &data, std::string id)
   {
-    referee_info[id]->robot_status = *data;
+    referee_info[id]->robot_status.reset(data);
   }
   void RobotDamageCallback(const roborts_msgs::RobotDamageConstPtr &data, std::string id)
   {
-    referee_info[id]->robot_damage = *data;
+    referee_info[id]->robot_damage.reset(data);
   }
   void RobotShootCallback(const roborts_msgs::RobotShootConstPtr &data, std::string id)
   {
-    referee_info[id]->robot_shoot = *data;
+    referee_info[id]->robot_shoot.reset(data);
   }
 
   int GetHP(std::string robot_name)
   {
-    return referee_info[robot_name]->robot_status.remain_hp;
+    return referee_info[robot_name]->robot_status->remain_hp;
   }
 
   // Enemy

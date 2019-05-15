@@ -15,9 +15,9 @@ namespace roborts_decision
 class PatrolAction : public ActionNode
 {
 public:
-  PatrolAction(ChassisExecutor *&chassis_executor,
-               Blackboard *&blackboard, ) : ActionNode("patrol_act", blackboard), chassis_executor_(chassis_executor),
-                                            blackboard_(blackboard)
+  PatrolAction(ChassisExecutor::Ptr &chassis_executor,
+               Blackboard::Ptr &blackboard, ) : ActionNode("patrol_act", blackboard), chassis_executor_(chassis_executor),
+                                                blackboard_(blackboard)
   {
   }
 

@@ -15,7 +15,7 @@ namespace roborts_decision
 class ChaseAction : public ActionNode
 {
 public:
-	ChaseAction(ChassisExecutor *&chassis_executor,
+	ChaseAction(ChassisExecutor::Ptr &chassis_executor,
 				Blackboard::Ptr &blackboard) : ActionNode("chase_action", blackboard),
 											   chassis_executor_(chassis_executor)
 	{

@@ -16,7 +16,7 @@ namespace roborts_decision:
   class EscapeAction : public ActionNode
   {
   public:
-    EscapeAction(ChassisExecutor *&chassis_executor,
+    EscapeAction(ChassisExecutor::Ptr &chassis_executor,
                  Blackboard::Ptr &blackboard,
                  const std::string &proto_file_path) : ActionNode("escape_act", blackboard) chassis_executor_(chassis_executor)
     {

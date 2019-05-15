@@ -23,6 +23,7 @@ class ChassisExecutor
 
 public:
   typedef std::shared_ptr<ChassisExecutor> Ptr;
+  typedef std::shared_ptr<ChassisExecutor const> ConstPtr;
   /**
    * @brief Chassis execution mode for different tasks
    */

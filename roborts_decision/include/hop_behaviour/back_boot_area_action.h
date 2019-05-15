@@ -12,7 +12,7 @@ namespace roborts_decision
 class BackBootAreaAction : public ActionNode
 {
 public:
-    BackBootAreaAction(ChassisExecutor *&chassis_executor,
+    BackBootAreaAction(ChassisExecutor::Ptr &chassis_executor,
                        const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_actionC", blackboard),
                                                             chassis_executor_(chassis_executor)
 

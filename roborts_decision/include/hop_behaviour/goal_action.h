@@ -14,7 +14,7 @@ namespace roborts_decision
 class GoalAction : public ActionNode
 {
 public:
-  GoalAction(ChassisExecutor *&chassis_executor,
+  GoalAction(ChassisExecutor::Ptr &chassis_executor,
              Blackboard::Ptr &blackboard) : ActionNode("goal_action", blackboard),
                                             chassis_executor_(chassis_executor) {}
 

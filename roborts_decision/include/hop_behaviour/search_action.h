@@ -15,8 +15,8 @@ namespace roborts_decision
 class SearchAction : public ActionNode
 {
 public:
-  SearchAction(ChassisExecutor *&chassis_executor,
-               Blackboard *&blackboard) : ActionNode("search_act", blackboard), chassis_executor_(chassis_executor)
+  SearchAction(ChassisExecutor::Ptr &chassis_executor,
+               Blackboard::Ptr &blackboard) : ActionNode("search_act", blackboard), chassis_executor_(chassis_executor)
   {
   }
 
