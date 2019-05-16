@@ -41,7 +41,7 @@ public:
     return BehaviorState::RUNNING;
   }
 
-  ~GoalBehavior() = default;
+  ~GoalAction() = default;
 
 private:
   //! executor

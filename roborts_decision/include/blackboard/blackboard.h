@@ -121,22 +121,6 @@ public:
 
   void RefereeSubscribe(std::string robot_name)
   {
-    // std::vector<std::string> referee_topic_names = {
-    //     "game_status",
-    //     "game_result",
-    //     "game_survivor",
-    //     "field_bonus_status",
-    //     "field_supplier_status",
-    //     "robot_status",
-    //     "robot_heat",
-    //     "robot_bonus",
-    //     "robot_damage",
-    //     "robot_shoot"};
-
-    // for (auto topic_name : referee_topic_names)
-    // {
-    //   ros::Subscriber sub = nh.subscribe<topic_tools::ShapeShifter>("/" + robot_name + "/" + topic_name, 100, boost::bind(&Blackboard::RefereeCallback, this, _1, topic_name, robot_name));
-    // }
     ROS_INFO("Initializing blackboard subscriber to referee msg");
     if (robot_name == "master")
     {
@@ -197,6 +181,11 @@ public:
     return decision_config.master();
   }
 
+  bool IsWing()
+  {
+    return !decision_config.master();
+  }
+
   bool IsBlue()
   {
     switch (referee_info["master"]->robot_status.id)
@@ -224,6 +213,11 @@ public:
     default:
       ROS_ERROR("For AI challenge, please set robot id to Blue3/4 or Red3/4 in the referee system main control module");
     }
+  }
+
+  bool IsRed()
+  {
+    return !IsBlue();
   }
 
   void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, const std::string id)

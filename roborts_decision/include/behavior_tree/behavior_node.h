@@ -387,7 +387,10 @@ protected:
    * @brief Reevaluate the precondition every tick according to abort type
    * @return True if reevaluation passes
    */
-  virtual bool Reevaluation();
+  virtual bool Reevaluation()
+  {
+    return Precondition();
+  }
   //! the determined function of the precondition node
   std::function<bool()> precondition_function_;
   //! the abort type of the precondition node

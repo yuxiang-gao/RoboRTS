@@ -74,7 +74,7 @@ public:
     return chassis_executor_->Update();
   }
 
-  ~PatrolBehavior() = default;
+  ~PatrolAction() = default;
 
 private:
   //! executor

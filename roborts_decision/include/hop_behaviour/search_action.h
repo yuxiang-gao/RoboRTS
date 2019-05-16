@@ -184,7 +184,7 @@ public:
     search_count_ = 5;
   }
 
-  ~SearchBehavior() = default;
+  ~SearchAction() = default;
 
 private:
   //! executor

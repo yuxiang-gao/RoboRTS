@@ -168,7 +168,7 @@ namespace roborts_decision:
       chassis_executor_->Cancel();
     }
 
-    ~EscapeBehavior()
+    ~EscapeAction()
     {
     }
 

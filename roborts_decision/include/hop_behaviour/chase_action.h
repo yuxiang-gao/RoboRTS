@@ -165,7 +165,7 @@ public:
 		chase_goal_ = chase_goal;
 	}
 
-	~ChaseBehavior() = default;
+	~ChaseAction() = default;
 
 private:
 	//! executor

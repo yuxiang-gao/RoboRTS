@@ -48,14 +48,12 @@ public:
     DTPreconditions(ChassisExecutor::Ptr &chasis_executor, Blackboard::Ptr &blackboard) : chasis_executor_(chasis_executor),
                                                                                           blackboard_(blackboard)
     {
-        }
+    }
     ~DTPreconditions() = default;
 
 private:
     ChassisExecutor::ConstPtr chasis_executor_;
     Blackboard::ConstPtr blackboard_;
-    bool is_master;
-    bool is_blue;
 };
 } // namespace roborts_decision
 
@@ -74,13 +72,15 @@ int main(int argc, char **argv)
     roborts_decision::PatrolAction patrol_action(chassis_executor, blackboard);
     roborts_decision::GoalAction goal_action(chassis_executor, blackboard);
 
-    SelectorNode root_node("root_node", blackboard);
-    root_node.SetLevel(0);
-    root_node.SetParent(NULL);
-    PreconditionNode game_start("start", precondition_function = gameStart());
-    SequenceNode sq_1("sq_1", blackboard);
-    game_start.AddChildren(sq_1);
-    sq_1.AddChildren({std::make_shared<BackBootAreaAction>(chassis_executor, blackboard)});
+    // SelectorNode root_node("root_node", blackboard);
+    // root_node.SetLevel(0);
+    // root_node.SetParent(NULL);
+    // PreconditionNode game_start("start", precondition_function = gameStart());
+    // SequenceNode sq_1("sq_1", blackboard);
+    // game_start.AddChildren(sq_1);
+    // sq_1.AddChildren({std::make_shared<BackBootAreaAction>(chassis_executor, blackboard)});
+
+    PreconditionNode cond_enemy_detect("cond_enemy_detect", blackboard, blackboard->IsEnemyDetected(), AbortType::SELF);
 
     return 0;
 }

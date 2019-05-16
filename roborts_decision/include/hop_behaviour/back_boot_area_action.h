@@ -65,7 +65,7 @@ public:
         chassis_executor_->Cancel();
     }
 
-    ~BackBootAreaBehavior() = default;
+    ~BackBootAreaAction() = default;
 
 private:
     //! executor
