@@ -100,6 +100,8 @@ public:
   roborts_decision::DecisionConfig decision_config;
   // dictionary, used to store referee info for each robot
   std::map<std::string /*robot_name*/, boost::shared_ptr<RefereeSystemInfo>> referee_info;
+  bool is_master;
+  bool is_blue;
   // RefereeSystemInfo wing_status;
   // RefereeSystemInfo master_status;
   explicit Blackboard(const std::string &proto_file_path) : enemy_detected_(false),
@@ -122,11 +124,38 @@ public:
 
     roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config);
 
+    is_master = decision_config.master();
     // referee system
     referee_info["master"] = boost::make_shared<RefereeSystemInfo>();
     referee_info["wing"] = boost::make_shared<RefereeSystemInfo>();
     RefereeSubscribe("master");
     RefereeSubscribe("wing");
+
+    switch (referee_info["master"]->robot_status.id)
+    {
+    case 3:
+      ROS_INFO("Team: BLUE, Master Robot");
+      // is_master = true;
+      is_blue = true;
+      break;
+    case 4:
+      ROS_INFO("Team: BLUE, Master Robot");
+      // is_master = false;
+      is_blue = true;
+      break;
+    case 13:
+      ROS_INFO("Team: BLUE, Master Robot");
+      // is_master = true;
+      is_blue = false;
+      break;
+    case 14:
+      ROS_INFO("Team: BLUE, Master Robot");
+      // is_master = false;
+      is_blue = false;
+      break;
+    default:
+      ROS_ERROR("For AI challenge, please set robot id to Blue3/4 or Red3/4 in the referee system main control module")
+    }
 
     if (!decision_config.simulate())
     {
