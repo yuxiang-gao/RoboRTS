@@ -100,8 +100,7 @@ public:
   roborts_decision::DecisionConfig decision_config;
   // dictionary, used to store referee info for each robot
   std::map<std::string /*robot_name*/, boost::shared_ptr<RefereeSystemInfo>> referee_info;
-  bool is_master;
-  bool is_blue;
+
   // RefereeSystemInfo wing_status;
   // RefereeSystemInfo master_status;
   explicit Blackboard(const std::string &proto_file_path) : enemy_detected_(false),
@@ -124,38 +123,13 @@ public:
 
     roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config);
 
-    is_master = decision_config.master();
+    // is_master = decision_config.master();
     // referee system
     referee_info["master"] = boost::make_shared<RefereeSystemInfo>();
     referee_info["wing"] = boost::make_shared<RefereeSystemInfo>();
     RefereeSubscribe("master");
     RefereeSubscribe("wing");
-
-    switch (referee_info["master"]->robot_status.id)
-    {
-    case 3:
-      ROS_INFO("Team: BLUE, Master Robot");
-      // is_master = true;
-      is_blue = true;
-      break;
-    case 4:
-      ROS_INFO("Team: BLUE, Master Robot");
-      // is_master = false;
-      is_blue = true;
-      break;
-    case 13:
-      ROS_INFO("Team: BLUE, Master Robot");
-      // is_master = true;
-      is_blue = false;
-      break;
-    case 14:
-      ROS_INFO("Team: BLUE, Master Robot");
-      // is_master = false;
-      is_blue = false;
-      break;
-    default:
-      ROS_ERROR("For AI challenge, please set robot id to Blue3/4 or Red3/4 in the referee system main control module")
-    }
+    IsBlue();
 
     if (!decision_config.simulate())
     {
@@ -239,6 +213,44 @@ public:
   ~Blackboard() = default;
 
   // referee
+  int GetHP(std::string robot_name)
+  {
+    return referee_info[robot_name]->robot_status->remain_hp;
+  }
+
+  bool IsMaster()
+  {
+    return decision_config.master();
+  }
+
+  bool IsBlue()
+  {
+    switch (referee_info["master"]->robot_status.id)
+    {
+    case 3:
+      ROS_DEBUG("Team: BLUE, Master Robot");
+      // is_master = true;
+      return true;
+      break;
+    case 4:
+      ROS_DEBUG("Team: BLUE, Master Robot");
+      // is_master = false;
+      return true;
+      break;
+    case 13:
+      ROS_DEBUG("Team: BLUE, Master Robot");
+      // is_master = true;
+      return false;
+      break;
+    case 14:
+      ROS_DEBUG("Team: BLUE, Master Robot");
+      // is_master = false;
+      return false;
+      break;
+    default:
+      ROS_ERROR("For AI challenge, please set robot id to Blue3/4 or Red3/4 in the referee system main control module")
+    }
+  }
 
   void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, const std::string id)
   {
@@ -280,11 +292,6 @@ public:
   void RobotShootCallback(const roborts_msgs::RobotShootConstPtr &data, const std::string id)
   {
     referee_info[id]->robot_shoot.reset(data);
-  }
-
-  int GetHP(std::string robot_name)
-  {
-    return referee_info[robot_name]->robot_status->remain_hp;
   }
 
   // Enemy
@@ -436,6 +443,7 @@ private:
   ros::Subscriber robot_bonus_wing_sub_;
   ros::Subscriber robot_damage_wing_sub_;
   ros::Subscriber robot_shoot_wing_sub_;
+  bool is_blue;
   void UpdateRobotPose()
   {
     tf::Stamped<tf::Pose> robot_tf_pose;
