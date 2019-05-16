@@ -1,5 +1,6 @@
 #include <ros/ros.h>
-
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include "behaviour_tree/behaviour_tree.h"
 #include "executor/chassis_executor.h"
 #include "blackboard/blackboard.h"
@@ -16,13 +17,13 @@ namespace roborts_decision
 class HopTree
 {
 public:
-    HopTree(const std::string &proto_file_path) : blackboard_ptr_(std::make_shared<Blackboard>(full_path)), chassis_executor_(std::make_shared<ChassisExecutor>())
+    HopTree(const std::string &proto_file_path) : blackboard_ptr_(boost::make_shared<Blackboard>(full_path)), chassis_executor_(boost::make_shared<ChassisExecutor>())
     {
     }
 
 protected:
-    const Blackboard::Ptr blackboard_ptr_;
-    const ChassisExecutor::Ptr chassis_executor_;
+    Blackboard::ConstPtr blackboard_ptr_;
+    ChassisExecutor::ConstPtr chassis_executor_;
 };
 } // namespace roborts_decision
 

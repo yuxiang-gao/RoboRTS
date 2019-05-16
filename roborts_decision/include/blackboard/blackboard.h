@@ -160,69 +160,95 @@ public:
     // {
     //   ros::Subscriber sub = nh.subscribe<topic_tools::ShapeShifter>("/" + robot_name + "/" + topic_name, 100, boost::bind(&Blackboard::RefereeCallback, this, _1, topic_name, robot_name));
     // }
-    nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
+    ROS_INFO("Initializing blackboard subscriber to referee msg")
+    if (robot_name == "master")
+    {
+      game_status_master_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
+      game_result_master_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
+      game_survivor_master_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
+      bonus_status_master_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
+      supplier_status_master_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
+      robot_heat_master_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
+      robot_bonus_master_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
+      robot_status_master_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
+      robot_damage_master_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
 
-    nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
+      robot_shoot_master_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
+    }
+    else
+    {
+      game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
+
+      game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
+
+      game_survivor_wing_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
+
+      bonus_status_wing_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
+
+      supplier_status_wing_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
+
+      robot_heat_wing_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
+
+      robot_bonus_wing_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
+
+      robot_status_wing_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
+
+      robot_damage_wing_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
+
+      robot_shoot_wing_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
+    }
   }
 
   ~Blackboard() = default;
 
   // referee
 
-  void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, std::string id)
+  void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, const std::string id)
   {
     referee_info[id]->game_status.reset(data);
   }
 
-  void GameResultCallback(const roborts_msgs::GameResultConstPtr &data, std::string id)
+  void GameResultCallback(const roborts_msgs::GameResultConstPtr &data, const std::string id)
   {
     referee_info[id]->game_result.reset(data);
   }
-  void GameSurvivorCallback(const roborts_msgs::GameSurvivorConstPtr &data, std::string id)
+  void GameSurvivorCallback(const roborts_msgs::GameSurvivorConstPtr &data, const std::string id)
   {
     referee_info[id]->game_survivor.reset(data);
   }
-  void BonusStatusCallback(const roborts_msgs::BonusStatusConstPtr &data, std::string id)
+  void BonusStatusCallback(const roborts_msgs::BonusStatusConstPtr &data, const std::string id)
   {
     referee_info[id]->bonus_status.reset(data);
   }
-  void SupplierStatusCallback(const roborts_msgs::SupplierStatusConstPtr &data, std::string id)
+  void SupplierStatusCallback(const roborts_msgs::SupplierStatusConstPtr &data, const std::string id)
   {
     referee_info[id]->supplier_status.reset(data);
   }
-  void RobotHeatCallback(const roborts_msgs::RobotHeatConstPtr &data, std::string id)
+  void RobotHeatCallback(const roborts_msgs::RobotHeatConstPtr &data, const std::string id)
   {
     referee_info[id]->robot_heat.reset(data);
   }
-  void RobotBonusCallback(const roborts_msgs::RobotBonusConstPtr &data, std::string id)
+  void RobotBonusCallback(const roborts_msgs::RobotBonusConstPtr &data, const std::string id)
   {
     referee_info[id]->robot_bonus.reset(data);
   }
-  void RobotStatusCallback(const roborts_msgs::RobotStatusConstPtr &data, std::string id)
+  void RobotStatusCallback(const roborts_msgs::RobotStatusConstPtr &data, const std::string id)
   {
     referee_info[id]->robot_status.reset(data);
   }
-  void RobotDamageCallback(const roborts_msgs::RobotDamageConstPtr &data, std::string id)
+  void RobotDamageCallback(const roborts_msgs::RobotDamageConstPtr &data, const std::string id)
   {
     referee_info[id]->robot_damage.reset(data);
   }
-  void RobotShootCallback(const roborts_msgs::RobotShootConstPtr &data, std::string id)
+  void RobotShootCallback(const roborts_msgs::RobotShootConstPtr &data, const std::string id)
   {
     referee_info[id]->robot_shoot.reset(data);
   }
@@ -361,6 +387,26 @@ public:
 
 private:
   ros::NodeHandle nh_;
+  ros::Subscriber game_status_master_sub_;
+  ros::Subscriber game_result_master_sub_;
+  ros::Subscriber game_survivor_master_sub_;
+  ros::Subscriber bonus_status_master_sub_;
+  ros::Subscriber supplier_status_master_sub_;
+  ros::Subscriber robot_status_master_sub_;
+  ros::Subscriber robot_heat_master_sub_;
+  ros::Subscriber robot_bonus_master_sub_;
+  ros::Subscriber robot_damage_master_sub_;
+  ros::Subscriber robot_shoot_master_sub_;
+  ros::Subscriber game_status_wing_sub_;
+  ros::Subscriber game_result_wing_sub_;
+  ros::Subscriber game_survivor_wing_sub_;
+  ros::Subscriber bonus_status_wing_sub_;
+  ros::Subscriber supplier_status_wing_sub_;
+  ros::Subscriber robot_status_wing_sub_;
+  ros::Subscriber robot_heat_wing_sub_;
+  ros::Subscriber robot_bonus_wing_sub_;
+  ros::Subscriber robot_damage_wing_sub_;
+  ros::Subscriber robot_shoot_wing_sub_;
   void UpdateRobotPose()
   {
     tf::Stamped<tf::Pose> robot_tf_pose;
