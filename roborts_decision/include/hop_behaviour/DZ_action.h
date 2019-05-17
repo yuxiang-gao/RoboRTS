@@ -12,7 +12,7 @@
 
 namespace roborts_decision
 {
-class GoalAction : public ActionNode
+class DZAction : public ActionNode
 {
 public:
   GoalAction(ChassisExecutor::Ptr &chassis_executor,
