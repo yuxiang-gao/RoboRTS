@@ -452,6 +452,7 @@ private:
   ros::Subscriber robot_bonus_wing_sub_;
   ros::Subscriber robot_damage_wing_sub_;
   ros::Subscriber robot_shoot_wing_sub_;
+  ros::Publisher ros_robot_supply_pub_ ;
   bool is_blue;
   void UpdateRobotPose()
   {
