@@ -332,6 +332,20 @@ public:
   {
     return goal_;
   }
+  geometry_msgs::PoseStamped GetReloadGoal() const
+  {
+    reload_goal_.header.frame_id = "map";
+	reload_goal_.pose.orientation.x = 0;
+	reload_goal_.pose.orientation.y = 0;
+	reload_goal_.pose.orientation.z = 0;
+	reload_goal_.pose.orientation.w = 1;
+
+	reload_goal_.pose.position.x = 0;
+	reload_goal_.pose.position.y = 0;
+	reload_goal_.pose.position.z = 0;
+
+    return reload_goal_;
+  }
 
   bool IsNewGoal()
   {
@@ -438,6 +452,7 @@ private:
 
   //! Goal info
   geometry_msgs::PoseStamped goal_;
+  geometry_msgs::PoseStamped reload_goal_;
   bool new_goal_;
 
   //! Enemy info
