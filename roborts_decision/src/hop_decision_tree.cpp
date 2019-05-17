@@ -137,7 +137,7 @@ int main(int argc, char **argv)
     roborts_decision::EscapeAction escape_action(chassis_executor, blackboard);
     roborts_decision::PatrolAction patrol_action(chassis_executor, blackboard);
     roborts_decision::GoalAction goal_action(chassis_executor, blackboard);
-    roborts_decision::ReloadAction reload_action("robot_1", chassis_executor, blackboard)
+    roborts_decision::ReloadAction reload_action("robot_0", chassis_executor, blackboard)
     roborts_decision::DZAction DZ_action(chassis_executor, blackboard)
 
     // SelectorNode root_node("root_node", blackboard);
