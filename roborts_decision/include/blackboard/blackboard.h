@@ -118,7 +118,12 @@ public:
                                                  boost::bind(&Blackboard::ArmorDetectionFeedbackCallback, this, _1));
     }
   }
-
+  
+  void RefreePublishSupply(rstd::string robot_name)
+  {
+    ros_robot_supply_pub_ = ros_nh_.advertise<roborts_msgs::RobotStatus>("/" + robot_name + "/projectile_supply");
+    ros_robot_supply_pub_.pub(true)
+}
   void RefereeSubscribe(std::string robot_name)
   {
     ROS_INFO("Initializing blackboard subscriber to referee msg");
