@@ -1,0 +1,9 @@
+<launch>
+
+    <!-- Get expected scans -->
+    <node pkg="expected_scan_generator" type="expected_scan_generator" name="expected_scan_generator" />
+
+    <!-- Detect objects -->
+    <node pkg="novel_lidar_detection" type="novel_lidar_detection" name="novel_lidar_detector" />
+
+</launch>

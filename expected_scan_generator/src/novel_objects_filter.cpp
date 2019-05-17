@@ -100,7 +100,7 @@ public:
             spose_out.header.stamp = cb_time;
 
             try{
-                listener_.waitForTransform(fixed_frame, "/base_scan",msg->header.stamp, ros::Duration(3.0));
+                listener_.waitForTransform(fixed_frame, "/base_laser_link",msg->header.stamp, ros::Duration(3.0));
                 listener_.transformPose(fixed_frame, spose, spose_out);
             }
             catch (tf::TransformException &ex) {
