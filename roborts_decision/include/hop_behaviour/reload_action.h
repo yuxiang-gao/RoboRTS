@@ -1,6 +1,6 @@
 #ifndef ROBORTS_DECISION_RELOAD_ACTION_H
 #define ROBORTS_DECISION_RELOAD_ACTION_H
-
+#include <chrono>
 #include "io/io.h"
 #include <ros/ros.h>
 
@@ -49,6 +49,14 @@ public:
       }*/
         chassis_executor_->Execute(blackboard_->GetReloadGoal());
         blackboard->RefreePublishSupply(robot_name_)
+        std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+        std::chrono::duration<double> diff = end_time-start_time;
+        while (diff <= 7)
+        {
+            std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end-start;
+        }
         return BehaviourState::SUCCESS;
     }
     return BehaviorState::RUNNING;
