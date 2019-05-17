@@ -62,8 +62,8 @@ private:
   //! perception information
   Blackboard *const blackboard_;
 
-  //! planning goal
-  geometry_msgs::PoseStamped planning_goal_;
+  //! reload goal
+  geometry_msgs::PoseStamped reload_goal_;
 };
 } // namespace roborts_decision
 
