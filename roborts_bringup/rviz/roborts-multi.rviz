@@ -8,25 +8,16 @@ Panels:
         - /Status1
         - /LaserScan1
         - /Map1
-        - /Map1/Status1
         - /Map2
         - /Path1
         - /Path2
         - /LaserScan2
-        - /LaserScan2/Status1
         - /Map3
         - /Path3
         - /Path4
         - /TF1
-        - /TF1/Status1
         - /TF1/Frames1
         - /TF1/Tree1
-        - /TF1/Tree1/robot_0/odom1
-        - /TF1/Tree1/robot_0/odom1/robot_0/base_footprint1
-        - /TF1/Tree1/robot_0/odom1/robot_0/base_footprint1/robot_0/base_link1
-        - /TF1/Tree1/robot_1/odom1
-        - /TF1/Tree1/robot_1/odom1/robot_1/base_footprint1
-        - /TF1/Tree1/robot_1/odom1/robot_1/base_footprint1/robot_1/base_link1
       Splitter Ratio: 0.5
     Tree Height: 663
   - Class: rviz/Selection
@@ -266,11 +257,6 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        robot_0/odom:
-          robot_0/base_footprint:
-            robot_0/base_link:
-              robot_0/base_laser_link:
-                {}
         robot_1/odom:
           robot_1/base_footprint:
             robot_1/base_link:
@@ -282,7 +268,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: robot_1/odom
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:

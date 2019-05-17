@@ -33,7 +33,7 @@ bool LocalizationNode::Init() {
   odom_frame_   = std::move(localization_config.odom_frame_id);
   global_frame_ = std::move(localization_config.global_frame_id);
   base_frame_   = std::move(localization_config.base_frame_id);
-
+LOG_INFO << "baseframe: " <<  localization_config.base_frame_id; 
   laser_topic_ = std::move(localization_config.laser_topic_name);
 
   init_pose_ = {localization_config.initial_pose_x,
@@ -66,10 +66,11 @@ bool LocalizationNode::Init() {
   amcl_ptr_= std::make_unique<Amcl>();
   amcl_ptr_->GetParamFromRos(&nh_);
   amcl_ptr_->Init(init_pose_, init_cov_);
-
+LOG_INFO << "loc init1";
   map_init_ = GetStaticMap();
+  LOG_INFO << "loc init2";
   laser_init_ = GetLaserPose();
-
+LOG_INFO << "loc init";
   return map_init_&&laser_init_;
 }
 

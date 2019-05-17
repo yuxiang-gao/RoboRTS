@@ -54,6 +54,7 @@ class GLogWrapper {
   GLogWrapper(char *program) {
     google::InitGoogleLogging(program);
     FLAGS_stderrthreshold = google::WARNING;
+    FLAGS_logtostderr = true;
     FLAGS_colorlogtostderr = true;
     FLAGS_v = 3;
     google::InstallFailureSignalHandler();
