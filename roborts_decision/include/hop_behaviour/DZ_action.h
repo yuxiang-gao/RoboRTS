@@ -3,6 +3,7 @@
 
 #include "io/io.h"
 #include <ros/ros.h>
+#include <chrono>
 
 #include "executor/chassis_executor.h"
 #include "behaviour_tree/behaviour_tree.h"
@@ -48,6 +49,14 @@ public:
         return BehaviourState::SUCCESS;
       }*/
         chassis_executor_->Execute(blackboard_->GetDZGoal());
+        std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+        std::chrono::duration<double> diff = end_time-start_time;
+        while (diff <= 7)
+        {
+            std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> diff = end-start;
+        }
         return BehaviourState::SUCCESS;
     }
     return BehaviorState::RUNNING;
