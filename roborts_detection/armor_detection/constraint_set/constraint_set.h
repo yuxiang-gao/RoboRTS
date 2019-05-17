@@ -57,7 +57,7 @@ struct LightInfo {
       width_  = (float)std::sqrt(edge_1);
       height_ = (float)std::sqrt(edge_2);
 
-      if (vertices[0].y < vertices[1].y) {
+      if (vertices[0].y < vertices[1].y) { // DJI: <
         angle_ = std::atan2(vertices[1].y - vertices[0].y, vertices[1].x - vertices[0].x);
       } else {
         angle_ = std::atan2(vertices[0].y - vertices[1].y, vertices[0].x - vertices[1].x);
@@ -67,7 +67,7 @@ struct LightInfo {
       width_  = (float)std::sqrt(edge_2);
       height_ = (float)std::sqrt(edge_1);
 
-      if (vertices[2].y < vertices[1].y) {
+      if (vertices[2].y < vertices[1].y) { // DJI: <
         angle_ = std::atan2(vertices[1].y - vertices[2].y, vertices[1].x - vertices[2].x);
       } else {
         angle_ = std::atan2(vertices[2].y - vertices[1].y, vertices[2].x - vertices[1].x);
