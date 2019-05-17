@@ -346,6 +346,28 @@ public:
 
     return reload_goal_;
   }
+  
+  geometry_msgs::PoseStamped GetDZGoal() const
+  {
+    DZ_goal_.header.frame_id = "map";
+    /*
+    tf::Quaternion quaternion = tf::createQuaternionFromRPY(0,0,0); // roll, pitch , yaw
+    DZ_goal_.pose.orientation.x = quaternion.x();
+	Dz_goal_.pose.orientation.y = quaternion.y();
+	Dz_goal_.pose.orientation.z = quaternion.z();
+	DZ_goal_.pose.orientation.w = quaternion.w();
+*/
+	DZ_goal_.pose.orientation.x = 0;
+	Dz_goal_.pose.orientation.y = 0;
+	Dz_goal_.pose.orientation.z = 0;
+	DZ_goal_.pose.orientation.w = 1;
+
+	DZ_goal_.pose.position.x = 0;
+	DZ_goal_.pose.position.y = 0;
+	DZ_goal_.pose.position.z = 0;
+
+    return DZ_goal_;
+  }
 
   bool IsNewGoal()
   {
@@ -453,6 +475,7 @@ private:
   //! Goal info
   geometry_msgs::PoseStamped goal_;
   geometry_msgs::PoseStamped reload_goal_;
+  geometry_msgs::PoseStamped DZ_goal_;
   bool new_goal_;
 
   //! Enemy info
