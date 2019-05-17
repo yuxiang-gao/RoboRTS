@@ -14,8 +14,8 @@ namespace roborts_decision
 class GoalAction : public ActionNode
 {
 public:
-  GoalAction(ChassisExecutor::Ptr &chassis_executor,
-             Blackboard::Ptr &blackboard) : ActionNode("goal_action", blackboard),
+  ReloadAction(std::string robot_name,ChassisExecutor::Ptr &chassis_executor,
+             Blackboard::Ptr &blackboard) : ActionNode("reload_action", blackboard),
                                             chassis_executor_(chassis_executor) {}
 
     void OnInitialize()
@@ -48,6 +48,7 @@ public:
         return BehaviourState::SUCCESS;
       }*/
         chassis_executor_->Execute(blackboard_->GetReloadGoal());
+        blackboard->RefreePublishSupply(robot_name_)
         return BehaviourState::SUCCESS;
     }
     return BehaviorState::RUNNING;
@@ -61,6 +62,7 @@ private:
 
   //! perception information
   Blackboard *const blackboard_;
+  std::string robot_name_;
 
   //! reload goal
   geometry_msgs::PoseStamped reload_goal_;
