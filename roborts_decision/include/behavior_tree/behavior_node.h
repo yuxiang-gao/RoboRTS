@@ -389,7 +389,7 @@ protected:
    */
   virtual bool Reevaluation()
   {
-    return Precondition();
+    return Precondition(&blackboard_ptr_);
   }
   //! the determined function of the precondition node
   std::function<bool()> precondition_function_;
