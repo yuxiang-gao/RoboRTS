@@ -15,7 +15,7 @@ class GoalAction : public ActionNode
 {
 public:
   GoalAction(ChassisExecutor::Ptr &chassis_executor,
-             Blackboard::Ptr &blackboard) : ActionNode("goal_action", blackboard),
+             Blackboard::Ptr &blackboard) : ActionNode("DZ_action", blackboard),
                                             chassis_executor_(chassis_executor) {}
 
     void OnInitialize()
