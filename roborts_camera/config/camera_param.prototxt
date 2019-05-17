@@ -31,11 +31,11 @@ camera: {
     height_offset: 0
   }
 
-  fps: 100
+  fps: 45
   auto_exposure: 0
-  exposure_value: 5
-  exposure_time: 5
-  auto_white_balance: 1
+  exposure_value: 3
+  exposure_time: 3
+  auto_white_balance: 0
   auto_gain: 0
   contrast: 20
   flip: 1
