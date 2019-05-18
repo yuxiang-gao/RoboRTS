@@ -60,8 +60,8 @@ public:
     FLAGS_colorlogtostderr = true;
     FLAGS_v = 3;
 
-    FLAGS_logtostderr = true;
-    FLAGS_minloglevel = 0;
+    // FLAGS_logtostderr = true;
+    // FLAGS_minloglevel = 0;
     google::InstallFailureSignalHandler();
   }
 
