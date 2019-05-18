@@ -27,17 +27,18 @@
 //#define DLOG_ERROR std::cout
 
 // GLog Wrapper
-namespace roborts_localization {
+namespace roborts_localization
+{
 
 #define LOG_INFO LOG(INFO)
 #define LOG_WARNING LOG(WARNING)
 #define LOG_ERROR LOG(ERROR)
 #define LOG_FATAL LOG(FATAL)
 
-#define LOG_INFO_IF(condition) LOG_IF(INFO,condition)
-#define LOG_WARNING_IF(condition) LOG_IF(WARNING,condition)
-#define LOG_ERROR_IF(condition) LOG_IF(ERROR,condition)
-#define LOG_FATAL_IF(condition) LOG_IF(FATAL,condition)
+#define LOG_INFO_IF(condition) LOG_IF(INFO, condition)
+#define LOG_WARNING_IF(condition) LOG_IF(WARNING, condition)
+#define LOG_ERROR_IF(condition) LOG_IF(ERROR, condition)
+#define LOG_FATAL_IF(condition) LOG_IF(FATAL, condition)
 
 #define LOG_INFO_EVERY(freq) LOG_EVERY_N(INFO, freq)
 #define LOG_WARNING_EVERY(freq) LOG_EVERY_N(WARNING, freq)
@@ -49,22 +50,27 @@ namespace roborts_localization {
 
 #define LOG_WARNING_FIRST_N(times) LOG_FIRST_N(WARNING, times)
 
-class GLogWrapper {
- public:
-  GLogWrapper(char *program) {
+class GLogWrapper
+{
+public:
+  GLogWrapper(char *program)
+  {
     google::InitGoogleLogging(program);
     FLAGS_stderrthreshold = google::WARNING;
-    FLAGS_logtostderr = true;
     FLAGS_colorlogtostderr = true;
     FLAGS_v = 3;
+
+    FLAGS_logtostderr = true;
+    FLAGS_minloglevel = 0;
     google::InstallFailureSignalHandler();
   }
 
-  ~GLogWrapper() {
+  ~GLogWrapper()
+  {
     google::ShutdownGoogleLogging();
   }
 };
 
-}// roborts_localization
+} // namespace roborts_localization
 
 #endif //ROBORTS_LOCALIZATION_LOG_H

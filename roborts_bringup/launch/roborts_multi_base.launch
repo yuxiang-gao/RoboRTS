@@ -8,13 +8,18 @@
         <!--Load parameters for localization node  -->
         <rosparam command="load" file="$(find roborts_localization)/config/localization.yaml" />
         <rosparam command="load" file="$(find roborts_localization)/amcl/config/amcl.yaml" />
+        <rosparam param="initial_pose_x" subst_value="True">$(arg initial_pose_x)</rosparam>
+        <rosparam param="initial_pose_y" subst_value="True">$(arg initial_pose_y)</rosparam>
+        <rosparam param="base_frame" subst_value="True">"/$(arg robot_name)/base_link"</rosparam>
+        <rosparam param="laser_topic_name" subst_value="True">"/$(arg robot_name)/scan"</rosparam>
+        <rosparam param="odom_frame" subst_value="True">"$(arg robot_name)/odom"</rosparam>
+
+        <!-- <rosparam param="odom_frame" subst_value="True">"/$(arg robot_name)/odom"</rosparam> -->
         <rosparam>
             initial_pose_a : 3.14
-            global_frame_id : /map
+            global_frame : /map
+            map_topic_name : /map
         </rosparam>
-        <rosparam param="initial_pose_x" subst_value="True">"$(arg initial_pose_x)"</rosparam>
-        <rosparam param="initial_pose_y" subst_value="True">"$(arg initial_pose_y)"</rosparam>
-        <rosparam param="base_frame_id" subst_value="True">"/$(arg robot_name)/base_link"</rosparam>
         <!-- Run the localization node -->
         <node pkg="roborts_localization" type="localization_node" name="localization_node" respawn="false">
             <remap from="map" to="/map"/>

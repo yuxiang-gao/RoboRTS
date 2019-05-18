@@ -33,7 +33,7 @@ bool LocalizationNode::Init() {
   odom_frame_   = std::move(localization_config.odom_frame_id);
   global_frame_ = std::move(localization_config.global_frame_id);
   base_frame_   = std::move(localization_config.base_frame_id);
-LOG_INFO << "baseframe: " <<  localization_config.base_frame_id; 
+
   laser_topic_ = std::move(localization_config.laser_topic_name);
 
   init_pose_ = {localization_config.initial_pose_x,
@@ -42,7 +42,7 @@ LOG_INFO << "baseframe: " <<  localization_config.base_frame_id;
   init_cov_ = {localization_config.initial_cov_xx,
                localization_config.initial_cov_yy,
                localization_config.initial_cov_aa};
-
+LOG_INFO << "init pose " << localization_config.initial_pose_x<<localization_config.initial_pose_y ;
   transform_tolerance_  = ros::Duration(localization_config.transform_tolerance);
   publish_visualize_ = localization_config.publish_visualize;
 
@@ -66,11 +66,10 @@ LOG_INFO << "baseframe: " <<  localization_config.base_frame_id;
   amcl_ptr_= std::make_unique<Amcl>();
   amcl_ptr_->GetParamFromRos(&nh_);
   amcl_ptr_->Init(init_pose_, init_cov_);
-LOG_INFO << "loc init1";
+
   map_init_ = GetStaticMap();
-  LOG_INFO << "loc init2";
   laser_init_ = GetLaserPose();
-LOG_INFO << "loc init";
+
   return map_init_&&laser_init_;
 }
 
@@ -80,7 +79,6 @@ bool LocalizationNode::GetStaticMap(){
   nav_msgs::GetMap::Request req;
   nav_msgs::GetMap::Response res;
   if(static_map_srv_.call(req,res)) {
-    LOG_INFO << "Received Static Map";
     amcl_ptr_->HandleMapMessage(res.map, init_pose_, init_cov_);
     first_map_received_ = true;
     return true;
@@ -107,7 +105,7 @@ bool LocalizationNode::GetLaserPose() {
 }
 
 void LocalizationNode::InitialPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &init_pose_msg) {
-
+LOG_INFO << "Initial pose";
   if (init_pose_msg->header.frame_id == "") {
     LOG_WARNING << "Received initial pose with empty frame_id.";
   } // Only accept initial pose estimates in the global frame
@@ -164,7 +162,6 @@ void LocalizationNode::InitialPoseCallback(const geometry_msgs::PoseWithCovarian
 }
 
 void LocalizationNode::LaserScanCallback(const sensor_msgs::LaserScan::ConstPtr &laser_scan_msg_ptr){
-
   last_laser_msg_timestamp_ = laser_scan_msg_ptr->header.stamp;
 
   Vec3d pose_in_odom;
@@ -218,6 +215,7 @@ void LocalizationNode::PublishVisualize(){
 
 bool LocalizationNode::PublishTf() {
   ros::Time transform_expiration = (last_laser_msg_timestamp_ + transform_tolerance_);
+
   if (amcl_ptr_->CheckTfUpdate()) {
     // Subtracting base to odom from map to base and send map to odom instead
     tf::Stamped<tf::Pose> odom_to_map;

@@ -58,7 +58,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/LaserScan
       Color: 255; 255; 0
-      Color Transformer: FlatColor
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -73,7 +73,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.100000001
       Style: Flat Squares
-      Topic: /robot_0/base_scan
+      Topic: /robot_0/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -154,7 +154,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/LaserScan
       Color: 255; 255; 0
-      Color Transformer: FlatColor
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -169,7 +169,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.100000001
       Style: Flat Squares
-      Topic: /robot_1/base_scan
+      Topic: /robot_1/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -235,6 +235,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        map:
+          Value: true
         robot_0/base_footprint:
           Value: true
         robot_0/base_laser_link:
@@ -257,11 +259,17 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        robot_1/odom:
-          robot_1/base_footprint:
-            robot_1/base_link:
-              robot_1/base_laser_link:
-                {}
+        map:
+          robot_0/odom:
+            robot_0/base_footprint:
+              robot_0/base_link:
+                robot_0/base_laser_link:
+                  {}
+          robot_1/odom:
+            robot_1/base_footprint:
+              robot_1/base_link:
+                robot_1/base_laser_link:
+                  {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -304,10 +312,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.0047971
+      Pitch: 0.644797444
       Target Frame: map
       Value: ThirdPersonFollower (rviz)
-      Yaw: 1.69261277
+      Yaw: 2.34261346
     Saved: ~
 Window Geometry:
   Displays:
