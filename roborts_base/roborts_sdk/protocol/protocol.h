@@ -446,10 +446,12 @@ class Protocol {
   bool CRCTailCheck(uint8_t *data_ptr, size_t length);
   /******************* Const List ***************************/
 
+  //! rate of buffer reading
+  static const int    READING_RATE = 8000;
   //! size of receive buffer used to read from hardware device
-  static const size_t BUFFER_SIZE = 1024;
+  static const size_t BUFFER_SIZE = 4096;
   //! max Size of package
-  static const size_t MAX_PACK_SIZE = 1024;
+  static const size_t MAX_PACK_SIZE = 4096;
   //! session number for a sender/receiver
   static const size_t SESSION_TABLE_NUM = 32;
   //! length of header
@@ -512,6 +514,8 @@ class Protocol {
   std::thread send_poll_thread_;
   //! receive pool thread
   std::thread receive_pool_thread_;
+  //! mutex for map
+  std::mutex mutex_;
 };
 }
 #endif //ROBORTS_SDK_PROTOCOL_H

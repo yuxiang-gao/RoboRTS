@@ -146,7 +146,7 @@ void ArmorDetectionNode::ActionCB(const roborts_msgs::ArmorDetectionGoal::ConstP
 
 void ArmorDetectionNode::ExecuteLoop() {
   undetected_count_ = undetected_armor_delay_;
-
+  cv::Point3f prev_target_3d;
   while(running_) {
     usleep(1);
     if (node_state_ == NodeState::RUNNING) {
@@ -171,7 +171,10 @@ void ArmorDetectionNode::ExecuteLoop() {
 
         std::lock_guard<std::mutex> guard(mutex_);
         undetected_count_ = undetected_armor_delay_;
+	
+
         PublishMsgs();
+        prev_target_3d = target_3d;
       } else if(undetected_count_ != 0) {
 
         gimbal_angle_.yaw_mode = true;
