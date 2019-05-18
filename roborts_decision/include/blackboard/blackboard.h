@@ -92,17 +92,17 @@ public:
     costmap_2d_ = costmap_ptr_->GetLayeredCostmap()->GetCostMap();
 
     // Enemy fake pose
-    ros::NodeHandle rviz_nh("/move_base_simple");
+    ros::NodeHandle rviz_nh("move_base_simple");
     enemy_sub_ = rviz_nh.subscribe<geometry_msgs::PoseStamped>("goal", 1, &Blackboard::GoalCallback, this);
 
     roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config);
 
     // is_master = decision_config.master();
     // referee system
-    referee_info["master"] = boost::make_shared<RefereeSystemInfo>();
-    referee_info["wing"] = boost::make_shared<RefereeSystemInfo>();
-    RefereeSubscribe("master");
-    RefereeSubscribe("wing");
+    referee_info[robot_0_] = boost::make_shared<RefereeSystemInfo>();
+    referee_info[robot_1_] = boost::make_shared<RefereeSystemInfo>();
+    RefereeSubscribe(robot_0_);
+    RefereeSubscribe(robot_1_);
     IsBlue();
 
     if (!decision_config.simulate())
@@ -118,17 +118,25 @@ public:
                                                  boost::bind(&Blackboard::ArmorDetectionFeedbackCallback, this, _1));
     }
   }
-  
-  void RefreePublishSupply(rstd::string robot_name)
+
+  void Supply()
   {
-    ros_robot_supply_pub_ = ros_nh_.advertise<roborts_msgs::RobotStatus>("/" + robot_name + "/projectile_supply");
-    ros_robot_supply_pub_.pub(true)
-}
+    roborts_msgs::ProjectileSupply sup_msg;
+    sup_msg.number = 100;
+    if (GetRobotName() == "robot_0")
+      robot_master_supply_pub_.publish(sup_msg);
+    else
+      robot_wing_supply_pub_.publish(sup_msg);
+  }
+  
   void RefereeSubscribe(std::string robot_name)
   {
+
     ROS_INFO("Initializing blackboard subscriber to referee msg");
-    if (robot_name == "master")
+    if (robot_name == "robot_0")
     {
+      robot_master_supply_pub_ = nh_.advertise<roborts_msgs::RobotStatus>("/" + robot_name + "/projectile_supply", 1);
+
       game_status_master_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
 
       game_result_master_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
@@ -151,6 +159,7 @@ public:
     }
     else
     {
+      robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::RobotStatus>("/" + robot_name + "/projectile_supply", 1);
       game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
 
       game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
@@ -191,6 +200,14 @@ public:
     return !decision_config.master();
   }
 
+  std::string GetRobotName()
+  {
+    if (IsMaster())
+      return robot_0_;
+    else
+      return robot_1_;
+  }
+
   bool IsBlue()
   {
     switch (referee_info["master"]->robot_status.id)
@@ -201,7 +218,7 @@ public:
       return true;
       break;
     case 4:
-      ROS_DEBUG("Team: BLUE, Master Robot");
+      ROS_DEBUG("Team: BLUE, wing Robot");
       // is_master = false;
       return true;
       break;
@@ -320,10 +337,46 @@ public:
     return enemy_pose_;
   }
 
+  int GetBonusStatus() 
+  {
+    if (IsBlue())
+      return referee_info[GetRobotName()]->bonus_status.blue_bonus;
+    else
+      return referee_info[GetRobotName()]->bonus_status.red_bonus;
+  }
+
+  bool IsBonusUnoccupied()
+  {
+    if (GetBonusStatus() == 0)
+      return true;
+  }
+
+  bool IsBonusOccupied()
+  {
+    if (GetBonusStatus() == 2)
+      return true;
+  }
+
   bool IsEnemyDetected() const
   {
     ROS_INFO("%s: %d", __FUNCTION__, (int)enemy_detected_);
     return enemy_detected_;
+  }
+
+  bool IsFiveSecondCD() 
+  {
+    if (referee_info[GetRobotName()]->game_status.game_status == 3)
+      return true;
+    else
+      return false;
+  }
+
+  bool IsGameStart()
+  {
+    if (referee_info[GetRobotName()]->game_status.game_status == 4)
+      return true;
+    else
+      return false;
   }
 
   // Goal
@@ -337,42 +390,43 @@ public:
   {
     return goal_;
   }
-  geometry_msgs::PoseStamped GetReloadGoal() const
-  {
-    reload_goal_.header.frame_id = "map";
-	reload_goal_.pose.orientation.x = 0;
-	reload_goal_.pose.orientation.y = 0;
-	reload_goal_.pose.orientation.z = 0;
-	reload_goal_.pose.orientation.w = 1;
 
-	reload_goal_.pose.position.x = 0;
-	reload_goal_.pose.position.y = 0;
-	reload_goal_.pose.position.z = 0;
+  geometry_msgs::PoseStamped GetReloadGoal()
+  {
+    reload_goal_.header.frame_id = "/map";
+    reload_goal_.pose.orientation.x = 0;
+    reload_goal_.pose.orientation.y = 0;
+    reload_goal_.pose.orientation.z = 0;
+    reload_goal_.pose.orientation.w = 1;
+
+    reload_goal_.pose.position.x = 4;
+    reload_goal_.pose.position.y = 0.5;
+    reload_goal_.pose.position.z = 0;
 
     return reload_goal_;
   }
-  
-  geometry_msgs::PoseStamped GetDZGoal() const
-  {
-    DZ_goal_.header.frame_id = "map";
-    /*
-    tf::Quaternion quaternion = tf::createQuaternionFromRPY(0,0,0); // roll, pitch , yaw
-    DZ_goal_.pose.orientation.x = quaternion.x();
-	Dz_goal_.pose.orientation.y = quaternion.y();
-	Dz_goal_.pose.orientation.z = quaternion.z();
-	DZ_goal_.pose.orientation.w = quaternion.w();
-*/
-	DZ_goal_.pose.orientation.x = 0;
-	Dz_goal_.pose.orientation.y = 0;
-	Dz_goal_.pose.orientation.z = 0;
-	DZ_goal_.pose.orientation.w = 1;
 
-	DZ_goal_.pose.position.x = 0;
-	DZ_goal_.pose.position.y = 0;
-	DZ_goal_.pose.position.z = 0;
+//   geometry_msgs::PoseStamped GetDZGoal() const
+//   {
+//     DZ_goal_.header.frame_id = "map";
+//     /*
+//     tf::Quaternion quaternion = tf::createQuaternionFromRPY(0,0,0); // roll, pitch , yaw
+//     DZ_goal_.pose.orientation.x = quaternion.x();
+// 	Dz_goal_.pose.orientation.y = quaternion.y();
+// 	Dz_goal_.pose.orientation.z = quaternion.z();
+// 	DZ_goal_.pose.orientation.w = quaternion.w();
+// */
+//     DZ_goal_.pose.orientation.x = 0;
+//     Dz_goal_.pose.orientation.y = 0;
+//     Dz_goal_.pose.orientation.z = 0;
+//     DZ_goal_.pose.orientation.w = 1;
 
-    return DZ_goal_;
-  }
+//     DZ_goal_.pose.position.x = 0;
+//     DZ_goal_.pose.position.y = 0;
+//     DZ_goal_.pose.position.z = 0;
+
+//     return DZ_goal_;
+//   }
 
   bool IsNewGoal()
   {
@@ -431,6 +485,8 @@ public:
   }
 
 private:
+  const std::string robot_0_ = "robot_0";
+  const std::string robot_1_ = "robot_1";
   ros::NodeHandle nh_;
   ros::Subscriber game_status_master_sub_;
   ros::Subscriber game_result_master_sub_;
@@ -452,7 +508,8 @@ private:
   ros::Subscriber robot_bonus_wing_sub_;
   ros::Subscriber robot_damage_wing_sub_;
   ros::Subscriber robot_shoot_wing_sub_;
-  ros::Publisher ros_robot_supply_pub_ ;
+  ros::Publisher robot_wing_supply_pub_;
+  ros::Publisher robot_master_supply_pub_;
   bool is_blue;
   void UpdateRobotPose()
   {
