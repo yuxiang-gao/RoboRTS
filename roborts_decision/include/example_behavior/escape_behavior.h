@@ -4,12 +4,12 @@
 #include "io/io.h"
 #include "roborts_msgs/TwistAccel.h"
 
-#include "../blackboard/blackboard.h"
-#include "../executor/chassis_executor.h"
-#include "../behavior_tree/behavior_state.h"
-#include "../proto/decision.pb.h"
+#include "blackboard/blackboard.h"
+#include "executor/chassis_executor.h"
+#include "behavior_tree/behavior_state.h"
+#include "../../proto/decision.pb.h"
 
-#include "line_iterator.h"
+#include "utils/line_iterator.h"
 
 // Added by Thomas to make without errors
 #include <random>

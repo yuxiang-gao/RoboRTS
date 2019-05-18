@@ -4,9 +4,9 @@
 
 #include "io/io.h"
 
-#include "../blackboard/blackboard.h"
-#include "../executor/chassis_executor.h"
-#include "../behavior_tree/behavior_state.h"
+#include "blackboard/blackboard.h"
+#include "executor/chassis_executor.h"
+#include "behavior_tree/behavior_state.h"
 
 
 namespace roborts_decision {
