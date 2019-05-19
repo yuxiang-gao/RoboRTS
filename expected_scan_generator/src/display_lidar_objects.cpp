@@ -7,9 +7,8 @@
 #include "visualization_msgs/MarkerArray.h"
 #include "visualization_msgs/Marker.h"
 #include "novel_msgs/NovelObjectArray.h"
-
-
-
+#include "geometry_msgs/Vector3.h"
+#include "std_msgs/ColorRGBA.h"
 
 
 class DisplayLidarObjects
@@ -55,9 +54,23 @@ public:
         for (int i = 0; i < msg->detected_objects.size(); ++i) 
         {
             visualization_msgs::Marker to_push;
+            geometry_msgs::Vector3 scale;
+            scale.x = 0.1;
+            scale.y = 0.1;
+            scale.z = 0.1;
+            std_msgs::ColorRGBA color;
+            color.r = 1.0;
+            color.g = 0.0;
+            color.b = 0.0;
+            color.a = 1.0;
+            to_push.scale = scale;
+            to_push.color = color;
+            to_push.header = msg->header;
             to_push.pose = msg->detected_objects[i].pose;
             to_publish.markers.push_back(to_push);
         }
+
+        LOmarkers_pub.publish(to_publish);
 
     }
 
