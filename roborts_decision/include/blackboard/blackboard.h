@@ -82,11 +82,25 @@ public:
   {
 
     tf_ptr_ = std::make_shared<tf::TransformListener>(ros::Duration(10));
-
+    ros::NodeHandle nh_priv("~");
     std::string map_path = ros::package::getPath("roborts_costmap") +
                            "/config/costmap_parameter_config_for_decision.prototxt";
-    costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
-                                             map_path);
+    if (nh_priv.hasParam("global_frame") && nh_priv.hasParam("robot_base_frame"))
+    {
+      std::string global_frame, robot_base_frame;
+      ros::param::get("~global_frame", global_frame);
+      ros::param::get("~robot_base_frame", robot_base_frame);
+      costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
+                                               map_path,
+                                               global_frame,
+                                               robot_base_frame);
+    }
+    else
+    {
+      costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
+                                               map_path);
+    }
+
     charmap_ = costmap_ptr_->GetCostMap()->GetCharMap();
 
     costmap_2d_ = costmap_ptr_->GetLayeredCostmap()->GetCostMap();
