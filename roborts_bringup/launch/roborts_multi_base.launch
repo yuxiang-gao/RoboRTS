@@ -4,11 +4,11 @@
     <arg name="initial_pose_y" />
     <group ns="$(arg robot_name)">
         <param name="tf_prefix" value="$(arg robot_name)" />
-        <node pkg="tf" type="tf_remap" name="tf_remapper" output="screen">
+        <!-- <node pkg="tf" type="tf_remap" name="tf_remapper" output="screen">
             <rosparam param="mappings">
-    [{old: map, new: /map}]
+                [{old: map, new: /map}]
             </rosparam>
-        </node>
+        </node> -->
         <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="$(anon map_broadcaster)" args="0.0  0.0 0.0  0.0  0.0 0.0 /map /robot_0/map" /> -->
         <!--Load parameters for localization node  -->
         <rosparam command="load" file="$(find roborts_localization)/config/localization.yaml" />
