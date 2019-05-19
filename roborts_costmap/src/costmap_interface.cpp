@@ -128,6 +128,86 @@ CostmapInterface::CostmapInterface(std::string map_name,
                                 map_origin_y_);
   }
 }
+// overload for custom frames
+CostmapInterface::CostmapInterface(std::string map_name,
+                                   tf::TransformListener &tf,
+                                   std::string config_file,
+                                   std::string global_frame,
+                                   std::string robot_base_frame) :
+    layered_costmap_(nullptr),
+    name_(map_name),
+    tf_(tf),
+    config_file_(config_file),
+    stop_updates_(false),
+    initialized_(true),
+    stopped_(false),
+    robot_stopped_(false),
+    map_update_thread_(NULL),
+    last_publish_(0),
+    dist_behind_robot_threshold_to_care_obstacles_(0.05),
+    is_debug_(false),
+    map_update_thread_shutdown_(false) {
+  std::string tf_error;
+  ros::NodeHandle private_nh(map_name);
+  LoadParameter();
+  robot_base_frame_ = robot_base_frame;
+  global_frame_ = global_frame;
+  layered_costmap_ = new CostmapLayers(global_frame_, is_rolling_window_, is_track_unknown_);
+  layered_costmap_->SetFilePath(config_file_inflation_);
+  ros::Time last_error = ros::Time::now();
+  
+  while (ros::ok() && !tf_.waitForTransform(global_frame_, robot_base_frame_, ros::Time(), ros::Duration(0.1), \
+         ros::Duration(0.01), &tf_error)) {
+    ros::spinOnce();
+    if (last_error + ros::Duration(5.0) < ros::Time::now()) {
+      last_error = ros::Time::now();
+    }
+    tf_error.clear();
+  }
+  if (has_static_layer_) {
+    Layer *plugin_static_layer;
+    plugin_static_layer = new StaticLayer;
+    layered_costmap_->AddPlugin(plugin_static_layer);
+    plugin_static_layer->Initialize(layered_costmap_, map_name + "/" + "static_layer", &tf_);
+  }
+  if (has_obstacle_layer_) {
+    Layer *plugin_obstacle_layer = new ObstacleLayer;
+    layered_costmap_->AddPlugin(plugin_obstacle_layer);
+    plugin_obstacle_layer->Initialize(layered_costmap_, map_name + "/" + "obstacle_layer", &tf_);
+  }
+  Layer *plugin_inflation_layer = new InflationLayer;
+  layered_costmap_->AddPlugin(plugin_inflation_layer);
+  plugin_inflation_layer->Initialize(layered_costmap_, map_name + "/" + "inflation_layer", &tf_);
+  SetUnpaddedRobotFootprint(footprint_points_);
+  stop_updates_ = false;
+  initialized_ = true;
+  stopped_ = false;
+  robot_stopped_ = false;
+  map_update_thread_shutdown_ = false;
+  timer_ = private_nh.createTimer(ros::Duration(0.1), &CostmapInterface::DetectMovement, this);
+  if (is_debug_) {
+    // special values:
+    cost_translation_table_[0] = 0;  // NO obstacle
+    cost_translation_table_[253] = 99;  // INSCRIBED obstacle
+    cost_translation_table_[254] = 100;  // LETHAL obstacle
+    cost_translation_table_[255] = -1;  // UNKNOWN
+
+    // regular cost values scale the range 1 to 252 (inclusive) to fit
+    // into 1 to 98 (inclusive).
+    for (int i = 1; i < 253; i++) {
+      cost_translation_table_[i] = char(1 + (97 * (i - 1)) / 251);
+    }
+  }
+  costmap_pub_ = private_nh.advertise<nav_msgs::OccupancyGrid>(name_ + "/costmap", 10);
+  map_update_thread_ = new std::thread(std::bind(&CostmapInterface::MapUpdateLoop, this, map_update_frequency_));
+  if (is_rolling_window_) {
+    layered_costmap_->ResizeMap((unsigned int) map_width_ / map_resolution_,
+                                (unsigned int) map_height_ / map_resolution_,
+                                map_resolution_,
+                                map_origin_x_,
+                                map_origin_y_);
+  }
+}
 
 void CostmapInterface::LoadParameter() {
 

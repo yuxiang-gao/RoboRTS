@@ -91,6 +91,7 @@ class CostmapInterface {
    * @param map_update_frequency The frequency to update costmap
    */
   CostmapInterface(std::string map_name, tf::TransformListener& tf, std::string config_file);
+  CostmapInterface(std::string map_name, tf::TransformListener& tf, std::string config_file, std::string global_frame, std::string robot_base_frame);
   ~CostmapInterface();
   /**
    * @brief Start the costmap processing.

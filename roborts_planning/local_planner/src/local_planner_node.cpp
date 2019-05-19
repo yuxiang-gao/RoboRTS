@@ -54,11 +54,16 @@ roborts_common::ErrorInfo LocalPlannerNode::Init() {
   frequency_ = local_algorithms.frequency();
   tf_ = std::make_shared<tf::TransformListener>(ros::Duration(10));
 
+  std::string global_frame, robot_base_frame;
+  ros::param::get("~global_frame", global_frame);
+  ros::param::get("~robot_base_frame", robot_base_frame);  
   std::string map_path = ros::package::getPath("roborts_costmap") + \
       "/config/costmap_parameter_config_for_local_plan.prototxt";
   local_cost_ = std::make_shared<roborts_costmap::CostmapInterface>("local_costmap",
                                                                           *tf_,
-                                                                          map_path.c_str());
+                                                                          map_path.c_str(),
+                                                                           global_frame,
+                                                                           robot_base_frame);
   local_planner_ = roborts_common::AlgorithmFactory<LocalPlannerBase>::CreateAlgorithm(selected_algorithm_);
   if (local_planner_== nullptr) {
     ROS_ERROR("global planner algorithm instance can't be loaded");

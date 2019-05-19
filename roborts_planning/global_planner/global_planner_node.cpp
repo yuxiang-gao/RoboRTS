@@ -51,7 +51,6 @@ ErrorInfo GlobalPlannerNode::Init() {
                      "Cannot load global planner protobuf configuration file.");
   }
 
-
   selected_algorithm_ = global_planner_config.selected_algorithm();
   cycle_duration_ = std::chrono::microseconds((int) (1e6 / global_planner_config.frequency()));
   max_retries_ = global_planner_config.max_retries();
@@ -66,11 +65,17 @@ ErrorInfo GlobalPlannerNode::Init() {
   tf_ptr_ = std::make_shared<tf::TransformListener>(ros::Duration(10));
 
   // Create global costmap
+  std::string global_frame, robot_base_frame;
+  ros::param::get("~global_frame", global_frame);
+  ros::param::get("~robot_base_frame", robot_base_frame);  
   std::string map_path = ros::package::getPath("roborts_costmap") + \
       "/config/costmap_parameter_config_for_global_plan.prototxt";
   costmap_ptr_ = std::make_shared<roborts_costmap::CostmapInterface>("global_costmap",
                                                                            *tf_ptr_,
-                                                                           map_path.c_str());
+                                                                           map_path.c_str(),
+                                                                           global_frame,
+                                                                           robot_base_frame);
+ROS_INFO("path frame id: %s", costmap_ptr_->GetGlobalFrameID());
   // Create the instance of the selected algorithm
   global_planner_ptr_ = roborts_common::AlgorithmFactory<GlobalPlannerBase,CostmapPtr >::CreateAlgorithm(
       selected_algorithm_, costmap_ptr_);
@@ -80,7 +85,7 @@ ErrorInfo GlobalPlannerNode::Init() {
                      "global planner algorithm instance can't be loaded");
   }
 
-
+ROS_INFO("path frame id: %s", costmap_ptr_->GetGlobalFrameID());
   // Initialize path frame from global costmap
   path_.header.frame_id = costmap_ptr_->GetGlobalFrameID();
   return ErrorInfo(ErrorCode::OK);
