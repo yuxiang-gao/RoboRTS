@@ -1,7 +1,7 @@
 camera: {
   camera_name: "back_camera"
   camera_type: "uvc"
-  camera_path: "/dev/video0"
+  camera_path: "/dev/v4l/by-path/platform-3530000.xhci-usb-0:2.1:1.0-video-index0"
 
   camera_matrix {
     data: 1126.389639
