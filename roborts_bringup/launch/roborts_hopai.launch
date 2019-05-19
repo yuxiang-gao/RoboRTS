@@ -13,7 +13,9 @@
     </include>
 
     <!-- Publish static tf -->
-    <include file="$(find roborts_bringup)/launch/static_tf.launch" />
+    <include file="$(find roborts_bringup)/launch/static_tf.launch">
+      <arg name="robot_name" value="$(arg robot_name)" />
+    </include>
 
     <!-- Run the lidar node -->
     <node name="rplidar_node" pkg="rplidar_ros" type="rplidarNode">
