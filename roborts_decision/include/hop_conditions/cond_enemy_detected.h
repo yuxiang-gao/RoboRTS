@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 
 #include "executor/chassis_executor.h"
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 
 namespace roborts_decision

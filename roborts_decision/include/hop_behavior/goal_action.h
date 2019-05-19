@@ -5,7 +5,7 @@
 #include <ros/ros.h>
 
 #include "executor/chassis_executor.h"
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 #include "utils/line_iterator.h"
 
@@ -35,7 +35,7 @@ public:
       if (blackboard_->IsNewGoal())
       {
         chassis_executor_->Execute(blackboard_->GetGoal());
-        return BehaviourState::SUCCESS;
+        return Behaviortate::SUCCESS;
       }
     }
     return BehaviorState::RUNNING;

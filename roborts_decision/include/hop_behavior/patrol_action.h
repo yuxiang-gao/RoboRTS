@@ -44,7 +44,7 @@ public:
     }
   }
 
-  BehaviourState Update()
+  Behaviortate Update()
   {
     auto executor_state = chassis_executor_->Update();
     if (executor_state != BehaviorState::RUNNING)
@@ -52,15 +52,15 @@ public:
       if (patrol_goals_.empty())
       {
         ROS_ERROR("patrol goal is empty");
-        return BehaviourState::FAILURE;
+        return Behaviortate::FAILURE;
       }
 
       ROS_INFO("send goal");
       chassis_executor_->Execute(patrol_goals_[patrol_count_]);
       patrol_count_ = ++patrol_count_ % point_size_;
-      return BehaviourState::SUCCESS;
+      return Behaviortate::SUCCESS;
     }
-    return BehaviourState::RUNNING;
+    return Behaviortate::RUNNING;
   }
 
   void OnTerminate(BehaviorState state)

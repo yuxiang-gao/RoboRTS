@@ -1,16 +1,16 @@
 #include <ros/ros.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "executor/chassis_executor.h"
 #include "blackboard/blackboard.h"
 
-#include "hop_behaviour/back_boot_area_action.h"
-#include "hop_behaviour/escape_action.h"
-#include "hop_behaviour/chase_action.h"
-#include "hop_behaviour/search_action.h"
-#include "hop_behaviour/patrol_action.h"
-#include "hop_behaviour/goal_action.h"
+#include "hop_behavior/back_boot_area_action.h"
+#include "hop_behavior/escape_action.h"
+#include "hop_behavior/chase_action.h"
+#include "hop_behavior/search_action.h"
+#include "hop_behavior/patrol_action.h"
+#include "hop_behavior/goal_action.h"
 namespace roborts_decision
 {
 

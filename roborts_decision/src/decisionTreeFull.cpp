@@ -9,7 +9,7 @@
 #include "strategy/patrol_action.h"
 #include "strategy/goal_action.h"
 
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "../blackboard/blackboard.h"
 
 

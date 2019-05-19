@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 
 #include "executor/chassis_executor.h"
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 
 namespace roborts_decision
@@ -13,7 +13,7 @@ class BackBootAreaAction : public ActionNode
 {
 public:
     BackBootAreaAction(ChassisExecutor::Ptr &chassis_executor,
-                       const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_actionC", blackboard),
+                       const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_action", blackboard),
                                                             chassis_executor_(chassis_executor)
 
     {
@@ -34,7 +34,7 @@ public:
         boot_position_.pose.orientation = master_quaternion;
     }
 
-    BehaviourState Update()
+    Behaviortate Update()
     {
         auto executor_state = chassis_executor_->Update();
         if (executor_state != BehaviorState::RUNNING)
@@ -54,7 +54,7 @@ public:
             if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
             {
                 chassis_executor_->Execute(boot_position_);
-                return BehaviourState::SUCCESS;
+                return Behaviortate::SUCCESS;
             }
         }
         return BehaviorState::RUNNING;

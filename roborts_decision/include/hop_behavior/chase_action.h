@@ -6,7 +6,7 @@
 #include <ros/console.h>
 
 #include "executor/chassis_executor.h"
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 #include "utils/line_iterator.h"
 
@@ -61,7 +61,7 @@ public:
 					chassis_executor_->Cancel();
 					cancel_goal_ = false;
 				}
-				return BehaviourState::FAILURE;
+				return Behaviortate::FAILURE;
 			}
 			else
 			{
@@ -88,7 +88,7 @@ public:
 
 				if (!get_enemy_cell)
 				{
-					return BehaviourState::FAILURE;
+					return Behaviortate::FAILURE;
 				}
 
 				auto robot_x = robot_map_pose.pose.position.x;
@@ -130,7 +130,7 @@ public:
 					{
 						cancel_goal_ = true;
 						chassis_executor_->Execute(reduce_goal);
-						return BehaviourState::SUCCESS;
+						return Behaviortate::SUCCESS;
 					}
 					else
 					{
@@ -139,24 +139,24 @@ public:
 							chassis_executor_->Cancel();
 							cancel_goal_ = false;
 						}
-						return BehaviourState::FAILURE;
+						return Behaviortate::FAILURE;
 					}
 				}
 				else
 				{
 					cancel_goal_ = true;
 					chassis_executor_->Execute(reduce_goal);
-					return BehaviourState::FAILURE;
+					return Behaviortate::FAILURE;
 				}
 			}
 		}
 		return BehaviorState::RUNNING;
 	}
 
-	void OnTerminate(BehaviourState state)
+	void OnTerminate(Behaviortate state)
 	{
-		ROS_DEBUG_COND_NAMED(state == BehaviourState::FAILURE, GetName(), "action %s failed", GetName());
-		ROS_DEBUG_COND_NAMED(state == BehaviourState::SUCCESS, GetName(), "action %s succeeded", GetName());
+		ROS_DEBUG_COND_NAMED(state == Behaviortate::FAILURE, GetName(), "action %s failed", GetName());
+		ROS_DEBUG_COND_NAMED(state == Behaviortate::SUCCESS, GetName(), "action %s succeeded", GetName());
 		chassis_executor_->Cancel();
 	}
 

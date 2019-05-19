@@ -9,7 +9,7 @@
 // #include "example_behavior/patrol_behavior.h"
 // #include "example_behavior/goal_behavior.h"
 
-#include "../behaviour_tree/behaviour_tree.h"
+#include "../behavior_tree/behavior_tree.h"
 #include "../blackboard/blackboard.h"
 
 namespace roborts_decision

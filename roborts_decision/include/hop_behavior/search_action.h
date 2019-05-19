@@ -97,7 +97,7 @@ public:
     }
   }
 
-  BehaviourState Update()
+  Behaviortate Update()
   {
 
     double yaw;

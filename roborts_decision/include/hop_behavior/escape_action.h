@@ -43,7 +43,7 @@ namespace roborts_decision:
       whirl_vel_.twist.angular.x = blackboard_ptr_->decision_config.whirl_vel().angle_x_vel();
     }
 
-    BehaviourState Update()
+    Behaviortate Update()
     {
       auto executor_state = chassis_executor_->Update();
 
@@ -99,7 +99,7 @@ namespace roborts_decision:
           if (!get_enemy_cell)
           {
             chassis_executor_->Execute(whirl_vel_);
-            return BehaviourState::FAILURE;
+            return Behaviortate::FAILURE;
           }
 
           while (true)
@@ -157,10 +157,10 @@ namespace roborts_decision:
         {
           chassis_executor_->Execute(whirl_vel_);
           ROS_DEBUG("No Enemy Detected")
-          return BehaviourState::SUCCESS;
+          return Behaviortate::SUCCESS;
         }
       }
-      return BehaviourState::RUNNING;
+      return Behaviortate::RUNNING;
     }
 
     void OnTerminate()
