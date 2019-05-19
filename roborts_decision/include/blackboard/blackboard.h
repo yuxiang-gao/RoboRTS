@@ -168,7 +168,7 @@ public:
     ROS_INFO("Initializing blackboard subscriber to referee msg");
     if (robot_name == "robot_0")
     {
-      robot_master_supply_pub_ = nh_.advertise<roborts_msgs::RobotStatus>("/" + robot_name + "/projectile_supply", 1);
+      robot_master_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
 
       game_status_master_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
 
@@ -192,7 +192,7 @@ public:
     }
     else if (robot_name == "robot_1")
     {
-      robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::RobotStatus>("/" + robot_name + "/projectile_supply", 1);
+      robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
       game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
 
       game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
