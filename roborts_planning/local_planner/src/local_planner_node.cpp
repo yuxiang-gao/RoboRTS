@@ -23,7 +23,7 @@ namespace roborts_local_planner
 {
 
 using roborts_common::NodeState;
-LocalPlannerNode::LocalPlannerNode() : local_planner_nh_("~"),
+LocalPlannerNode::LocalPlannerNode() : local_planner_nh_(),
                                        as_(local_planner_nh_, "local_planner_node_action", boost::bind(&LocalPlannerNode::ExcuteCB, this, _1), false),
                                        initialized_(false), node_state_(roborts_common::NodeState::IDLE),
                                        node_error_info_(roborts_common::ErrorCode::OK), max_error_(5),
@@ -63,7 +63,8 @@ roborts_common::ErrorInfo LocalPlannerNode::Init()
 
   std::string map_path = ros::package::getPath("roborts_costmap") +
                          "/config/costmap_parameter_config_for_local_plan.prototxt";
-  if (local_planner_nh_.hasParam("global_frame") && local_planner_nh_.hasParam("robot_base_frame"))
+  ros::NodeHandle nh_priv("~");
+  if (nh_priv.hasParam("global_frame") && nh_priv.hasParam("robot_base_frame"))
   {
     std::string global_frame, robot_base_frame;
     ros::param::get("~global_frame", global_frame);
@@ -93,7 +94,7 @@ roborts_common::ErrorInfo LocalPlannerNode::Init()
   std::string name;
   visual_frame_ = local_cost_->GetGlobalFrameID();
   visual_ = LocalVisualizationPtr(new LocalVisualization(local_planner_nh_, visual_frame_));
-  vel_pub_ = local_planner_nh_.advertise<roborts_msgs::TwistAccel>("/cmd_vel_acc", 5);
+  vel_pub_ = local_planner_nh_.advertise<roborts_msgs::TwistAccel>("cmd_vel_acc", 5);
 
   return roborts_common::ErrorInfo(roborts_common::ErrorCode::OK);
 }
