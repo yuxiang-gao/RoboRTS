@@ -8,9 +8,9 @@
 
   <group ns="$(arg robot_name)">
     <!-- Run the robot sdk interface -->
-    <include file="$(find roborts_bringup)/launch/base.launch" >
-    <param name="tf_prefix" value="$(arg robot_name)"/>
-    </include> 
+    <include file="$(find roborts_bringup)/launch/base.launch">
+      <param name="tf_prefix" value="$(arg robot_name)"/>
+    </include>
 
     <!-- Publish static tf -->
     <include file="$(find roborts_bringup)/launch/static_tf.launch" />
