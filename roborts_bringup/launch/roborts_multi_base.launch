@@ -30,7 +30,7 @@
             <remap from="map" to="/map"/>
             <remap from="static_map" to="/static_map"/>
             <param name="global_frame" value="/map" />
-            <param name="robot_base_frame" value="$(arg robot_name)/base_link"/>
+            <param name="robot_base_frame" value="/$(arg robot_name)/base_link"/>
         </node>
 
         <!-- Run the global planner Node -->

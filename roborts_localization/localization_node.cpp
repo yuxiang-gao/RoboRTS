@@ -277,7 +277,7 @@ bool LocalizationNode::GetPoseFromTf(const std::string &target_frame,
   } catch (tf::TransformException &e) {
     LOG_ERROR << "Couldn't transform from "
               << source_frame
-              << "to "
+              << " to "
               << target_frame;
     return false;
   }
