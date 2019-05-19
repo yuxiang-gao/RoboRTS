@@ -63,25 +63,29 @@ roborts_common::ErrorInfo LocalPlannerNode::Init()
 
   std::string map_path = ros::package::getPath("roborts_costmap") +
                          "/config/costmap_parameter_config_for_local_plan.prototxt";
-  ros::NodeHandle nh_priv("~");
-  if (nh_priv.hasParam("global_frame") && nh_priv.hasParam("robot_base_frame"))
-  {
-    std::string global_frame, robot_base_frame;
-    ros::param::get("~global_frame", global_frame);
-    ros::param::get("~robot_base_frame", robot_base_frame);
-
-    local_cost_ = std::make_shared<roborts_costmap::CostmapInterface>("local_costmap",
-                                                                      *tf_,
-                                                                      map_path.c_str(),
-                                                                      global_frame,
-                                                                      robot_base_frame);
-  }
-  else
-  {
-    local_cost_ = std::make_shared<roborts_costmap::CostmapInterface>("local_costmap",
+                  
+  // ros::NodeHandle nh_priv("~");
+  local_cost_ = std::make_shared<roborts_costmap::CostmapInterface>("local_costmap",
                                                                       *tf_,
                                                                       map_path.c_str());
-  }
+  // if (nh_priv.hasParam("global_frame") && nh_priv.hasParam("robot_base_frame"))
+  // {
+  //   std::string global_frame, robot_base_frame;
+  //   ros::param::get("~global_frame", global_frame);
+  //   ros::param::get("~robot_base_frame", robot_base_frame);
+
+  //   local_cost_ = std::make_shared<roborts_costmap::CostmapInterface>("local_costmap",
+  //                                                                     *tf_,
+  //                                                                     map_path.c_str(),
+  //                                                                     global_frame,
+  //                                                                     robot_base_frame);
+  // }
+  // else
+  // {
+  //   local_cost_ = std::make_shared<roborts_costmap::CostmapInterface>("local_costmap",
+  //                                                                     *tf_,
+  //                                                                     map_path.c_str());
+  // }
 
   local_planner_ = roborts_common::AlgorithmFactory<LocalPlannerBase>::CreateAlgorithm(selected_algorithm_);
   if (local_planner_ == nullptr)

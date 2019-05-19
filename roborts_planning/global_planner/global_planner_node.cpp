@@ -72,23 +72,26 @@ ErrorInfo GlobalPlannerNode::Init()
   // Create global costmap
   std::string map_path = ros::package::getPath("roborts_costmap") +
                          "/config/costmap_parameter_config_for_global_plan.prototxt";
-  if (viz_nh.hasParam("global_frame") && viz_nh.hasParam("robot_base_frame"))
-  {
-    std::string global_frame, robot_base_frame;
-    ros::param::get("~global_frame", global_frame);
-    ros::param::get("~robot_base_frame", robot_base_frame);
-    costmap_ptr_ = std::make_shared<roborts_costmap::CostmapInterface>("global_costmap",
-                                                                       *tf_ptr_,
-                                                                       map_path.c_str(),
-                                                                       global_frame,
-                                                                       robot_base_frame);
-  }
-  else
-  {
-    costmap_ptr_ = std::make_shared<roborts_costmap::CostmapInterface>("global_costmap",
-                                                                       *tf_ptr_,
-                                                                       map_path.c_str());
-  }
+  costmap_ptr_ = std::make_shared<roborts_costmap::CostmapInterface>("global_costmap",
+                                                                     *tf_ptr_,
+                                                                     map_path.c_str());
+  // if (viz_nh.hasParam("global_frame") && viz_nh.hasParam("robot_base_frame"))
+  // {
+  //   std::string global_frame, robot_base_frame;
+  //   ros::param::get("~global_frame", global_frame);
+  //   ros::param::get("~robot_base_frame", robot_base_frame);
+  //   costmap_ptr_ = std::make_shared<roborts_costmap::CostmapInterface>("global_costmap",
+  //                                                                      *tf_ptr_,
+  //                                                                      map_path.c_str(),
+  //                                                                      global_frame,
+  //                                                                      robot_base_frame);
+  // }
+  // else
+  // {
+  //   costmap_ptr_ = std::make_shared<roborts_costmap::CostmapInterface>("global_costmap",
+  //                                                                      *tf_ptr_,
+  //                                                                      map_path.c_str());
+  // }
 
   // Create the instance of the selected algorithm
   global_planner_ptr_ = roborts_common::AlgorithmFactory<GlobalPlannerBase, CostmapPtr>::CreateAlgorithm(

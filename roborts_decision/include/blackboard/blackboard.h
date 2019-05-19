@@ -61,9 +61,18 @@ struct RefereeSystemInfo
   roborts_msgs::RobotBonus robot_bonus;
   roborts_msgs::RobotDamage robot_damage;
   roborts_msgs::RobotShoot robot_shoot;
-  RefereeSystemInfo()
-  {
-  };
+  RefereeSystemInfo() : game_status(),
+                        game_result(),
+                        game_survivor(),
+                        bonus_status(),
+                        supplier_status(),
+                        robot_status(),
+                        robot_heat(),
+                        robot_bonus(),
+                        robot_damage(),
+                        robot_shoot(){
+
+                        };
 };
 
 class Blackboard
@@ -89,21 +98,23 @@ public:
 
     std::string map_path = ros::package::getPath("roborts_costmap") +
                            "/config/costmap_parameter_config_for_decision.prototxt";
-    if (nh_priv_.hasParam("global_frame") && nh_priv_.hasParam("robot_base_frame"))
-    {
-      std::string global_frame, robot_base_frame;
-      ros::param::get("~global_frame", global_frame);
-      ros::param::get("~robot_base_frame", robot_base_frame);
-      costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
-                                               map_path,
-                                               global_frame,
-                                               robot_base_frame);
-    }
-    else
-    {
-      costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
-                                               map_path);
-    }
+    costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
+                                             map_path);
+    // if (nh_priv_.hasParam("global_frame") && nh_priv_.hasParam("robot_base_frame"))
+    // {
+    //   std::string global_frame, robot_base_frame;
+    //   ros::param::get("~global_frame", global_frame);
+    //   ros::param::get("~robot_base_frame", robot_base_frame);
+    //   costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
+    //                                            map_path,
+    //                                            global_frame,
+    //                                            robot_base_frame);
+    // }
+    // else
+    // {
+    //   costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
+    //                                            map_path);
+    // }
 
     charmap_ = costmap_ptr_->GetCostMap()->GetCharMap();
 
