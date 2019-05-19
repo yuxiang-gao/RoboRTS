@@ -14,8 +14,8 @@ namespace roborts_decision
 class GoalAction : public ActionNode
 {
 public:
-  GoalAction(ChassisExecutor::Ptr &chassis_executor,
-             Blackboard::Ptr &blackboard) : ActionNode("goal_action", blackboard),
+  GoalAction(const ChassisExecutor::Ptr &chassis_executor,
+             const Blackboard::Ptr &blackboard) : ActionNode("goal_action", blackboard),
                                             chassis_executor_(chassis_executor) {}
 
   void OnInitialize()
@@ -32,10 +32,10 @@ public:
     auto executor_state = chassis_executor_->Update();
     if (executor_state != BehaviorState::RUNNING)
     {
-      if (blackboard_->IsNewGoal())
+      if (blackboard_ptr_->IsNewGoal())
       {
-        chassis_executor_->Execute(blackboard_->GetGoal());
-        return Behaviortate::SUCCESS;
+        chassis_executor_->Execute(blackboard_ptr_->GetGoal());
+        return BehaviorState::SUCCESS;
       }
     }
     return BehaviorState::RUNNING;
@@ -45,10 +45,7 @@ public:
 
 private:
   //! executor
-  ChassisExecutor *const chassis_executor_;
-
-  //! perception information
-  Blackboard *const blackboard_;
+  const ChassisExecutor::Ptr chassis_executor_;
 
   //! planning goal
   geometry_msgs::PoseStamped planning_goal_;

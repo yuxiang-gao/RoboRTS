@@ -14,8 +14,8 @@ namespace roborts_decision
 class GoalAction : public ActionNode
 {
 public:
-  ReloadAction(std::string robot_name,ChassisExecutor::Ptr &chassis_executor,
-             Blackboard::Ptr &blackboard) : ActionNode("reload_action", blackboard),
+  ReloadAction(std::string robot_name, const ChassisExecutor::Ptr &chassis_executor,
+             const Blackboard::Ptr &blackboard) : ActionNode("reload_action", blackboard),
                                             chassis_executor_(chassis_executor) {}
 
     void OnInitialize()
@@ -47,7 +47,7 @@ public:
         chassis_executor_->Execute(blackboard_->GetGoal());
         return Behaviortate::SUCCESS;
       }*/
-        chassis_executor_->Execute(blackboard_->GetReloadGoal());
+        chassis_executor_->Execute(blackboard_ptr_->GetReloadGoal());
         blackboard->RefreePublishSupply(robot_name_)
         std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
         std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
@@ -68,8 +68,6 @@ private:
   //! executor
   ChassisExecutor *const chassis_executor_;
 
-  //! perception information
-  Blackboard *const blackboard_;
   std::string robot_name_;
 
   //! reload goal

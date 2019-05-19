@@ -12,7 +12,7 @@ namespace roborts_decision
 class EnemyDetectedCondition : public PreconditionNode
 {
 public:
-    EnemyDetectedCondition(ChassisExecutor::Ptr &chassis_executor,
+    EnemyDetectedCondition(const ChassisExecutor::Ptr &chassis_executor,
                            Blackboard::Ptr &blackboard) : PreconditionNode("enemy_detected_cond", blackboard), blackboard->IsEnemyDetected(), AbortType::SELF)
     {
     }

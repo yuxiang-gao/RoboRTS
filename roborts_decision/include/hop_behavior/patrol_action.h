@@ -14,13 +14,12 @@ namespace roborts_decision
 class PatrolAction : public ActionNode
 {
 public:
-  PatrolAction(ChassisExecutor::Ptr &chassis_executor,
-               Blackboard::Ptr &blackboard, ) : ActionNode("patrol_act", blackboard), chassis_executor_(chassis_executor),
-                                                blackboard_(blackboard)
+  PatrolAction(const ChassisExecutor::Ptr &chassis_executor,
+               const Blackboard::Ptr &blackboard) : ActionNode("patrol_act", blackboard), chassis_executor_(chassis_executor)
   {
   }
 
-  void OnIntialize()
+  void OnInitialize()
   {
     patrol_count_ = 0;
     point_size_ = 0;
@@ -44,7 +43,7 @@ public:
     }
   }
 
-  Behaviortate Update()
+  BehaviorState Update()
   {
     auto executor_state = chassis_executor_->Update();
     if (executor_state != BehaviorState::RUNNING)
@@ -52,15 +51,15 @@ public:
       if (patrol_goals_.empty())
       {
         ROS_ERROR("patrol goal is empty");
-        return Behaviortate::FAILURE;
+        return BehaviorState::FAILURE;
       }
 
       ROS_INFO("send goal");
       chassis_executor_->Execute(patrol_goals_[patrol_count_]);
       patrol_count_ = ++patrol_count_ % point_size_;
-      return Behaviortate::SUCCESS;
+      return BehaviorState::SUCCESS;
     }
-    return Behaviortate::RUNNING;
+    return BehaviorState::RUNNING;
   }
 
   void OnTerminate(BehaviorState state)
@@ -68,19 +67,13 @@ public:
     chassis_executor_->Cancel();
   }
 
-  BehaviorState Update()
-  {
-    return chassis_executor_->Update();
-  }
+
 
   ~PatrolAction() = default;
 
 private:
   //! executor
-  ChassisExecutor *const chassis_executor_;
-
-  //! perception information
-  Blackboard *const blackboard_;
+  const ChassisExecutor::Ptr chassis_executor_;
 
   //! patrol buffer
   std::vector<geometry_msgs::PoseStamped> patrol_goals_;

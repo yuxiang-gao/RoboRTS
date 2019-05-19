@@ -170,10 +170,10 @@ public:
 
 private:
   //! executor
-  ChassisExecutor *const chassis_executor_;
+  const ChassisExecutor::Ptr chassis_executor_;
 
   //! perception information
-  Blackboard *const blackboard_;
+  const Blackboard::Ptr blackboard_;
 
   //! chase goal
   geometry_msgs::PoseStamped chase_goal_;

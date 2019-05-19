@@ -15,7 +15,7 @@ namespace roborts_decision
 class DZAction : public ActionNode
 {
 public:
-  GoalAction(ChassisExecutor::Ptr &chassis_executor,
+  GoalAction(const ChassisExecutor::Ptr &chassis_executor,
              Blackboard::Ptr &blackboard) : ActionNode("DZ_action", blackboard),
                                             chassis_executor_(chassis_executor) {}
 
@@ -46,7 +46,7 @@ public:
       /*if (blackboard_->IsNewGoal())
       {
         chassis_executor_->Execute(blackboard_->GetGoal());
-        return Behaviortate::SUCCESS;
+        return BehaviorState::SUCCESS;
       }*/
         chassis_executor_->Execute(blackboard_->GetDZGoal());
         std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
@@ -57,7 +57,7 @@ public:
             std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
             std::chrono::duration<double> diff = end-start;
         }
-        return Behaviortate::SUCCESS;
+        return BehaviorState::SUCCESS;
     }
     return BehaviorState::RUNNING;
   }
@@ -66,10 +66,10 @@ public:
 
 private:
   //! executor
-  ChassisExecutor *const chassis_executor_;
+  const ChassisExecutor::Ptr chassis_executor_;
 
   //! perception information
-  Blackboard *const blackboard_;
+  const Blackboard::Ptr blackboard_;
 
   //! DZ goal
   geometry_msgs::PoseStamped DZ_goal_;

@@ -76,7 +76,7 @@ class BackBootAreaAction : public ActionNode
 
   private:
     //! executor
-    ChassisExecutor *const chassis_executor_;
+    const ChassisExecutor::Ptr chassis_executor_;
     //! boot position
     geometry_msgs::PoseStamped boot_position_;
     //! chase buffer
