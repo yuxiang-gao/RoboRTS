@@ -85,7 +85,7 @@ public:
     ros::NodeHandle nh_priv("~");
     std::string map_path = ros::package::getPath("roborts_costmap") +
                            "/config/costmap_parameter_config_for_decision.prototxt";
-    if (viz_nh.hasParam("global_frame") && viz_nh.hasParam("robot_base_frame"))
+    if (nh_priv.hasParam("global_frame") && nh_priv.hasParam("robot_base_frame"))
     {
       std::string global_frame, robot_base_frame;
       ros::param::get("~global_frame", global_frame);
