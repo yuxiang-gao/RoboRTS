@@ -11,6 +11,9 @@
 
 #include "utils/line_iterator.h"
 
+// Added by Thomas to make without errors
+#include <random>
+
 namespace roborts_decision{
 class EscapeBehavior {
  public:

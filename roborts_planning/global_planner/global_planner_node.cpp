@@ -75,7 +75,7 @@ ErrorInfo GlobalPlannerNode::Init() {
                                                                            map_path.c_str(),
                                                                            global_frame,
                                                                            robot_base_frame);
-ROS_INFO("path frame id: %s", (std::string)costmap_ptr_->GetGlobalFrameID());
+
   // Create the instance of the selected algorithm
   global_planner_ptr_ = roborts_common::AlgorithmFactory<GlobalPlannerBase,CostmapPtr >::CreateAlgorithm(
       selected_algorithm_, costmap_ptr_);
@@ -85,7 +85,6 @@ ROS_INFO("path frame id: %s", (std::string)costmap_ptr_->GetGlobalFrameID());
                      "global planner algorithm instance can't be loaded");
   }
 
-ROS_INFO("path frame id: %s", costmap_ptr_->GetGlobalFrameID());
   // Initialize path frame from global costmap
   path_.header.frame_id = costmap_ptr_->GetGlobalFrameID();
   return ErrorInfo(ErrorCode::OK);
