@@ -66,6 +66,7 @@ public:
             to_push.scale = scale;
             to_push.color = color;
             to_push.header = msg->header;
+            to_push.header.frame_id = "/base_laser_link";
             to_push.pose = msg->detected_objects[i].pose;
             to_publish.markers.push_back(to_push);
         }
