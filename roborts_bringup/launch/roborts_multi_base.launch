@@ -41,7 +41,7 @@
             <param name="robot_base_frame" value="$(arg robot_name)/base_link"/> -->
         </node>
         <!-- Run the local planner node -->
-        <node pkg="roborts_planning" type="local_planner_node" name="local_planner_node" respawn="false" output="screen">
+        <node pkg="roborts_planning" type="local_planner_node" name="local_planner_node" respawn="false" >
             <remap from="map" to="/map"/>
             <remap from="static_map" to="/static_map"/>
             <!-- <param name="global_frame" value="$(arg robot_name)/odom" />

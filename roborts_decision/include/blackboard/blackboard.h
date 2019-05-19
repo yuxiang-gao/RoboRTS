@@ -134,8 +134,9 @@ public:
     RefereeSubscribe(robot_0_);
     RefereeSubscribe(robot_1_);
     ROS_INFO("Referee interface Initialized ");
-    ROS_INFO("Referee interface Initialized ");
-    IsBlue();
+    // IsBlue();
+    // ROS_INFO("Referee interface Initialized ");
+    //TODO: wait for referee msgs
 
     if (!decision_config.simulate())
     {
