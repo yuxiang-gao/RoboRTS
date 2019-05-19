@@ -35,7 +35,7 @@
         </node>
 
         <!-- Run the global planner Node -->
-        <node pkg="roborts_planning" type="global_planner_node" name="global_planner_node" respawn="false" output="screen">
+        <node pkg="roborts_planning" type="global_planner_node" name="global_planner_node" respawn="false" >
             <remap from="map" to="/map"/>
             <remap from="static_map" to="/static_map"/>
             <param name="global_frame" value="/map" />

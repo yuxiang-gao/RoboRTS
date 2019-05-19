@@ -6,8 +6,15 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /LaserScan1
+        - /TF1
         - /TF1/Frames1
+        - /Map1
         - /Map2
+        - /Path1
+        - /Path2
+        - /LaserScan2
+        - /Map3
       Splitter Ratio: 0.5
     Tree Height: 557
   - Class: rviz/Selection
@@ -63,7 +70,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.100000001
       Style: Flat Squares
-      Topic: /scan
+      Topic: /robot_0/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -73,15 +80,23 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        base_footprint:
-          Value: true
-        base_laser_link:
-          Value: true
-        base_link:
-          Value: true
         map:
           Value: true
-        odom:
+        robot_0/base_footprint:
+          Value: true
+        robot_0/base_laser_link:
+          Value: true
+        robot_0/base_link:
+          Value: true
+        robot_0/odom:
+          Value: true
+        robot_1/base_footprint:
+          Value: true
+        robot_1/base_laser_link:
+          Value: true
+        robot_1/base_link:
+          Value: true
+        robot_1/odom:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -90,10 +105,10 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          odom:
-            base_footprint:
-              base_link:
-                base_laser_link:
+          robot_0/odom:
+            robot_0/base_footprint:
+              robot_0/base_link:
+                robot_0/base_laser_link:
                   {}
       Update Interval: 0
       Value: true
@@ -113,7 +128,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /local_costmap/local_costmap/costmap
+      Topic: /robot_0/local_costmap/local_costmap/costmap
       Unreliable: false
       Use Timestamp: false
       Value: true
@@ -137,7 +152,7 @@ Visualization Manager:
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
       Shaft Length: 0.100000001
-      Topic: /global_planner_node/path
+      Topic: /robot_0/global_planner_node/path
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -160,7 +175,7 @@ Visualization Manager:
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
       Shaft Length: 0.100000001
-      Topic: /local_planner_node/local_planner
+      Topic: /robot_0/local_planner_node/local_planner
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -188,10 +203,20 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.0500000007
       Style: Flat Squares
-      Topic: /expected_scan
+      Topic: /robot_0/expected_scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
+      Value: true
+    - Alpha: 0.699999988
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /robot_0/local_costmap/local_costmap/costmap
+      Unreliable: false
+      Use Timestamp: false
       Value: true
   Enabled: true
   Global Options:
@@ -218,7 +243,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 14.1031532
+      Distance: 13.3081894
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -233,10 +258,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.54479635
+      Pitch: 0.334796667
       Target Frame: map
       Value: ThirdPersonFollower (rviz)
-      Yaw: 4.75260639
+      Yaw: 3.16760349
     Saved: ~
 Window Geometry:
   Displays:
@@ -254,5 +279,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 928
-  X: 512
+  X: 65
   Y: 102
