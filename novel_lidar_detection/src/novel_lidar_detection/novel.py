@@ -10,7 +10,7 @@ class NovelLidarDetection(object):
     def __init__(self, 
         in_scan_topic='/scan', 
         expected_scan_topic='/expected_scan', 
-        out_scan_topic='filtered_scan', 
+        out_scan_topic='/filtered_scan', 
         detected_object_topic='/lidar_objects', 
         amcl_pose_topic='/amcl_pose',
         odom_topic='/odom',
@@ -122,6 +122,7 @@ class NovelLidarDetection(object):
             return
 	'''
 
+        #rospy.loginfo('Expected_scan shape: (n={}) \t received scan (n={})'.format(self.last_ex
         if self.last_scan.shape != self.last_expected.shape:
             rospy.logerr('Expected scan (n={}) is not the same size as received scan (n={})'.format(self.last_expected.shape,self.last_scan.shape))
 
@@ -228,11 +229,13 @@ class NovelLidarDetection(object):
         # rospy.logwarn_throttle(10, 'Pose msg received: cov: {} mag: {}'.format(self.last_pose_covariance, self.cov_mag ))
         self.last_pose_header = msg.header
     def ls_callback(self, msg):
+        #rospy.loginfo('inside lscallback')
         self.last_scan_msg = msg
         if self.pose_ready:
+            #rospy.loginfo('updating last_scan');
             self.range_max = msg.range_max
             self.last_scan = np.array(msg.ranges)
-            # self.pose_ready = False
+            self.pose_ready = False
 
     def els_callback(self, msg):
         self.last_expected = np.array(msg.ranges)

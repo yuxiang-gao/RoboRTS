@@ -33,5 +33,9 @@
   <!-- Run the local planner node -->
   <node pkg="roborts_planning" type="local_planner_node" name="local_planner_node" respawn="false" />
 
+  <!-- Run RVIZ -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find roborts_bringup)/rviz/roborts.rviz"/>
+
+
 </launch>
 

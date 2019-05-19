@@ -147,6 +147,7 @@ void ArmorDetectionNode::ActionCB(const roborts_msgs::ArmorDetectionGoal::ConstP
 void ArmorDetectionNode::ExecuteLoop() {
   undetected_count_ = undetected_armor_delay_;
   cv::Point3f prev_target_3d;
+  cv::Point3f pprev_target_3d;
   while(running_) {
     usleep(1);
     if (node_state_ == NodeState::RUNNING) {
@@ -159,23 +160,43 @@ void ArmorDetectionNode::ExecuteLoop() {
         z_ = target_3d.z;
         error_info_ = error_info;
       }
+/*             FILTERING    THE   TARGET  			!
+ *             FILTERING    THE   TARGET  			!
+ *             FILTERING    THE   TARGET  			!
+ *             FILTERING    THE   TARGET  			!
+ *             FILTERING    THE   TARGET          	!
+ *             FILTERING    THE   TARGET            !
+ */
+      if (undetected_count_>= 5 ) {
+		gimbal_angle_.yaw_mode = true;
+        gimbal_angle_.pitch_mode = true;
+        gimbal_angle_.yaw_angle = 0;
+        gimbal_angle_.pitch_angle = 0;
 
-      if(detected_enemy_) {
-        float pitch, yaw;
-        gimbal_control_.Transform(target_3d, pitch, yaw);
+        undetected_count_--;
+        PublishMsgs();}
+      else 
+		{
+		if (undetected_count_ > 0 && undetected_count_ < 5) target_3d = prev_target_3d;
+		else target_3d = 0.7*target_3d+0.2*prev_target_3d+0.1*pprev_target_3d;
+				
+		float pitch, yaw;
+		gimbal_control_.Transform(target_3d, pitch, yaw);
 
-        gimbal_angle_.yaw_mode = true; //0 means absolute, 1 means relative
-        gimbal_angle_.pitch_mode = false;
-        gimbal_angle_.yaw_angle = yaw * 0.7;
-        gimbal_angle_.pitch_angle = pitch;
+		gimbal_angle_.yaw_mode = true; //0 means absolute, 1 means relative
+		gimbal_angle_.pitch_mode = false;
+		gimbal_angle_.yaw_angle = yaw * 0.7;
+		gimbal_angle_.pitch_angle = pitch;
 
-        std::lock_guard<std::mutex> guard(mutex_);
-        undetected_count_ = undetected_armor_delay_;
+		std::lock_guard<std::mutex> guard(mutex_);
+		undetected_count_ = undetected_armor_delay_;
 	
 
-        PublishMsgs();
-        prev_target_3d = target_3d;
-      } else if(undetected_count_ != 0) {
+		PublishMsgs();
+		prev_target_3d = target_3d;
+		pprev_target_3d = prev_target_3d;
+		}
+       /* else if(undetected_count_ != 0) {
 
         gimbal_angle_.yaw_mode = true;
         gimbal_angle_.pitch_mode = true;
@@ -184,7 +205,7 @@ void ArmorDetectionNode::ExecuteLoop() {
 
         undetected_count_--;
         PublishMsgs();
-      }
+      }*/
     } else if (node_state_ == NodeState::PAUSE) {
       std::unique_lock<std::mutex> lock(mutex_);
       condition_var_.wait(lock);
