@@ -27,13 +27,11 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
   - Class: rviz/Tool Properties
     Expanded: ~
     Name: Tool Properties
     Splitter Ratio: 0.5
-Toolbars:
-  toolButtonStyle: 2
 Visualization Manager:
   Class: ""
   Displays:
@@ -71,12 +69,16 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
-        base_footprint:
-          Value: true
+        All Enabled: false
         base_laser_link:
           Value: true
         base_link:
+          Value: true
+        camera:
+          Value: false
+        gimbal:
+          Value: false
+        map:
           Value: true
         odom:
           Value: true
@@ -86,7 +88,15 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          odom:
+            base_link:
+              base_laser_link:
+                {}
+              camera:
+                {}
+              gimbal:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 0.699999988
@@ -185,6 +195,37 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.100000001
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.300000012
+      Head Radius: 0.100000001
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.0500000007
+      Shape: Arrow
+      Topic: /amcl_pose
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Arrow Length: 0.300000012
+      Axes Length: 0.300000012
+      Axes Radius: 0.00999999978
+      Class: rviz/PoseArray
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.0700000003
+      Head Radius: 0.0299999993
+      Name: PoseArray
+      Shaft Length: 0.230000004
+      Shaft Radius: 0.00999999978
+      Shape: Arrow (Flat)
+      Topic: /particlecloud
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -210,25 +251,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 14.1031532
+      Distance: 13.1647711
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 4.20187092
-        Y: 0.607704878
-        Z: 2.67863174e-06
+        X: 0.753884315
+        Y: 0.209175944
+        Z: 1.14771901e-05
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.00100000005
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.54479635
+      Pitch: 1.53479636
       Target Frame: map
       Value: ThirdPersonFollower (rviz)
-      Yaw: 4.75260639
+      Yaw: 1.60942233
     Saved: ~
 Window Geometry:
   Displays:

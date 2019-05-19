@@ -74,9 +74,11 @@ public:
 
 	{
 		nh_.param<float>("map_resolution", map_resolution, 0.05);
-		nh_.param<float>("min_angle", min_angle, -2.356);
-		nh_.param<float>("max_angle", max_angle, 2.356);
-		nh_.param<int>("points_per_scan", points_per_scan, 270);
+		//nh_.param<float>("min_angle", min_angle, -2.356);
+		//nh_.param<float>("max_angle", max_angle, 2.356);
+		nh_.param<float>("min_angle", min_angle, 0);
+		nh_.param<float>("max_angle", max_angle, 3.14 + 1.57);
+		nh_.param<int>("points_per_scan", points_per_scan, 360);
 		nh_.param<float>("range", range, 5);
 		nh_.param<bool>("map_known", map_known, false);
 		nh_.param<bool>("pose_known", pose_known, false);
@@ -140,7 +142,8 @@ public:
 		m.getRPY(roll, pitch, yaw);
 
 		// Adjust for vehicle angle
-		map_scan_angle = curr_scan_angle + yaw; 
+		map_scan_angle = curr_scan_angle + yaw -2.3562; // Magic number is yaw between robot base and lidar
+	    //map_scan_angle = curr_scan_angle + yaw;
 
 		int max_hyp = range/map_resolution; // message member variable is 0?? Read from RVIZ
 		//ROS_INFO("max_hyp = %d\nmin_angle = %f\nmax_angle = %f\npoints_per_scan = %d\nangle_increment = %f\ncalc = %f", max_hyp, min_angle, max_angle, points_per_scan, angle_increment, std::abs(min_angle - max_angle)/(float)points_per_scan);
