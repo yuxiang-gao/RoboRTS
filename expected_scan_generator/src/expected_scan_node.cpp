@@ -76,7 +76,7 @@ public:
 		nh_.param<float>("map_resolution", map_resolution, 0.05);
 		nh_.param<float>("min_angle", min_angle, -2.356);
 		nh_.param<float>("max_angle", max_angle, 2.356);
-		nh_.param<int>("points_per_scan", points_per_scan, 270);
+		nh_.param<int>("points_per_scan", points_per_scan, 360);
 		nh_.param<float>("range", range, 5);
 		nh_.param<bool>("map_known", map_known, false);
 		nh_.param<bool>("pose_known", pose_known, false);
