@@ -7,7 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1/Frames1
-        - /LaserScan2
+        - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 815
   - Class: rviz/Selection
@@ -77,8 +77,6 @@ Visualization Manager:
           Value: true
         camera:
           Value: false
-        gimbal:
-          Value: false
         map:
           Value: true
         odom:
@@ -95,8 +93,6 @@ Visualization Manager:
               base_laser_link:
                 {}
               camera:
-                {}
-              gimbal:
                 {}
       Update Interval: 0
       Value: true
@@ -176,7 +172,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/LaserScan
       Color: 255; 255; 255
-      Color Transformer: ""
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -226,6 +222,14 @@ Visualization Manager:
       Shape: Arrow (Flat)
       Topic: /particlecloud
       Unreliable: false
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /lidar_objects_markers
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -288,5 +292,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 928
-  X: 65
+  X: 992
   Y: 24

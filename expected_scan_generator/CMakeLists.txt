@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   novel_msgs
   tf
+  visualization_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -211,4 +212,6 @@ target_link_libraries(expected_scan_generator ${catkin_LIBRARIES})
 add_executable(novel_objects_filter src/novel_objects_filter.cpp)
 target_link_libraries(novel_objects_filter ${catkin_LIBRARIES})
 
+add_executable(display_lidar_objects src/display_lidar_objects.cpp)
+target_link_libraries(display_lidar_objects ${catkin_LIBRARIES})
 

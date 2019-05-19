@@ -4,6 +4,11 @@
     <node pkg="expected_scan_generator" type="expected_scan_generator" name="expected_scan_generator" />
 
     <!-- Detect objects -->
-    <node pkg="novel_lidar_detection" type="novel_lidar_detection" name="novel_lidar_detector" output="screen"/>
+    <node pkg="novel_lidar_detection" type="novel_lidar_detection" name="novel_lidar_detector" />
+
+    <!-- filter -->
+    <!--<node pkg="expected_scan_generator" type="novel_objects_filter" name="novel_objects_filter" output="screen"/> -->
+    <!-- visualizer -->
+    <node pkg="expected_scan_generator" type="display_lidar_objects" name="display_lidar_objects" output="screen" />
 
 </launch>
