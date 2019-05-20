@@ -399,6 +399,12 @@ public:
       return referee_info[GetRobotName()]->bonus_status.red_bonus;
   }
 
+  // True if bonus is activated for this robot
+  int IsBonusActivated()
+  {
+    return referee_info[GetRobotName()]->robot_bonus.bonus;
+  }
+
   bool IsBonusUnoccupied()
   {
     if (GetBonusStatus() == 0)

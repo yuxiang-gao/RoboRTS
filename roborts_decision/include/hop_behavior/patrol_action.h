@@ -57,7 +57,7 @@ public:
       ROS_INFO("send goal");
       chassis_executor_->Execute(patrol_goals_[patrol_count_]);
       patrol_count_ = ++patrol_count_ % point_size_;
-      return BehaviorState::SUCCESS;
+      // return BehaviorState::SUCCESS;
     }
     return BehaviorState::RUNNING;
   }
@@ -66,8 +66,6 @@ public:
   {
     chassis_executor_->Cancel();
   }
-
-
 
   ~PatrolAction() = default;
 
