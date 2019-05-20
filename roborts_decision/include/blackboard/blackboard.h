@@ -112,6 +112,15 @@ public:
     roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config);
 
     referee_info = std::map<std::string /*robot_name*/, std::shared_ptr<RefereeSystemInfo>>();
+
+    nh_.getParam("robot_name", robot_name_);
+    ROS_INFO("Robot Name: %s", robot_name_.c_str());
+
+    // init bullet count
+    bullet_count_ = (robot_name_ == robot_0_) ? 40 : 0;
+    fric_wheel_srv_ = nh_.serviceClient<roborts_msgs::FricWhl>("cmd_fric_wheel");
+    shoot_srv_ = nh_.serviceClient<roborts_msgs::ShootCmd>("cmd_shoot");
+
     // is_master = decision_config.master();
     // referee system
     referee_info[robot_0_] = std::make_shared<RefereeSystemInfo>();
@@ -141,464 +150,576 @@ public:
   {
     roborts_msgs::ProjectileSupply sup_msg;
     sup_msg.number = 100;
-    if (GetRobotName() == "robot_0")
+    if (robot_name_ == "robot_0")
       robot_master_supply_pub_.publish(sup_msg);
     else
       robot_wing_supply_pub_.publish(sup_msg);
   }
 
-  void RefereeSubscribe(std::string robot_name)
+  void TurnOnFricWheel()
   {
-
-    ROS_INFO("Initializing blackboard subscriber to referee msg");
-    if (robot_name == "robot_0")
+    roborts_msgs::FricWhl srv;
+    srv.open = true;
+    int i = 10;
+    while (i-- >= 0)
     {
-      robot_master_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
-
-      game_status_master_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
-
-      game_result_master_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
-
-      game_survivor_master_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
-
-      bonus_status_master_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
-
-      supplier_status_master_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
-
-      robot_heat_master_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
-
-      robot_bonus_master_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
-
-      robot_status_master_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
-
-      robot_damage_master_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
-
-      robot_shoot_master_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
-    }
-    else if (robot_name == "robot_1")
-    {
-      robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
-      game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
-
-      game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
-
-      game_survivor_wing_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
-
-      bonus_status_wing_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
-
-      supplier_status_wing_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
-
-      robot_heat_wing_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
-
-      robot_bonus_wing_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
-
-      robot_status_wing_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
-
-      robot_damage_wing_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
-
-      robot_shoot_wing_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
-    }
-    else
-    {
-      robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::RobotStatus>("/projectile_supply", 1);
-      game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
-
-      game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
-
-      game_survivor_wing_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
-
-      bonus_status_wing_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
-
-      supplier_status_wing_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
-
-      robot_heat_wing_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
-
-      robot_bonus_wing_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
-
-      robot_status_wing_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
-
-      robot_damage_wing_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
-
-      robot_shoot_wing_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
-    }
-  }
-
-  ~Blackboard() = default;
-
-  // referee
-  int GetHP(std::string robot_name)
-  {
-    return referee_info[robot_name]->robot_status.remain_hp;
-  }
-
-  bool IsMaster()
-  {
-    return decision_config.master();
-  }
-
-  bool IsWing()
-  {
-    return !decision_config.master();
-  }
-
-  std::string GetRobotName()
-  {
-    if (IsMaster())
-      return robot_0_;
-    else
-      return robot_1_;
-  }
-
-  std::string GetOtherRobotName()
-  {
-    if (!IsMaster())
-      return robot_0_;
-    else
-      return robot_1_;
-  }
-
-  bool IsBlue()
-  {
-    switch (referee_info["master"]->robot_status.id)
-    {
-    case 3:
-      ROS_DEBUG("Team: BLUE, Master Robot");
-      // is_master = true;
-      return true;
-      break;
-    case 4:
-      ROS_DEBUG("Team: BLUE, wing Robot");
-      // is_master = false;
-      return true;
-      break;
-    case 13:
-      ROS_DEBUG("Team: BLUE, Master Robot");
-      // is_master = true;
-      return false;
-      break;
-    case 14:
-      ROS_DEBUG("Team: BLUE, Master Robot");
-      // is_master = false;
-      return false;
-      break;
-    default:
-      ROS_ERROR("For AI challenge, please set robot id to Blue3/4 or Red3/4 in the referee system main control module");
-    }
-  }
-
-  bool IsRed()
-  {
-    return !IsBlue();
-  }
-
-  void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, const std::string id)
-  {
-    referee_info[id]->game_status = *data;
-  }
-
-  void GameResultCallback(const roborts_msgs::GameResultConstPtr &data, const std::string id)
-  {
-    referee_info[id]->game_result = *data;
-  }
-  void GameSurvivorCallback(const roborts_msgs::GameSurvivorConstPtr &data, const std::string id)
-  {
-    referee_info[id]->game_survivor = *data;
-  }
-  void BonusStatusCallback(const roborts_msgs::BonusStatusConstPtr &data, const std::string id)
-  {
-    referee_info[id]->bonus_status = *data;
-  }
-  void SupplierStatusCallback(const roborts_msgs::SupplierStatusConstPtr &data, const std::string id)
-  {
-    referee_info[id]->supplier_status = *data;
-  }
-  void RobotHeatCallback(const roborts_msgs::RobotHeatConstPtr &data, const std::string id)
-  {
-    referee_info[id]->robot_heat = *data;
-  }
-  void RobotBonusCallback(const roborts_msgs::RobotBonusConstPtr &data, const std::string id)
-  {
-    referee_info[id]->robot_bonus = *data;
-  }
-  void RobotStatusCallback(const roborts_msgs::RobotStatusConstPtr &data, const std::string id)
-  {
-    referee_info[id]->robot_status = *data;
-  }
-  void RobotDamageCallback(const roborts_msgs::RobotDamageConstPtr &data, const std::string id)
-  {
-    referee_info[id]->robot_damage = *data;
-  }
-  void RobotShootCallback(const roborts_msgs::RobotShootConstPtr &data, const std::string id)
-  {
-    referee_info[id]->robot_shoot = *data;
-  }
-
-  // Enemy
-  void ArmorDetectionFeedbackCallback(const roborts_msgs::ArmorDetectionFeedbackConstPtr &feedback)
-  {
-    if (feedback->detected)
-    {
-      enemy_detected_ = true;
-      ROS_INFO("Find Enemy!");
-
-      tf::Stamped<tf::Pose> tf_pose, global_tf_pose;
-      geometry_msgs::PoseStamped camera_pose_msg, global_pose_msg;
-      camera_pose_msg = feedback->enemy_pos;
-
-      double distance = std::sqrt(camera_pose_msg.pose.position.x * camera_pose_msg.pose.position.x +
-                                  camera_pose_msg.pose.position.y * camera_pose_msg.pose.position.y);
-      double yaw = atan(camera_pose_msg.pose.position.y / camera_pose_msg.pose.position.x);
-
-      //camera_pose_msg.pose.position.z=camera_pose_msg.pose.position.z;
-      tf::Quaternion quaternion = tf::createQuaternionFromRPY(0,
-                                                              0,
-                                                              yaw);
-      camera_pose_msg.pose.orientation.w = quaternion.w();
-      camera_pose_msg.pose.orientation.x = quaternion.x();
-      camera_pose_msg.pose.orientation.y = quaternion.y();
-      camera_pose_msg.pose.orientation.z = quaternion.z();
-      poseStampedMsgToTF(camera_pose_msg, tf_pose);
-
-      tf_pose.stamp_ = ros::Time(0);
-      try
+      if (fric_wheel_srv_.call(srv))
       {
-        tf_ptr_->transformPose("map", tf_pose, global_tf_pose);
-        tf::poseStampedTFToMsg(global_tf_pose, global_pose_msg);
-
-        if (GetDistance(global_pose_msg, enemy_pose_) > 0.2 || GetAngle(global_pose_msg, enemy_pose_) > 0.2)
-        {
-          enemy_pose_ = global_pose_msg;
-        }
+        ROS_INFO("Fric received: %d", (int)srv.response.received);
+        if (srv.response.received)
+          return;
       }
-      catch (tf::TransformException &ex)
+      else
       {
-        ROS_ERROR("tf error when transform enemy pose from camera to map");
+        ROS_ERROR("Failed to turn on fric wheel");
+        return;
+      }
+    }
+    ROS_ERROR("Failed to turn on fric wheel");
+  }
+
+  void TurnOffFricWheel()
+  {
+    roborts_msgs::FricWhl srv;
+    srv.request.open = false;
+    int i = 10;
+    while (i-- >= 0)
+      if (fric_wheel_srv_.call(srv))
+      {
+        ROS_INFO("Fric received: %d", (int)srv.response.received);
+        if (srv.response.received)
+          return;
+      }
+      else
+      {
+        ROS_ERROR("Failed to turn on fric wheel");
+        return;
+      }
+  }
+}
+
+void
+Shoot(int num)
+{
+  roborts_msgs::ShootCmd srv;
+  srv.request.mode = roborts_msgs::ShootCmd::ONCE;
+  srv.request.number = num;
+  while (true)
+  {
+    if (shoot_srv_.call(srv))
+    {
+      ROS_INFO("Shoot received: %d", (int)srv.response.received);
+      if (srv.response.received)
+      {
+        bullet_count_ -= num;
+        return;
       }
     }
     else
     {
-      enemy_detected_ = false;
+      ROS_ERROR("Failed to turn on fric wheel");
+      return;
     }
   }
+}
 
-  geometry_msgs::PoseStamped GetEnemy() const
+bool IsNeedReload()
+{
+  return (bullet_count_ <= 10);
+}
+
+void RefereeSubscribe(std::string robot_name)
+{
+
+  ROS_INFO("Initializing blackboard subscriber to referee msg");
+  if (robot_name == "robot_0")
   {
-    return enemy_pose_;
+    robot_master_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
+
+    game_status_master_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
+
+    game_result_master_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
+
+    game_survivor_master_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
+
+    bonus_status_master_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
+
+    supplier_status_master_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
+
+    robot_heat_master_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
+
+    robot_bonus_master_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
+
+    robot_status_master_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
+
+    robot_damage_master_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
+
+    robot_shoot_master_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
   }
-
-  int GetSupplierStatus()
+  else if (robot_name == "robot_1")
   {
-    return referee_info[GetRobotName()]->supplier_status.status;
+    robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
+
+    game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
+
+    game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
+
+    game_survivor_wing_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/" + robot_name + "/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
+
+    bonus_status_wing_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/" + robot_name + "/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
+
+    supplier_status_wing_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/" + robot_name + "/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
+
+    robot_heat_wing_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/" + robot_name + "/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
+
+    robot_bonus_wing_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/" + robot_name + "/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
+
+    robot_status_wing_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/" + robot_name + "/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
+
+    robot_damage_wing_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
+
+    robot_shoot_wing_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
   }
-
-  int GetBonusStatus()
+  else
   {
-    if (IsBlue())
-      return referee_info[GetRobotName()]->bonus_status.blue_bonus;
-    else
-      return referee_info[GetRobotName()]->bonus_status.red_bonus;
+    robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::RobotStatus>("/projectile_supply", 1);
+    game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
+
+    game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
+
+    game_survivor_wing_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
+
+    bonus_status_wing_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
+
+    supplier_status_wing_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
+
+    robot_heat_wing_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
+
+    robot_bonus_wing_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
+
+    robot_status_wing_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
+
+    robot_damage_wing_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
+
+    robot_shoot_wing_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
   }
+}
 
-  // True if bonus is activated for this robot
-  int IsBonusActivated()
+~Blackboard() = default;
+
+// referee
+int GetHP(std::string robot_name)
+{
+  return referee_info[robot_name]->robot_status.remain_hp;
+}
+
+bool IsMaster()
+{
+  // return decision_config.master();
+  return (robot_name_ == robot_0_);
+}
+
+bool IsWing(){
+    // return !decision_config.master();
+    return (robot_name_ == robot_0_)};
+
+std::string GetRobotName()
+{
+  // if (IsMaster())
+  //   return robot_0_;
+  // else
+  //   return robot_1_;
+  return robot_name_;
+}
+
+std::string GetOtherRobotName()
+{
+  if (!IsMaster())
+    return robot_0_;
+  else
+    return robot_1_;
+}
+
+bool IsBlue()
+{
+  switch (referee_info[robot_name_]->robot_status.id)
   {
-    return referee_info[GetRobotName()]->robot_bonus.bonus;
+  case 3:
+    ROS_DEBUG("Team: BLUE, Master Robot");
+    // is_master = true;
+    return true;
+    break;
+  case 4:
+    ROS_DEBUG("Team: BLUE, wing Robot");
+    // is_master = false;
+    return true;
+    break;
+  case 13:
+    ROS_DEBUG("Team: BLUE, Master Robot");
+    // is_master = true;
+    return false;
+    break;
+  case 14:
+    ROS_DEBUG("Team: BLUE, Master Robot");
+    // is_master = false;
+    return false;
+    break;
+  default:
+    ROS_ERROR("For AI challenge, please set robot id to Blue3/4 or Red3/4 in the referee system main control module");
   }
+}
 
-  bool IsBonusUnoccupied()
+bool IsRed()
+{
+  return !IsBlue();
+}
+
+void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, const std::string id)
+{
+  referee_info[id]->game_status = *data;
+}
+
+void GameResultCallback(const roborts_msgs::GameResultConstPtr &data, const std::string id)
+{
+  referee_info[id]->game_result = *data;
+}
+void GameSurvivorCallback(const roborts_msgs::GameSurvivorConstPtr &data, const std::string id)
+{
+  referee_info[id]->game_survivor = *data;
+}
+void BonusStatusCallback(const roborts_msgs::BonusStatusConstPtr &data, const std::string id)
+{
+  referee_info[id]->bonus_status = *data;
+}
+void SupplierStatusCallback(const roborts_msgs::SupplierStatusConstPtr &data, const std::string id)
+{
+  referee_info[id]->supplier_status = *data;
+}
+void RobotHeatCallback(const roborts_msgs::RobotHeatConstPtr &data, const std::string id)
+{
+  referee_info[id]->robot_heat = *data;
+}
+void RobotBonusCallback(const roborts_msgs::RobotBonusConstPtr &data, const std::string id)
+{
+  referee_info[id]->robot_bonus = *data;
+}
+void RobotStatusCallback(const roborts_msgs::RobotStatusConstPtr &data, const std::string id)
+{
+  referee_info[id]->robot_status = *data;
+}
+void RobotDamageCallback(const roborts_msgs::RobotDamageConstPtr &data, const std::string id)
+{
+  referee_info[id]->robot_damage = *data;
+}
+void RobotShootCallback(const roborts_msgs::RobotShootConstPtr &data, const std::string id)
+{
+  referee_info[id]->robot_shoot = *data;
+}
+
+// Enemy
+void ArmorDetectionFeedbackCallback(const roborts_msgs::ArmorDetectionFeedbackConstPtr &feedback)
+{
+  if (feedback->detected)
   {
-    if (GetBonusStatus() == 0)
-      return true;
-  }
+    enemy_detected_ = true;
+    ROS_INFO("Find Enemy!");
 
-  bool IsBonusOccupied()
-  {
-    if (GetBonusStatus() == 2)
-      return true;
-  }
+    tf::Stamped<tf::Pose> tf_pose, global_tf_pose;
+    geometry_msgs::PoseStamped camera_pose_msg, global_pose_msg;
+    camera_pose_msg = feedback->enemy_pos;
 
-  bool IsEnemyDetected() const
-  {
-    ROS_INFO("%s: %d", __FUNCTION__, (int)enemy_detected_);
-    return enemy_detected_;
-  }
+    double distance = std::sqrt(camera_pose_msg.pose.position.x * camera_pose_msg.pose.position.x +
+                                camera_pose_msg.pose.position.y * camera_pose_msg.pose.position.y);
+    double yaw = atan(camera_pose_msg.pose.position.y / camera_pose_msg.pose.position.x);
 
-  bool IsFiveSecondCD()
-  {
-    if (referee_info[GetRobotName()]->game_status.game_status == 3)
-      return true;
-    else
-      return false;
-  }
+    //camera_pose_msg.pose.position.z=camera_pose_msg.pose.position.z;
+    tf::Quaternion quaternion = tf::createQuaternionFromRPY(0,
+                                                            0,
+                                                            yaw);
+    camera_pose_msg.pose.orientation.w = quaternion.w();
+    camera_pose_msg.pose.orientation.x = quaternion.x();
+    camera_pose_msg.pose.orientation.y = quaternion.y();
+    camera_pose_msg.pose.orientation.z = quaternion.z();
+    poseStampedMsgToTF(camera_pose_msg, tf_pose);
 
-  bool IsGameStart()
-  {
-    if (referee_info[GetRobotName()]->game_status.game_status == 4)
-      return true;
-    else
-      return false;
-  }
-
-  // Goal
-  void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
-  {
-    new_goal_ = true;
-    goal_ = *goal;
-  }
-
-  geometry_msgs::PoseStamped GetGoal() const
-  {
-    return goal_;
-  }
-
-  geometry_msgs::PoseStamped GetReloadGoal()
-  {
-    reload_goal_.header.frame_id = "/map";
-    reload_goal_.pose.orientation.x = 0;
-    reload_goal_.pose.orientation.y = 0;
-    reload_goal_.pose.orientation.z = 0;
-    reload_goal_.pose.orientation.w = 1;
-
-    reload_goal_.pose.position.x = 4;
-    reload_goal_.pose.position.y = 0.5;
-    reload_goal_.pose.position.z = 0;
-
-    return reload_goal_;
-  }
-
-  bool IsNewGoal()
-  {
-    if (new_goal_)
-    {
-      new_goal_ = false;
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-  /*---------------------------------- Tools ------------------------------------------*/
-
-  double GetDistance(const geometry_msgs::PoseStamped &pose1,
-                     const geometry_msgs::PoseStamped &pose2)
-  {
-    const geometry_msgs::Point point1 = pose1.pose.position;
-    const geometry_msgs::Point point2 = pose2.pose.position;
-    const double dx = point1.x - point2.x;
-    const double dy = point1.y - point2.y;
-    return std::sqrt(dx * dx + dy * dy);
-  }
-
-  double GetAngle(const geometry_msgs::PoseStamped &pose1,
-                  const geometry_msgs::PoseStamped &pose2)
-  {
-    const geometry_msgs::Quaternion quaternion1 = pose1.pose.orientation;
-    const geometry_msgs::Quaternion quaternion2 = pose2.pose.orientation;
-    tf::Quaternion rot1, rot2;
-    tf::quaternionMsgToTF(quaternion1, rot1);
-    tf::quaternionMsgToTF(quaternion2, rot2);
-    return rot1.angleShortestPath(rot2);
-  }
-
-  const geometry_msgs::PoseStamped GetRobotMapPose()
-  {
-    UpdateRobotPose(GetRobotName());
-    return robot_map_pose_;
-  }
-
-  const geometry_msgs::PoseStamped GetOtherRobotMapPose()
-  {
-    UpdateRobotPose(GetOtherRobotName());
-    return robot_map_pose_;
-  }
-
-  const std::shared_ptr<CostMap> GetCostMap()
-  {
-    return costmap_ptr_;
-  }
-
-  const CostMap2D *GetCostMap2D()
-  {
-    return costmap_2d_;
-  }
-
-  const unsigned char *GetCharMap()
-  {
-    return charmap_;
-  }
-
-private:
-  const std::string robot_0_ = "robot_0";
-  const std::string robot_1_ = "robot_1";
-  ros::NodeHandle nh_;
-  ros::NodeHandle nh_priv_;
-  ros::Subscriber game_status_master_sub_;
-  ros::Subscriber game_result_master_sub_;
-  ros::Subscriber game_survivor_master_sub_;
-  ros::Subscriber bonus_status_master_sub_;
-  ros::Subscriber supplier_status_master_sub_;
-  ros::Subscriber robot_status_master_sub_;
-  ros::Subscriber robot_heat_master_sub_;
-  ros::Subscriber robot_bonus_master_sub_;
-  ros::Subscriber robot_damage_master_sub_;
-  ros::Subscriber robot_shoot_master_sub_;
-  ros::Subscriber game_status_wing_sub_;
-  ros::Subscriber game_result_wing_sub_;
-  ros::Subscriber game_survivor_wing_sub_;
-  ros::Subscriber bonus_status_wing_sub_;
-  ros::Subscriber supplier_status_wing_sub_;
-  ros::Subscriber robot_status_wing_sub_;
-  ros::Subscriber robot_heat_wing_sub_;
-  ros::Subscriber robot_bonus_wing_sub_;
-  ros::Subscriber robot_damage_wing_sub_;
-  ros::Subscriber robot_shoot_wing_sub_;
-  ros::Publisher robot_wing_supply_pub_;
-  ros::Publisher robot_master_supply_pub_;
-  bool is_blue;
-  void UpdateRobotPose(std::string robot_name)
-  {
-    tf::Stamped<tf::Pose> robot_tf_pose;
-    robot_tf_pose.setIdentity();
-
-    robot_tf_pose.frame_id_ = robot_name + "/" + "base_link";
-    robot_tf_pose.stamp_ = ros::Time();
+    tf_pose.stamp_ = ros::Time(0);
     try
     {
-      geometry_msgs::PoseStamped robot_pose;
-      tf::poseStampedTFToMsg(robot_tf_pose, robot_pose);
-      tf_ptr_->transformPose("/map", robot_pose, robot_map_pose_);
+      tf_ptr_->transformPose("map", tf_pose, global_tf_pose);
+      tf::poseStampedTFToMsg(global_tf_pose, global_pose_msg);
+
+      if (GetDistance(global_pose_msg, enemy_pose_) > 0.2 || GetAngle(global_pose_msg, enemy_pose_) > 0.2)
+      {
+        enemy_pose_ = global_pose_msg;
+      }
     }
-    catch (tf::LookupException &ex)
+    catch (tf::TransformException &ex)
     {
-      ROS_ERROR("Transform Error looking up robot pose: %s", ex.what());
+      ROS_ERROR("tf error when transform enemy pose from camera to map");
     }
   }
-  //! tf
-  std::shared_ptr<tf::TransformListener> tf_ptr_;
+  else
+  {
+    enemy_detected_ = false;
+  }
+}
 
-  //! Enenmy detection
-  ros::Subscriber enemy_sub_;
+geometry_msgs::PoseStamped GetEnemy() const
+{
+  return enemy_pose_;
+}
 
-  //! Goal info
-  geometry_msgs::PoseStamped goal_;
-  geometry_msgs::PoseStamped reload_goal_;
-  geometry_msgs::PoseStamped DZ_goal_;
-  bool new_goal_;
+int GetSupplierStatus()
+{
+  // uint8 CLOSE = 0
+  // uint8 PREPARING = 1
+  // uint8 SUPPLYING = 2
+  // uint8 status
+  return referee_info[robot_name_]->supplier_status.status;
+}
 
-  //! Enemy info
-  actionlib::SimpleActionClient<roborts_msgs::ArmorDetectionAction> armor_detection_actionlib_client_;
-  roborts_msgs::ArmorDetectionGoal armor_detection_goal_;
-  geometry_msgs::PoseStamped enemy_pose_;
-  bool enemy_detected_;
+int GetBonusStatus()
+{
+  // uint8 UNOCCUPIED = 0
+  // uint8 BEING_OCCUPIED= 1
+  // uint8 OCCUPIED = 2
+  if (IsBlue())
+    return referee_info[robot_name_]->bonus_status.blue_bonus;
+  else
+    return referee_info[robot_name_]->bonus_status.red_bonus;
+}
 
-  //! cost map
-  std::shared_ptr<CostMap> costmap_ptr_;
-  CostMap2D *costmap_2d_;
-  unsigned char *charmap_;
+// True if bonus is activated for this robot
+int IsBonusActivated()
+{
+  return referee_info[robot_name_]->robot_bonus.bonus;
+}
 
-  //! robot map pose
-  geometry_msgs::PoseStamped robot_map_pose_;
-};
+bool IsBonusUnoccupied()
+{
+  if (GetBonusStatus() == 0)
+    return true;
+}
+
+bool IsBonusOccupied()
+{
+  if (GetBonusStatus() == 2)
+    return true;
+}
+
+bool IsEnemyDetected() const
+{
+  ROS_INFO("%s: %d", __FUNCTION__, (int)enemy_detected_);
+  return enemy_detected_;
+}
+
+// game status
+bool IsFiveSecondCD()
+{
+  if (referee_info[robot_name_]->game_status.game_status == 3)
+    return true;
+  else
+    return false;
+}
+
+bool IsGameStart()
+{
+  if (referee_info[robot_name_]->game_status.game_status == 4)
+    return true;
+  else
+    return false;
+}
+
+int GetRemainTime()
+{
+  referee_info[robot_name_]->game_status.game_status == 4
+}
+
+//! Bullet
+void AddBullet(int count)
+{
+  bullet_count_ += count;
+  ROS_INFO("Bullet number: %d", bullet_count_);
+}
+
+void SetBullet(int count)
+{
+  bullet_count_ = count;
+  ROS_INFO("Bullet number: %d", bullet_count_);
+}
+
+int GetBulletCount()
+{
+  return bullet_count_;
+}
+
+// Goal
+void GoalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
+{
+  new_goal_ = true;
+  goal_ = *goal;
+}
+
+geometry_msgs::PoseStamped GetGoal() const
+{
+  return goal_;
+}
+
+geometry_msgs::PoseStamped GetReloadGoal()
+{
+  reload_goal_.header.frame_id = "/map";
+  reload_goal_.pose.orientation.x = 0;
+  reload_goal_.pose.orientation.y = 0;
+  reload_goal_.pose.orientation.z = 0;
+  reload_goal_.pose.orientation.w = 1;
+
+  reload_goal_.pose.position.x = 4;
+  reload_goal_.pose.position.y = 0.5;
+  reload_goal_.pose.position.z = 0;
+
+  return reload_goal_;
+}
+
+bool IsNewGoal()
+{
+  if (new_goal_)
+  {
+    new_goal_ = false;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+/*---------------------------------- Tools ------------------------------------------*/
+
+double GetDistance(const geometry_msgs::PoseStamped &pose1,
+                   const geometry_msgs::PoseStamped &pose2)
+{
+  const geometry_msgs::Point point1 = pose1.pose.position;
+  const geometry_msgs::Point point2 = pose2.pose.position;
+  const double dx = point1.x - point2.x;
+  const double dy = point1.y - point2.y;
+  return std::sqrt(dx * dx + dy * dy);
+}
+
+double GetAngle(const geometry_msgs::PoseStamped &pose1,
+                const geometry_msgs::PoseStamped &pose2)
+{
+  const geometry_msgs::Quaternion quaternion1 = pose1.pose.orientation;
+  const geometry_msgs::Quaternion quaternion2 = pose2.pose.orientation;
+  tf::Quaternion rot1, rot2;
+  tf::quaternionMsgToTF(quaternion1, rot1);
+  tf::quaternionMsgToTF(quaternion2, rot2);
+  return rot1.angleShortestPath(rot2);
+}
+
+const geometry_msgs::PoseStamped GetRobotMapPose()
+{
+  UpdateRobotPose(robot_name_);
+  return robot_map_pose_;
+}
+
+const geometry_msgs::PoseStamped GetOtherRobotMapPose()
+{
+  UpdateRobotPose(GetOtherRobotName());
+  return robot_map_pose_;
+}
+
+const std::shared_ptr<CostMap> GetCostMap()
+{
+  return costmap_ptr_;
+}
+
+const CostMap2D *GetCostMap2D()
+{
+  return costmap_2d_;
+}
+
+const unsigned char *GetCharMap()
+{
+  return charmap_;
+}
+
+private:
+const std::string robot_0_ = "robot_0";
+const std::string robot_1_ = "robot_1";
+ros::NodeHandle nh_;
+ros::NodeHandle nh_priv_;
+ros::Subscriber game_status_master_sub_;
+ros::Subscriber game_result_master_sub_;
+ros::Subscriber game_survivor_master_sub_;
+ros::Subscriber bonus_status_master_sub_;
+ros::Subscriber supplier_status_master_sub_;
+ros::Subscriber robot_status_master_sub_;
+ros::Subscriber robot_heat_master_sub_;
+ros::Subscriber robot_bonus_master_sub_;
+ros::Subscriber robot_damage_master_sub_;
+ros::Subscriber robot_shoot_master_sub_;
+ros::Subscriber game_status_wing_sub_;
+ros::Subscriber game_result_wing_sub_;
+ros::Subscriber game_survivor_wing_sub_;
+ros::Subscriber bonus_status_wing_sub_;
+ros::Subscriber supplier_status_wing_sub_;
+ros::Subscriber robot_status_wing_sub_;
+ros::Subscriber robot_heat_wing_sub_;
+ros::Subscriber robot_bonus_wing_sub_;
+ros::Subscriber robot_damage_wing_sub_;
+ros::Subscriber robot_shoot_wing_sub_;
+ros::Publisher robot_wing_supply_pub_;
+ros::Publisher robot_master_supply_pub_;
+bool is_blue;
+void UpdateRobotPose(std::string robot_name)
+{
+  tf::Stamped<tf::Pose> robot_tf_pose;
+  robot_tf_pose.setIdentity();
+
+  robot_tf_pose.frame_id_ = robot_name + "/" + "base_link";
+  robot_tf_pose.stamp_ = ros::Time();
+  try
+  {
+    geometry_msgs::PoseStamped robot_pose;
+    tf::poseStampedTFToMsg(robot_tf_pose, robot_pose);
+    tf_ptr_->transformPose("/map", robot_pose, robot_map_pose_);
+  }
+  catch (tf::LookupException &ex)
+  {
+    ROS_ERROR("Transform Error looking up robot pose: %s", ex.what());
+  }
+}
+//! tf
+std::shared_ptr<tf::TransformListener> tf_ptr_;
+
+//! Enenmy detection
+ros::Subscriber enemy_sub_;
+
+//! Goal info
+geometry_msgs::PoseStamped goal_;
+geometry_msgs::PoseStamped reload_goal_;
+bool new_goal_;
+
+//! Enemy info
+actionlib::SimpleActionClient<roborts_msgs::ArmorDetectionAction> armor_detection_actionlib_client_;
+roborts_msgs::ArmorDetectionGoal armor_detection_goal_;
+geometry_msgs::PoseStamped enemy_pose_;
+bool enemy_detected_;
+
+//! cost map
+std::shared_ptr<CostMap> costmap_ptr_;
+CostMap2D *costmap_2d_;
+unsigned char *charmap_;
+
+//! robot map pose
+geometry_msgs::PoseStamped robot_map_pose_;
+
+//! bullet
+int bullet_count_;
+ros::ServiceClient fric_wheel_srv_;
+ros::ServiceClient shoot_srv_;
+
+std::string robot_name_;
+int robot_id_;
+}; // namespace roborts_decision
 } //namespace roborts_decision
 #endif //ROBORTS_DECISION_BLACKBOARD_H

@@ -43,6 +43,7 @@ public:
     }
     start_time_ = 0;
     patrol_time_limit_ = 10;
+    blackboard_ptr_->TurnOnFricWheel();
   }
 
   BehaviorState Update()
