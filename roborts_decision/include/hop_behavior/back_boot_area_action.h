@@ -32,32 +32,30 @@ public:
             blackboard_ptr_->decision_config.master_bot().start_position().pitch(),
             blackboard_ptr_->decision_config.master_bot().start_position().yaw());
         boot_position_.pose.orientation = master_quaternion;
+        ROS_INFO("quatw  %f", boot_position_.pose.orientation.w);
     }
 
     BehaviorState Update()
     {
         auto executor_state = chassis_executor_->Update();
+        ROS_INFO_STREAM_THROTTLE(1, "Executor State: " << (int)executor_state);
         if (executor_state != BehaviorState::RUNNING)
         {
             auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
-            auto dx = boot_position_.pose.position.x - robot_map_pose.pose.position.x;
-            auto dy = boot_position_.pose.position.y - robot_map_pose.pose.position.y;
+            auto linear_distance = blackboard_ptr_->GetDistance(robot_map_pose, boot_position_);
+            auto angular_distance = blackboard_ptr_->GetAngle(robot_map_pose, boot_position_);
 
-            auto boot_yaw = tf::getYaw(boot_position_.pose.orientation);
-            auto robot_yaw = tf::getYaw(robot_map_pose.pose.orientation);
-
-            tf::Quaternion rot1, rot2;
-            tf::quaternionMsgToTF(boot_position_.pose.orientation, rot1);
-            tf::quaternionMsgToTF(robot_map_pose.pose.orientation, rot2);
-            auto d_yaw = rot1.angleShortestPath(rot2);
-
-            if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
+            if (linear_distance > 0.2 || angular_distance > 0.5)
             {
                 chassis_executor_->Execute(boot_position_);
                 return BehaviorState::RUNNING;
             }
+            else
+            {
+                return BehaviorState::SUCCESS;
+            }
         }
-        return BehaviorState::SUCCESS;
+        return executor_state;
     }
 
     void OnTerminate(BehaviorState state)

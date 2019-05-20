@@ -39,21 +39,7 @@ public:
     chasis_cmd_sent_ = false;
     supply_cmd_sent_ = false;
     supply_start_time_ = 0;
-    switch (state)
-    {
-    case BehaviorState::IDLE:
-      ROS_INFO("[Action] %s %s IDLE!", name_.c_str(), __FUNCTION__);
-      break;
-    case BehaviorState::SUCCESS:
-      ROS_INFO("[Action] %s %s SUCCESS!", name_.c_str(), __FUNCTION__);
-      break;
-    case BehaviorState::FAILURE:
-      ROS_INFO("[Action] %s %s FAILURE!", name_.c_str(), __FUNCTION__);
-      break;
-    default:
-      ROS_INFO("[Action] %s %s ERROR!", name_.c_str(), __FUNCTION__);
-      return;
-    }
+    LogState(state);
   }
 
   BehaviorState Update()

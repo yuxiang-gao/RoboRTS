@@ -34,6 +34,7 @@ int main(int argc, char **argv)
   // ros::spin();
   auto command_thread = std::thread(Command);
   ros::Rate rate(10);
+  roborts_decision::BehaviorState state;
   while (ros::ok())
   {
     ros::spinOnce();
@@ -41,30 +42,30 @@ int main(int argc, char **argv)
     {
     //back to boot area
     case '1':
-      back_boot_area_action.Run();
+      state = back_boot_area_action.Run();
       break;
       //patrol
     case '2':
-      patrol_action.Run();
+      state = patrol_action.Run();
       break;
       //chase.
     case '3':
-      chase_action.Run();
+      state = chase_action.Run();
       break;
       //search
     case '4':
-      search_action.Run();
+      state = search_action.Run();
       break;
       //escape.
     case '5':
-      escape_action.Run();
+      state = escape_action.Run();
       break;
       //goal.
     case '6':
-      goal_action.Run();
+      state = goal_action.Run();
       break;
     case '7':
-      reload_action.Run();
+      state = reload_action.Run();
       break;
     case 27:
       if (command_thread.joinable())
@@ -74,6 +75,11 @@ int main(int argc, char **argv)
       return 0;
     default:
       break;
+    }
+    if (state == roborts_decision::BehaviorState::FAILURE || state == roborts_decision::BehaviorState::SUCCESS)
+    {
+      ROS_INFO("End state %d", (int)state);
+      return 0;
     }
     rate.sleep();
   }

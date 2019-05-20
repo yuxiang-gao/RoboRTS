@@ -41,11 +41,14 @@ public:
       patrol_goals_[i].pose.orientation.z = quaternion.z();
       patrol_goals_[i].pose.orientation.w = quaternion.w();
     }
+    start_time_ = 0;
+    patrol_time_limit_ = 10;
   }
 
   BehaviorState Update()
   {
     auto executor_state = chassis_executor_->Update();
+    ROS_INFO_STREAM_THROTTLE(1, "Executor State: " << (int)executor_state);
     if (executor_state != BehaviorState::RUNNING)
     {
       if (patrol_goals_.empty())
@@ -54,11 +57,18 @@ public:
         return BehaviorState::FAILURE;
       }
 
-      ROS_INFO("send goal");
       chassis_executor_->Execute(patrol_goals_[patrol_count_]);
       patrol_count_ = ++patrol_count_ % point_size_;
-      // return BehaviorState::SUCCESS;
+      start_time_ = ros::Time::now().toSec();
     }
+    else if (start_time_ != 0 && ros::Time::now().toSec() - start_time_ > patrol_time_limit_ || executor_state == BehaviorState::FAILURE)
+    {
+      ROS_WARN("Patrol goal time out.");
+      chassis_executor_->Execute(patrol_goals_[patrol_count_]);
+      patrol_count_ = ++patrol_count_ % point_size_;
+      start_time_ = ros::Time::now().toSec();
+    }
+    ROS_INFO("INTERVAL %f", ros::Time::now().toSec() - start_time_);
     return BehaviorState::RUNNING;
   }
 
@@ -77,6 +87,8 @@ private:
   std::vector<geometry_msgs::PoseStamped> patrol_goals_;
   unsigned int patrol_count_;
   unsigned int point_size_;
+  double start_time_;
+  double patrol_time_limit_;
 };
 } // namespace roborts_decision
 

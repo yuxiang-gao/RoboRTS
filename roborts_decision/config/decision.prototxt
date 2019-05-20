@@ -3,8 +3,8 @@ master: true
 
 wing_bot {
   start_position {
-    x: 1.25 # 7.23
-    y: 1.17 # 4.32
+    x: 7.23 #1.25 # 
+    y: 4.32 #1.17 # 
     z: 0
 
     roll:  0

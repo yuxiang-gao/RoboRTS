@@ -188,6 +188,25 @@ protected:
    */
   virtual void OnTerminate(BehaviorState state) = 0;
 
+  void LogState(BehaviorState state)
+  {
+    switch (state)
+    {
+    case BehaviorState::IDLE:
+      ROS_INFO("%s %s IDLE!", name_.c_str(), __FUNCTION__);
+      break;
+    case BehaviorState::SUCCESS:
+      ROS_INFO("%s %s SUCCESS!", name_.c_str(), __FUNCTION__);
+      break;
+    case BehaviorState::FAILURE:
+      ROS_INFO("%s %s FAILURE!", name_.c_str(), __FUNCTION__);
+      break;
+    default:
+      ROS_INFO("%s %s ERROR!", name_.c_str(), __FUNCTION__);
+      return;
+    }
+  }
+
   //! Node name
   std::string name_;
   //! State
