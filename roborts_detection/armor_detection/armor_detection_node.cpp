@@ -185,6 +185,7 @@ void ArmorDetectionNode::ExecuteLoop() {
 
 		gimbal_angle_.yaw_mode = true; //0 means absolute, 1 means relative
 		gimbal_angle_.pitch_mode = false;
+
 		gimbal_angle_.yaw_angle = yaw * 0.7;// DJI * 0.7 
 		gimbal_angle_.pitch_angle = pitch;
 
