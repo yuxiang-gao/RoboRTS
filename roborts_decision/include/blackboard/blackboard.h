@@ -61,6 +61,18 @@ struct RefereeSystemInfo
   roborts_msgs::RobotBonus robot_bonus;
   roborts_msgs::RobotDamage robot_damage;
   roborts_msgs::RobotShoot robot_shoot;
+  RefereeSystemInfo() : game_status(),
+                        game_result(),
+                        game_survivor(),
+                        bonus_status(),
+                        supplier_status(),
+                        robot_status(),
+                        robot_heat(),
+                        robot_bonus(),
+                        robot_damage(),
+                        robot_shoot(){
+
+                        };
 };
 
 class Blackboard
@@ -73,12 +85,13 @@ public:
   // config
   roborts_decision::DecisionConfig decision_config;
   // dictionary, used to store referee info for each robot
-  std::map<std::string /*robot_name*/, boost::shared_ptr<RefereeSystemInfo>> referee_info;
+  std::map<std::string /*robot_name*/, std::shared_ptr<RefereeSystemInfo>> referee_info;
 
   // RefereeSystemInfo wing_status;
   // RefereeSystemInfo master_status;
   explicit Blackboard(const std::string &proto_file_path) : enemy_detected_(false),
-                                                            armor_detection_actionlib_client_("armor_detection_node_action", true)
+                                                            armor_detection_actionlib_client_("armor_detection_node_action", true),
+                                                            nh_priv_("~")
   {
 
     tf_ptr_ = std::make_shared<tf::TransformListener>(ros::Duration(10));
@@ -87,23 +100,43 @@ public:
                            "/config/costmap_parameter_config_for_decision.prototxt";
     costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
                                              map_path);
+    // if (nh_priv_.hasParam("global_frame") && nh_priv_.hasParam("robot_base_frame"))
+    // {
+    //   std::string global_frame, robot_base_frame;
+    //   ros::param::get("~global_frame", global_frame);
+    //   ros::param::get("~robot_base_frame", robot_base_frame);
+    //   costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
+    //                                            map_path,
+    //                                            global_frame,
+    //                                            robot_base_frame);
+    // }
+    // else
+    // {
+    //   costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
+    //                                            map_path);
+    // }
+
     charmap_ = costmap_ptr_->GetCostMap()->GetCharMap();
 
     costmap_2d_ = costmap_ptr_->GetLayeredCostmap()->GetCostMap();
 
     // Enemy fake pose
-    ros::NodeHandle rviz_nh("/move_base_simple");
+    ros::NodeHandle rviz_nh("move_base_simple");
     enemy_sub_ = rviz_nh.subscribe<geometry_msgs::PoseStamped>("goal", 1, &Blackboard::GoalCallback, this);
 
     roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config);
 
+    referee_info = std::map<std::string /*robot_name*/, std::shared_ptr<RefereeSystemInfo>>();
     // is_master = decision_config.master();
     // referee system
-    referee_info["master"] = boost::make_shared<RefereeSystemInfo>();
-    referee_info["wing"] = boost::make_shared<RefereeSystemInfo>();
-    RefereeSubscribe("master");
-    RefereeSubscribe("wing");
-    IsBlue();
+    referee_info[robot_0_] = std::make_shared<RefereeSystemInfo>();
+    referee_info[robot_1_] = std::make_shared<RefereeSystemInfo>();
+    RefereeSubscribe(robot_0_);
+    RefereeSubscribe(robot_1_);
+    ROS_INFO("Referee interface Initialized ");
+    // IsBlue();
+    // ROS_INFO("Referee interface Initialized ");
+    //TODO: wait for referee msgs
 
     if (!decision_config.simulate())
     {
@@ -119,11 +152,24 @@ public:
     }
   }
 
+  void Supply()
+  {
+    roborts_msgs::ProjectileSupply sup_msg;
+    sup_msg.number = 100;
+    if (GetRobotName() == "robot_0")
+      robot_master_supply_pub_.publish(sup_msg);
+    else
+      robot_wing_supply_pub_.publish(sup_msg);
+  }
+
   void RefereeSubscribe(std::string robot_name)
   {
+
     ROS_INFO("Initializing blackboard subscriber to referee msg");
-    if (robot_name == "master")
+    if (robot_name == "robot_0")
     {
+      robot_master_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
+
       game_status_master_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
 
       game_result_master_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
@@ -144,8 +190,9 @@ public:
 
       robot_shoot_master_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
     }
-    else
+    else if (robot_name == "robot_1")
     {
+      robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::ProjectileSupply>("/" + robot_name + "/projectile_supply", 1);
       game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/" + robot_name + "/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
 
       game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/" + robot_name + "/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
@@ -165,6 +212,29 @@ public:
       robot_damage_wing_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/" + robot_name + "/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
 
       robot_shoot_wing_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/" + robot_name + "/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
+    }
+    else
+    {
+      robot_wing_supply_pub_ = nh_.advertise<roborts_msgs::RobotStatus>("/projectile_supply", 1);
+      game_status_wing_sub_ = nh_.subscribe<roborts_msgs::GameStatus>("/game_status", 100, boost::bind(&Blackboard::GameStatusCallback, this, _1, robot_name));
+
+      game_result_wing_sub_ = nh_.subscribe<roborts_msgs::GameResult>("/game_result", 100, boost::bind(&Blackboard::GameResultCallback, this, _1, robot_name));
+
+      game_survivor_wing_sub_ = nh_.subscribe<roborts_msgs::GameSurvivor>("/game_survivor", 100, boost::bind(&Blackboard::GameSurvivorCallback, this, _1, robot_name));
+
+      bonus_status_wing_sub_ = nh_.subscribe<roborts_msgs::BonusStatus>("/field_bonus_status", 100, boost::bind(&Blackboard::BonusStatusCallback, this, _1, robot_name));
+
+      supplier_status_wing_sub_ = nh_.subscribe<roborts_msgs::SupplierStatus>("/field_supplier_status", 100, boost::bind(&Blackboard::SupplierStatusCallback, this, _1, robot_name));
+
+      robot_heat_wing_sub_ = nh_.subscribe<roborts_msgs::RobotHeat>("/robot_heat", 100, boost::bind(&Blackboard::RobotHeatCallback, this, _1, robot_name));
+
+      robot_bonus_wing_sub_ = nh_.subscribe<roborts_msgs::RobotBonus>("/robot_bonus", 100, boost::bind(&Blackboard::RobotBonusCallback, this, _1, robot_name));
+
+      robot_status_wing_sub_ = nh_.subscribe<roborts_msgs::RobotStatus>("/robot_status", 100, boost::bind(&Blackboard::RobotStatusCallback, this, _1, robot_name));
+
+      robot_damage_wing_sub_ = nh_.subscribe<roborts_msgs::RobotDamage>("/robot_damage", 100, boost::bind(&Blackboard::RobotDamageCallback, this, _1, robot_name));
+
+      robot_shoot_wing_sub_ = nh_.subscribe<roborts_msgs::RobotShoot>("/robot_shoot", 100, boost::bind(&Blackboard::RobotShootCallback, this, _1, robot_name));
     }
   }
 
@@ -186,6 +256,14 @@ public:
     return !decision_config.master();
   }
 
+  std::string GetRobotName()
+  {
+    if (IsMaster())
+      return robot_0_;
+    else
+      return robot_1_;
+  }
+
   bool IsBlue()
   {
     switch (referee_info["master"]->robot_status.id)
@@ -196,7 +274,7 @@ public:
       return true;
       break;
     case 4:
-      ROS_DEBUG("Team: BLUE, Master Robot");
+      ROS_DEBUG("Team: BLUE, wing Robot");
       // is_master = false;
       return true;
       break;
@@ -315,10 +393,46 @@ public:
     return enemy_pose_;
   }
 
+  int GetBonusStatus()
+  {
+    if (IsBlue())
+      return referee_info[GetRobotName()]->bonus_status.blue_bonus;
+    else
+      return referee_info[GetRobotName()]->bonus_status.red_bonus;
+  }
+
+  bool IsBonusUnoccupied()
+  {
+    if (GetBonusStatus() == 0)
+      return true;
+  }
+
+  bool IsBonusOccupied()
+  {
+    if (GetBonusStatus() == 2)
+      return true;
+  }
+
   bool IsEnemyDetected() const
   {
     ROS_INFO("%s: %d", __FUNCTION__, (int)enemy_detected_);
     return enemy_detected_;
+  }
+
+  bool IsFiveSecondCD()
+  {
+    if (referee_info[GetRobotName()]->game_status.game_status == 3)
+      return true;
+    else
+      return false;
+  }
+
+  bool IsGameStart()
+  {
+    if (referee_info[GetRobotName()]->game_status.game_status == 4)
+      return true;
+    else
+      return false;
   }
 
   // Goal
@@ -332,6 +446,43 @@ public:
   {
     return goal_;
   }
+
+  geometry_msgs::PoseStamped GetReloadGoal()
+  {
+    reload_goal_.header.frame_id = "/map";
+    reload_goal_.pose.orientation.x = 0;
+    reload_goal_.pose.orientation.y = 0;
+    reload_goal_.pose.orientation.z = 0;
+    reload_goal_.pose.orientation.w = 1;
+
+    reload_goal_.pose.position.x = 4;
+    reload_goal_.pose.position.y = 0.5;
+    reload_goal_.pose.position.z = 0;
+
+    return reload_goal_;
+  }
+
+  //   geometry_msgs::PoseStamped GetDZGoal() const
+  //   {
+  //     DZ_goal_.header.frame_id = "map";
+  //     /*
+  //     tf::Quaternion quaternion = tf::createQuaternionFromRPY(0,0,0); // roll, pitch , yaw
+  //     DZ_goal_.pose.orientation.x = quaternion.x();
+  // 	Dz_goal_.pose.orientation.y = quaternion.y();
+  // 	Dz_goal_.pose.orientation.z = quaternion.z();
+  // 	DZ_goal_.pose.orientation.w = quaternion.w();
+  // */
+  //     DZ_goal_.pose.orientation.x = 0;
+  //     Dz_goal_.pose.orientation.y = 0;
+  //     Dz_goal_.pose.orientation.z = 0;
+  //     DZ_goal_.pose.orientation.w = 1;
+
+  //     DZ_goal_.pose.position.x = 0;
+  //     DZ_goal_.pose.position.y = 0;
+  //     DZ_goal_.pose.position.z = 0;
+
+  //     return DZ_goal_;
+  //   }
 
   bool IsNewGoal()
   {
@@ -390,7 +541,10 @@ public:
   }
 
 private:
+  const std::string robot_0_ = "robot_0";
+  const std::string robot_1_ = "robot_1";
   ros::NodeHandle nh_;
+  ros::NodeHandle nh_priv_;
   ros::Subscriber game_status_master_sub_;
   ros::Subscriber game_result_master_sub_;
   ros::Subscriber game_survivor_master_sub_;
@@ -411,6 +565,8 @@ private:
   ros::Subscriber robot_bonus_wing_sub_;
   ros::Subscriber robot_damage_wing_sub_;
   ros::Subscriber robot_shoot_wing_sub_;
+  ros::Publisher robot_wing_supply_pub_;
+  ros::Publisher robot_master_supply_pub_;
   bool is_blue;
   void UpdateRobotPose()
   {
@@ -438,6 +594,8 @@ private:
 
   //! Goal info
   geometry_msgs::PoseStamped goal_;
+  geometry_msgs::PoseStamped reload_goal_;
+  geometry_msgs::PoseStamped DZ_goal_;
   bool new_goal_;
 
   //! Enemy info

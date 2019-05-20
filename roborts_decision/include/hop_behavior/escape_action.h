@@ -11,14 +11,13 @@
 
 #include "utils/line_iterator.h"
 
-namespace roborts_decision:
+namespace roborts_decision
 {
   class EscapeAction : public ActionNode
   {
   public:
-    EscapeAction(ChassisExecutor::Ptr &chassis_executor,
-                 Blackboard::Ptr &blackboard,
-                 const std::string &proto_file_path) : ActionNode("escape_act", blackboard) chassis_executor_(chassis_executor)
+    EscapeAction(const ChassisExecutor::Ptr &chassis_executor,
+                 const Blackboard::Ptr &blackboard) : ActionNode("escape_act", blackboard), chassis_executor_(chassis_executor)
     {
     }
 
@@ -43,17 +42,17 @@ namespace roborts_decision:
       whirl_vel_.twist.angular.x = blackboard_ptr_->decision_config.whirl_vel().angle_x_vel();
     }
 
-    BehaviourState Update()
+    BehaviorState Update()
     {
       auto executor_state = chassis_executor_->Update();
 
       if (executor_state != BehaviorState::RUNNING)
       {
-        if (blackboard_->IsEnemyDetected())
+        if (blackboard_ptr_->IsEnemyDetected())
         {
 
           geometry_msgs::PoseStamped enemy;
-          enemy = blackboard_->GetEnemy();
+          enemy = blackboard_ptr_->GetEnemy();
           float goal_yaw, goal_x, goal_y;
           unsigned int goal_cell_x, goal_cell_y;
           unsigned int enemy_cell_x, enemy_cell_y;
@@ -61,7 +60,7 @@ namespace roborts_decision:
           std::random_device rd;
           std::mt19937 gen(rd());
 
-          auto robot_map_pose = blackboard_->GetRobotMapPose();
+          auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
           float x_min, x_max;
           if (enemy.pose.position.x < left_x_limit_)
           {
@@ -91,7 +90,7 @@ namespace roborts_decision:
           std::uniform_real_distribution<float> y_uni_dis(0, 5);
           //std::uniform_real_distribution<float> yaw_uni_dis(-M_PI, M_PI);
 
-          auto get_enemy_cell = blackboard_->GetCostMap2D()->World2Map(enemy.pose.position.x,
+          auto get_enemy_cell = blackboard_ptr_->GetCostMap2D()->World2Map(enemy.pose.position.x,
                                                                        enemy.pose.position.y,
                                                                        enemy_cell_x,
                                                                        enemy_cell_y);
@@ -99,14 +98,14 @@ namespace roborts_decision:
           if (!get_enemy_cell)
           {
             chassis_executor_->Execute(whirl_vel_);
-            return BehaviourState::FAILURE;
+            return BehaviorState::FAILURE;
           }
 
           while (true)
           {
             goal_x = x_uni_dis(gen);
             goal_y = y_uni_dis(gen);
-            auto get_goal_cell = blackboard_->GetCostMap2D()->World2Map(goal_x,
+            auto get_goal_cell = blackboard_ptr_->GetCostMap2D()->World2Map(goal_x,
                                                                         goal_y,
                                                                         goal_cell_x,
                                                                         goal_cell_y);
@@ -116,9 +115,9 @@ namespace roborts_decision:
               continue;
             }
 
-            auto index = blackboard_->GetCostMap2D()->GetIndex(goal_cell_x, goal_cell_y);
+            auto index = blackboard_ptr_->GetCostMap2D()->GetIndex(goal_cell_x, goal_cell_y);
             //          costmap_2d_->GetCost(goal_cell_x, goal_cell_y);
-            if (blackboard_->GetCharMap()[index] >= 253)
+            if (blackboard_ptr_->GetCharMap()[index] >= 253)
             {
               continue;
             }
@@ -126,7 +125,7 @@ namespace roborts_decision:
             unsigned int obstacle_count = 0;
             for (FastLineIterator line(goal_cell_x, goal_cell_y, enemy_cell_x, enemy_cell_y); line.IsValid(); line.Advance())
             {
-              auto point_cost = blackboard_->GetCostMap2D()->GetCost((unsigned int)(line.GetX()), (unsigned int)(line.GetY())); //current point's cost
+              auto point_cost = blackboard_ptr_->GetCostMap2D()->GetCost((unsigned int)(line.GetX()), (unsigned int)(line.GetY())); //current point's cost
 
               if (point_cost > 253)
               {
@@ -156,14 +155,14 @@ namespace roborts_decision:
         else
         {
           chassis_executor_->Execute(whirl_vel_);
-          ROS_DEBUG("No Enemy Detected")
-          return BehaviourState::SUCCESS;
+          ROS_DEBUG("No Enemy Detected");
+          return BehaviorState::SUCCESS;
         }
       }
-      return BehaviourState::RUNNING;
+      return BehaviorState::RUNNING;
     }
 
-    void OnTerminate()
+    void OnTerminate(BehaviorState state)
     {
       chassis_executor_->Cancel();
     }
@@ -174,15 +173,12 @@ namespace roborts_decision:
 
   private:
     //! executor
-    ChassisExecutor *const chassis_executor_;
+    const ChassisExecutor::Ptr chassis_executor_;
 
     float left_x_limit_, right_x_limit_;
     float robot_x_limit_;
     float left_random_min_x_, left_random_max_x_;
     float right_random_min_x_, right_random_max_x_;
-
-    //! perception information
-    Blackboard *const blackboard_;
 
     //! whirl velocity
     //  geometry_msgs::Twist whirl_vel_;

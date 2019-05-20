@@ -1,10 +1,11 @@
 <launch>
+      <arg name="robot_name" />
+      <!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id-->
+      <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="odom_broadcaster" args="0.0  0.0 0.0  0.0  0.0 0.0 odom $(arg robot_name)/odom" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_broadcaster" args="0.0  0.0 0.0  0.0  0.0 0.0 base_link $(arg robot_name)/base_link" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="gimbal_broadcaster" args="0.0  0.0 0.0  0.0  0.0 0.0 gimbal $(arg robot_name)/gimbal" /> -->
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_base_laser_link_broadcaster" args="0.15 0.0 0.05 -2.356194490192345 0.0 0.0 $(arg robot_name)/base_link $(arg robot_name)/base_laser_link" />
 
-    <!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id-->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_base_laser_link_broadcaster"
-        args="0.15 0.0 0.05 -2.356194490192345 0.0 0.0 base_link base_laser_link" /> 
-
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_camera_link_broadcaster"
-          args="0.0  0.0 0.0  0.0  0.0 0.0 base_link camera" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_camera_link_broadcaster" args="0.0  0.0 0.0  0.0  0.0 0.0 $(arg robot_name)/base_link $(arg robot_name)/camera" />
 
 </launch>

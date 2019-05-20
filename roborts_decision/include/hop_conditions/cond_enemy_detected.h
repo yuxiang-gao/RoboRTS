@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 
 #include "executor/chassis_executor.h"
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 
 namespace roborts_decision
@@ -12,7 +12,7 @@ namespace roborts_decision
 class EnemyDetectedCondition : public PreconditionNode
 {
 public:
-    EnemyDetectedCondition(ChassisExecutor::Ptr &chassis_executor,
+    EnemyDetectedCondition(const ChassisExecutor::Ptr &chassis_executor,
                            Blackboard::Ptr &blackboard) : PreconditionNode("enemy_detected_cond", blackboard), blackboard->IsEnemyDetected(), AbortType::SELF)
     {
     }

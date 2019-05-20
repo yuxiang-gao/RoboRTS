@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 
 #include "executor/chassis_executor.h"
-#include "behaviour_tree/behaviour_tree.h"
+#include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 
 namespace roborts_decision
@@ -12,8 +12,8 @@ namespace roborts_decision
 class BackBootAreaAction : public ActionNode
 {
 public:
-    BackBootAreaAction(ChassisExecutor::Ptr &chassis_executor,
-                       const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_actionC", blackboard),
+    BackBootAreaAction(const ChassisExecutor::Ptr &chassis_executor,
+                       const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_action", blackboard),
                                                             chassis_executor_(chassis_executor)
 
     {
@@ -34,12 +34,12 @@ public:
         boot_position_.pose.orientation = master_quaternion;
     }
 
-    BehaviourState Update()
+    BehaviorState Update()
     {
         auto executor_state = chassis_executor_->Update();
         if (executor_state != BehaviorState::RUNNING)
         {
-            auto robot_map_pose = blackboard_->GetRobotMapPose();
+            auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
             auto dx = boot_position_.pose.position.x - robot_map_pose.pose.position.x;
             auto dy = boot_position_.pose.position.y - robot_map_pose.pose.position.y;
 
@@ -54,7 +54,7 @@ public:
             if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
             {
                 chassis_executor_->Execute(boot_position_);
-                return BehaviourState::SUCCESS;
+                return BehaviorState::SUCCESS;
             }
         }
         return BehaviorState::RUNNING;
@@ -69,13 +69,13 @@ public:
 
 private:
     //! executor
-    ChassisExecutor *const chassis_executor_;
+    const ChassisExecutor::Ptr chassis_executor_;
     //! boot position
     geometry_msgs::PoseStamped boot_position_;
     //! chase buffer
     std::vector<geometry_msgs::PoseStamped> chase_buffer_;
     unsigned int chase_count_;
-}
+};
 } // namespace roborts_decision
 
 #endif //ROBORTS_DECISION_BACK_BOOT_AREA_ACTION_H

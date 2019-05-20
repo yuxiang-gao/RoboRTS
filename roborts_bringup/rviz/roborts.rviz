@@ -112,7 +112,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: false
       Name: Map
-      Topic: /robot_0/local_costmap/local_costmap/costmap
+      Topic: /local_costmap/local_costmap/costmap
       Unreliable: false
       Use Timestamp: false
       Value: false

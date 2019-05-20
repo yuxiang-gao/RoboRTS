@@ -42,7 +42,7 @@ bool LocalizationNode::Init() {
   init_cov_ = {localization_config.initial_cov_xx,
                localization_config.initial_cov_yy,
                localization_config.initial_cov_aa};
-LOG_INFO << "init pose " << localization_config.initial_pose_x<<localization_config.initial_pose_y ;
+//LOG_INFO << "init pose " << localization_config.initial_pose_x<<localization_config.initial_pose_y ;
   transform_tolerance_  = ros::Duration(localization_config.transform_tolerance);
   publish_visualize_ = localization_config.publish_visualize;
 
@@ -277,7 +277,7 @@ bool LocalizationNode::GetPoseFromTf(const std::string &target_frame,
   } catch (tf::TransformException &e) {
     LOG_ERROR << "Couldn't transform from "
               << source_frame
-              << "to "
+              << " to "
               << target_frame;
     return false;
   }

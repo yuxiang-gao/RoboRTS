@@ -57,7 +57,6 @@ namespace roborts_costmap {
 void ObstacleLayer::OnInitialize() {
   ros::NodeHandle nh;
   ParaObstacleLayer para_obstacle;
-
   std::string obstacle_map = ros::package::getPath("roborts_costmap") + \
       "/config/obstacle_layer_config.prototxt";
   roborts_common::ReadProtoFromTextFile(obstacle_map.c_str(), &para_obstacle);
@@ -75,6 +74,17 @@ void ObstacleLayer::OnInitialize() {
   std::string topic_string = "LaserScan", sensor_frame = "laser_frame";
   topic_string = para_obstacle.topic_string();
   sensor_frame = para_obstacle.sensor_frame();
+  // tf_prefix 
+  
+  if (nh.hasParam("tf_prefix"))
+  {
+    std::string tf_prefix;
+    nh.getParam("tf_prefix", tf_prefix);
+    // ROS_INFO_STREAM("Obstacle Layer TF_prefix: " << std::string(tf_prefix));
+    topic_string = "/" + tf_prefix + "/" + topic_string;
+    sensor_frame = "/" + tf_prefix + "/" + sensor_frame;
+    // ROS_INFO_STREAM(tf_prefix << " " << topic_string << sensor_frame);
+  }
 
   bool inf_is_valid = false, clearing = false, marking = true;
   inf_is_valid = para_obstacle.inf_is_valid();

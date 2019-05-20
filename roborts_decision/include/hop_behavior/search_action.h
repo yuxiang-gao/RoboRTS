@@ -15,7 +15,7 @@ namespace roborts_decision
 class SearchAction : public ActionNode
 {
 public:
-  SearchAction(ChassisExecutor::Ptr &chassis_executor,
+  SearchAction(const ChassisExecutor::Ptr &chassis_executor,
                Blackboard::Ptr &blackboard) : ActionNode("search_act", blackboard), chassis_executor_(chassis_executor)
   {
   }
@@ -97,7 +97,7 @@ public:
     }
   }
 
-  BehaviourState Update()
+  BehaviorState Update()
   {
 
     double yaw;
@@ -106,7 +106,7 @@ public:
     auto executor_state = chassis_executor_->Update();
     if (executor_state != BehaviorState::RUNNING)
     {
-      auto robot_map_pose = blackboard_->GetRobotMapPose();
+      auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
       if (search_count_ == 5)
       {
         x_diff = last_position_.pose.position.x - robot_map_pose.pose.position.x;
@@ -173,10 +173,7 @@ public:
     chassis_executor_->Cancel();
   }
 
-  BehaviorState Update()
-  {
-    return chassis_executor_->Update();
-  }
+
 
   void SetLastPosition(geometry_msgs::PoseStamped last_position)
   {
@@ -188,10 +185,7 @@ public:
 
 private:
   //! executor
-  ChassisExecutor *const chassis_executor_;
-
-  //! perception information
-  Blackboard *const blackboard_;
+  const ChassisExecutor::Ptr chassis_executor_;
 
   //! chase goal
   geometry_msgs::PoseStamped last_position_;

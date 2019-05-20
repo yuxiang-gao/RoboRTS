@@ -41,18 +41,29 @@ add_executable(behavior_test_node
   executor/chassis_executor.cpp
   )
 
-# add_executable(behavior_test_node
-#   ${DecisionProtoHds}
-#   ${DecisionProtoSrc}
-#   strategy/behavior_tree_example.cpp
-#   executor/chassis_executor.cpp
-#   )
-
 target_link_libraries(behavior_test_node
   PRIVATE
   roborts_costmap
   ${catkin_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
   )
+
 add_dependencies(behavior_test_node
+  roborts_msgs_generate_messages)
+
+add_executable(hop_behavior_test_node
+  ${DecisionProtoHds}
+  ${DecisionProtoSrc}
+  src/hop_behavior_test.cpp
+  executor/chassis_executor.cpp
+)
+
+target_link_libraries(hop_behavior_test_node
+  PRIVATE
+  roborts_costmap
+  ${catkin_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
+)
+
+add_dependencies(hop_behavior_test_node
   roborts_msgs_generate_messages)
