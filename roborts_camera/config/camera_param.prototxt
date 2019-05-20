@@ -1,6 +1,50 @@
 camera: {
   camera_name: "back_camera"
   camera_type: "uvc"
+  camera_path: "/dev/v4l/by-path/platform-3530000.xhci-usb-0:2.1:1.0-video-index0"
+
+  camera_matrix {
+    data: 1133.004071
+    data: 0.0
+    data: 588.836892
+    data: 0.0
+    data: 1133.374806
+    data: 482.119570
+    data: 0.0
+    data: 0.0
+    data: 1.0  
+  }
+
+  camera_distortion {
+    data: -0.443043
+    data: 0.186436
+    data: 0.001221
+    data: 0.005431
+    data: 0.0
+  }
+
+  resolution {
+    width: 640
+    height: 480
+
+    width_offset: 0
+    height_offset: 0
+  }
+
+  fps: 50
+  auto_exposure: 0
+  exposure_value: 3
+  exposure_time: 3
+  auto_white_balance: 0
+  auto_gain: 0
+  contrast: 20
+  flip: 1
+}
+
+
+camera: {
+  camera_name: "front_camera"
+  camera_type: "uvc"
   camera_path: "/dev/v4l/by-path/platform-3530000.xhci-usb-0:2.4:1.0-video-index0"
 
   camera_matrix {
@@ -31,7 +75,7 @@ camera: {
     height_offset: 0
   }
 
-  fps: 45
+  fps: 50
   auto_exposure: 0
   exposure_value: 3
   exposure_time: 3

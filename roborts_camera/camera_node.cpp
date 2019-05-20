@@ -25,9 +25,14 @@ CameraNode::CameraNode() {
   img_pubs_.resize(camera_num_);
   camera_threads_.resize(camera_num_);
   camera_driver_.resize(camera_num_);
+  if (nh.hasParam("tf_prefix"))
+  {
+    nh.getParam("tf_prefix", tf_prefix);
+  }
 
   for (unsigned int i = 0; i < camera_num_; i++) {
     auto camera_info = camera_param_.GetCameraParam()[i];
+    camera_info.camera_name = "/" + tf_prefix + "/" + camera_info.camera_name;
     nhs_.push_back(ros::NodeHandle(camera_info.camera_name));
     image_transport::ImageTransport it(nhs_.at(i));
     img_pubs_[i] = it.advertiseCamera("image_raw", 1, true);
