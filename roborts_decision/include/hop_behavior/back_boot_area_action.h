@@ -21,7 +21,7 @@ public:
 
     void OnInitialize()
     {
-        boot_position_.header.frame_id = "map";
+        boot_position_.header.frame_id = "/map";
 
         boot_position_.pose.position.x = blackboard_ptr_->decision_config.master_bot().start_position().x();
         boot_position_.pose.position.z = blackboard_ptr_->decision_config.master_bot().start_position().z();
