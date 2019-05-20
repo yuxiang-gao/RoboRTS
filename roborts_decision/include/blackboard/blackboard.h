@@ -100,21 +100,6 @@ public:
                            "/config/costmap_parameter_config_for_decision.prototxt";
     costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
                                              map_path);
-    // if (nh_priv_.hasParam("global_frame") && nh_priv_.hasParam("robot_base_frame"))
-    // {
-    //   std::string global_frame, robot_base_frame;
-    //   ros::param::get("~global_frame", global_frame);
-    //   ros::param::get("~robot_base_frame", robot_base_frame);
-    //   costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
-    //                                            map_path,
-    //                                            global_frame,
-    //                                            robot_base_frame);
-    // }
-    // else
-    // {
-    //   costmap_ptr_ = std::make_shared<CostMap>("decision_costmap", *tf_ptr_,
-    //                                            map_path);
-    // }
 
     charmap_ = costmap_ptr_->GetCostMap()->GetCharMap();
 
@@ -264,6 +249,14 @@ public:
       return robot_1_;
   }
 
+  std::string GetOtherRobotName()
+  {
+    if (!IsMaster())
+      return robot_0_;
+    else
+      return robot_1_;
+  }
+
   bool IsBlue()
   {
     switch (referee_info["master"]->robot_status.id)
@@ -393,6 +386,11 @@ public:
     return enemy_pose_;
   }
 
+  int GetSupplierStatus()
+  {
+    return referee_info[GetRobotName()]->supplier_status.status;
+  }
+
   int GetBonusStatus()
   {
     if (IsBlue())
@@ -462,28 +460,6 @@ public:
     return reload_goal_;
   }
 
-  //   geometry_msgs::PoseStamped GetDZGoal() const
-  //   {
-  //     DZ_goal_.header.frame_id = "map";
-  //     /*
-  //     tf::Quaternion quaternion = tf::createQuaternionFromRPY(0,0,0); // roll, pitch , yaw
-  //     DZ_goal_.pose.orientation.x = quaternion.x();
-  // 	Dz_goal_.pose.orientation.y = quaternion.y();
-  // 	Dz_goal_.pose.orientation.z = quaternion.z();
-  // 	DZ_goal_.pose.orientation.w = quaternion.w();
-  // */
-  //     DZ_goal_.pose.orientation.x = 0;
-  //     Dz_goal_.pose.orientation.y = 0;
-  //     Dz_goal_.pose.orientation.z = 0;
-  //     DZ_goal_.pose.orientation.w = 1;
-
-  //     DZ_goal_.pose.position.x = 0;
-  //     DZ_goal_.pose.position.y = 0;
-  //     DZ_goal_.pose.position.z = 0;
-
-  //     return DZ_goal_;
-  //   }
-
   bool IsNewGoal()
   {
     if (new_goal_)
@@ -521,7 +497,13 @@ public:
 
   const geometry_msgs::PoseStamped GetRobotMapPose()
   {
-    UpdateRobotPose();
+    UpdateRobotPose(GetRobotName());
+    return robot_map_pose_;
+  }
+
+  const geometry_msgs::PoseStamped GetOtherRobotMapPose()
+  {
+    UpdateRobotPose(GetOtherRobotName());
     return robot_map_pose_;
   }
 
@@ -568,18 +550,18 @@ private:
   ros::Publisher robot_wing_supply_pub_;
   ros::Publisher robot_master_supply_pub_;
   bool is_blue;
-  void UpdateRobotPose()
+  void UpdateRobotPose(std::string robot_name)
   {
     tf::Stamped<tf::Pose> robot_tf_pose;
     robot_tf_pose.setIdentity();
 
-    robot_tf_pose.frame_id_ = "base_link";
+    robot_tf_pose.frame_id_ = robot_name + "/" + "base_link";
     robot_tf_pose.stamp_ = ros::Time();
     try
     {
       geometry_msgs::PoseStamped robot_pose;
       tf::poseStampedTFToMsg(robot_tf_pose, robot_pose);
-      tf_ptr_->transformPose("map", robot_pose, robot_map_pose_);
+      tf_ptr_->transformPose("/map", robot_pose, robot_map_pose_);
     }
     catch (tf::LookupException &ex)
     {

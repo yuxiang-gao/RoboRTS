@@ -11,67 +11,122 @@
 
 namespace roborts_decision
 {
-class GoalAction : public ActionNode
+class ReloadAction : public ActionNode
 {
 public:
-  ReloadAction(std::string robot_name, const ChassisExecutor::Ptr &chassis_executor,
-             const Blackboard::Ptr &blackboard) : ActionNode("reload_action", blackboard),
-                                            chassis_executor_(chassis_executor) {}
+  ReloadAction(const ChassisExecutor::Ptr &chassis_executor,
+               const Blackboard::Ptr &blackboard) : ActionNode("reload_action", blackboard),
+                                                    chassis_executor_(chassis_executor) {}
 
-    void OnInitialize()
+  void OnInitialize()
   {
-        reload_goal_.header.frame_id = "map";
-        reload_goal_.pose.orientation.x = 0;
-        reload_goal_.pose.orientation.y = 0;
-        reload_goal_.pose.orientation.z = 0;
-        reload_goal_.pose.orientation.w = 1;
-        reload_goal_.pose.position.x = 0;
-        reload_goal_.pose.position.y = 0;
-        reload_goal_.pose.position.z = 0;
-        reload_goal_ = true;
-
+    reload_position_.header.frame_id = "map";
+    reload_position_.pose.orientation.x = 0;
+    reload_position_.pose.orientation.y = 0;
+    reload_position_.pose.orientation.z = -0.7071;
+    reload_position_.pose.orientation.w = 0.7071;
+    reload_position_.pose.position.x = 4;
+    reload_position_.pose.position.y = 0.5;
+    reload_position_.pose.position.z = 0;
+    chasis_cmd_sent_ = false;
+    supply_cmd_sent_ = false;
+    supply_start_time_ = 0;
   }
 
   void OnTerminate(BehaviorState state)
   {
     chassis_executor_->Cancel();
+    chasis_cmd_sent_ = false;
+    supply_cmd_sent_ = false;
+    supply_start_time_ = 0;
+    switch (state)
+    {
+    case BehaviorState::IDLE:
+      ROS_INFO("[Action] %s %s IDLE!", name_.c_str(), __FUNCTION__);
+      break;
+    case BehaviorState::SUCCESS:
+      ROS_INFO("[Action] %s %s SUCCESS!", name_.c_str(), __FUNCTION__);
+      break;
+    case BehaviorState::FAILURE:
+      ROS_INFO("[Action] %s %s FAILURE!", name_.c_str(), __FUNCTION__);
+      break;
+    default:
+      ROS_INFO("[Action] %s %s ERROR!", name_.c_str(), __FUNCTION__);
+      return;
+    }
   }
 
   BehaviorState Update()
   {
     auto executor_state = chassis_executor_->Update();
-    if (executor_state != BehaviorState::RUNNING)
+    // ROS_INFO_STREAM_THROTTLE(1, "Executor State: " << (int)executor_state);
+    // ROS_INFO_STREAM("cond " << (int)executor_state << " " << (int)chasis_cmd_sent_);
+    if (executor_state != BehaviorState::RUNNING && !chasis_cmd_sent_)
     {
-      /*if (blackboard_->IsNewGoal())
+      chasis_cmd_sent_ = true;
+      chassis_executor_->Execute(reload_position_);
+    }
+    else if (chasis_cmd_sent_ && executor_state == BehaviorState::FAILURE)
+    {
+      return BehaviorState::FAILURE;
+    }
+    else if (chasis_cmd_sent_ && executor_state == BehaviorState::SUCCESS)
+    {
+      int supplier_status = blackboard_ptr_->GetSupplierStatus();
+      auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
+      auto linear_distance = blackboard_ptr_->GetDistance(robot_map_pose, reload_position_);
+
+      // ROS_INFO_STREAM_THROTTLE(1, "distance: " << linear_distance);
+      // ROS_INFO_STREAM_THROTTLE(1, "Supply Status: " << supplier_status);
+
+      if (!supply_cmd_sent_)
       {
-        chassis_executor_->Execute(blackboard_->GetGoal());
-        return Behaviortate::SUCCESS;
-      }*/
-        chassis_executor_->Execute(blackboard_ptr_->GetReloadGoal());
-        blackboard->RefreePublishSupply(robot_name_)
-        std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
-        std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
-        std::chrono::duration<double> diff = end_time-start_time;
-        while (diff <= 7)
+        if (linear_distance <= 0.1)
         {
-            std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
-            std::chrono::duration<double> diff = end-start;
+          ROS_INFO_STREAM("send supply signal");
+          blackboard_ptr_->Supply();
+          supply_cmd_sent_ = true;
         }
-        return Behaviortate::SUCCESS;
+      }
+      else if (supply_cmd_sent_ && supply_start_time_ == 0)
+      {
+        if (supplier_status == 2)
+        {
+          supply_start_time_ = ros::Time::now().toSec();
+        }
+        ROS_INFO("START TIME %f", ros::Time::now().toSec());
+      }
+      else if (supply_cmd_sent_ && supply_start_time_ != 0)
+      {
+        ROS_INFO("LOADING TIME %f", ros::Time::now().toSec() - supply_start_time_);
+        if (supplier_status == 0)
+        {
+          return BehaviorState::SUCCESS;
+        }
+        else if (ros::Time::now().toSec() - supply_start_time_ > 30)
+        {
+          ROS_WARN("Reloading time out! LEAVE");
+          return BehaviorState::SUCCESS;
+        }
+      }
     }
     return BehaviorState::RUNNING;
   }
 
-  ~GoalAction() = default;
+  ~ReloadAction() = default;
 
 private:
   //! executor
-  ChassisExecutor *const chassis_executor_;
+  const ChassisExecutor::Ptr chassis_executor_;
 
   std::string robot_name_;
 
   //! reload goal
-  geometry_msgs::PoseStamped reload_goal_;
+  geometry_msgs::PoseStamped reload_position_;
+
+  bool chasis_cmd_sent_;
+  bool supply_cmd_sent_;
+  double supply_start_time_;
 };
 } // namespace roborts_decision
 

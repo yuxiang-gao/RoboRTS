@@ -8,6 +8,7 @@
 #include "hop_behavior/search_action.h"
 #include "hop_behavior/patrol_action.h"
 #include "hop_behavior/goal_action.h"
+#include "hop_behavior/reload_action.h"
 
 void Command();
 char command = '0';
@@ -26,7 +27,11 @@ int main(int argc, char **argv)
   roborts_decision::EscapeAction escape_action(chassis_executor, blackboard);
   roborts_decision::PatrolAction patrol_action(chassis_executor, blackboard);
   roborts_decision::GoalAction goal_action(chassis_executor, blackboard);
+  roborts_decision::ReloadAction reload_action(chassis_executor, blackboard);
 
+  auto act_lambda = [](auto act) { ROS_INFO_STREAM_COND((int)act.Run() == 1, act.GetName().c_str() << " SUCCESS"); };
+  // act_lambda(reload_action);
+  // ros::spin();
   auto command_thread = std::thread(Command);
   ros::Rate rate(10);
   while (ros::ok())
@@ -58,6 +63,9 @@ int main(int argc, char **argv)
     case '6':
       goal_action.Run();
       break;
+    case '7':
+      reload_action.Run();
+      break;
     case 27:
       if (command_thread.joinable())
       {
@@ -78,23 +86,23 @@ void Command()
 
   while (command != 27)
   {
-    std::cout << "**************************************************************************************" << std::endl;
-    std::cout << "*********************************please send a command********************************" << std::endl;
-    std::cout << "1: back boot area behavior" << std::endl
-              << "2: patrol behavior" << std::endl
-              << "3: chase_behavior" << std::endl
-              << "4: search behavior" << std::endl
-              << "5: escape behavior" << std::endl
-              << "6: goal behavior" << std::endl
-              << "esc: exit program" << std::endl;
-    std::cout << "**************************************************************************************" << std::endl;
-    std::cout << "> ";
+    // std::cout << "**************************************************************************************" << std::endl;
+    // std::cout << "*********************************please send a command********************************" << std::endl;
+    // std::cout << "1: back boot area behavior" << std::endl
+    //           << "2: patrol behavior" << std::endl
+    //           << "3: chase_behavior" << std::endl
+    //           << "4: search behavior" << std::endl
+    //           << "5: escape behavior" << std::endl
+    //           << "6: goal behavior" << std::endl
+    //           << "esc: exit program" << std::endl;
+    // std::cout << "**************************************************************************************" << std::endl;
+    // std::cout << "> ";
     std::cin >> command;
-    if (command != '1' && command != '2' && command != '3' && command != '4' && command != '5' && command != '6' && command != 27)
-    {
-      std::cout << "please input again!" << std::endl;
-      std::cout << "> ";
-      std::cin >> command;
-    }
+    // if (command != '1' && command != '2' && command != '3' && command != '4' && command != '5' && command != '6' && command != 27)
+    // {
+    //   std::cout << "please input again!" << std::endl;
+    //   std::cout << "> ";
+    //   std::cin >> command;
+    // }
   }
 }

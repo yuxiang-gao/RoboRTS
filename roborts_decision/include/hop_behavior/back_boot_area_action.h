@@ -54,10 +54,10 @@ public:
             if (std::sqrt(std::pow(dx, 2) + std::pow(dy, 2)) > 0.2 || d_yaw > 0.5)
             {
                 chassis_executor_->Execute(boot_position_);
-                return BehaviorState::SUCCESS;
+                return BehaviorState::RUNNING;
             }
         }
-        return BehaviorState::RUNNING;
+        return BehaviorState::SUCCESS;
     }
 
     void OnTerminate(BehaviorState state)

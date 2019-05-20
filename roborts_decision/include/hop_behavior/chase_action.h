@@ -17,7 +17,7 @@ class ChaseAction : public ActionNode
 public:
 	ChaseAction(const ChassisExecutor::Ptr &chassis_executor,
 				const Blackboard::Ptr &blackboard) : ActionNode("chase_action", blackboard),
-											   chassis_executor_(chassis_executor)
+													 chassis_executor_(chassis_executor)
 	{
 	}
 
@@ -81,9 +81,9 @@ public:
 				// if necessary add mutex lock
 				//blackboard_->GetCostMap2D()->GetMutex()->lock();
 				auto get_enemy_cell = blackboard_ptr_->GetCostMap2D()->World2Map(enemy_x,
-																			 enemy_y,
-																			 goal_cell_x,
-																			 goal_cell_y);
+																				 enemy_y,
+																				 goal_cell_x,
+																				 goal_cell_y);
 				//blackboard_->GetCostMap2D()->GetMutex()->unlock();
 
 				if (!get_enemy_cell)
@@ -96,9 +96,9 @@ public:
 				unsigned int robot_cell_x, robot_cell_y;
 				double goal_x, goal_y;
 				blackboard_ptr_->GetCostMap2D()->World2Map(robot_x,
-													   robot_y,
-													   robot_cell_x,
-													   robot_cell_y);
+														   robot_y,
+														   robot_cell_x,
+														   robot_cell_y);
 
 				if (blackboard_ptr_->GetCostMap2D()->GetCost(goal_cell_x, goal_cell_y) >= 253)
 				{
@@ -117,9 +117,9 @@ public:
 						{
 							find_goal = true;
 							blackboard_ptr_->GetCostMap2D()->Map2World((unsigned int)(line.GetX()),
-																   (unsigned int)(line.GetY()),
-																   goal_x,
-																   goal_y);
+																	   (unsigned int)(line.GetY()),
+																	   goal_x,
+																	   goal_y);
 
 							reduce_goal.pose.position.x = goal_x;
 							reduce_goal.pose.position.y = goal_y;
@@ -155,8 +155,8 @@ public:
 
 	void OnTerminate(BehaviorState state)
 	{
-		ROS_DEBUG_COND_NAMED(state == BehaviorState::FAILURE, GetName(), "action %s failed", GetName());
-		ROS_DEBUG_COND_NAMED(state == BehaviorState::SUCCESS, GetName(), "action %s succeeded", GetName());
+		ROS_DEBUG_COND_NAMED(state == BehaviorState::FAILURE, GetName().c_str(), "action %s failed", GetName().c_str());
+		ROS_DEBUG_COND_NAMED(state == BehaviorState::SUCCESS, GetName().c_str(), "action %s succeeded", GetName().c_str());
 		chassis_executor_->Cancel();
 	}
 
