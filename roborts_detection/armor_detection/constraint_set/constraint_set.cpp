@@ -87,11 +87,11 @@ void ConstraintSet::LoadParam() {
 
 
 
-ErrorInfo ConstraintSet::DetectArmor(bool &filter_detected, cv::Point3f &filter_target_3d) {
+ErrorInfo ConstraintSet::DetectArmor(bool &detected, cv::Point3f &target_3d) {
   std::vector<cv::RotatedRect> lights;
   std::vector<ArmorInfo> armors;
-  bool detected;
-  cv::Point3f target_3d;
+  // bool detected;
+  // cv::Point3f target_3d;
   auto img_begin = std::chrono::high_resolution_clock::now();
   bool sleep_by_diff_flag = true;
   while (true) {
