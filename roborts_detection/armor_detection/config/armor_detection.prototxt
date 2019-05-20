@@ -6,7 +6,7 @@ camera_gimbal_transform {
     offset_x :0
     offset_y :100
     offset_z :90
-    offset_pitch : 2.5 #-2.5
+    offset_pitch : -2.5 #-2.5
     offset_yaw : 0 #4.5
 }
 
