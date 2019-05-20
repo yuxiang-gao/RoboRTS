@@ -16,7 +16,7 @@ class GoalAction : public ActionNode
 public:
   GoalAction(const ChassisExecutor::Ptr &chassis_executor,
              const Blackboard::Ptr &blackboard) : ActionNode("goal_action", blackboard),
-                                            chassis_executor_(chassis_executor) {}
+                                                  chassis_executor_(chassis_executor) {}
 
   void OnInitialize()
   {
@@ -35,10 +35,10 @@ public:
       if (blackboard_ptr_->IsNewGoal())
       {
         chassis_executor_->Execute(blackboard_ptr_->GetGoal());
-        return BehaviorState::SUCCESS;
+        return BehaviorState::RUNNING;
       }
     }
-    return BehaviorState::RUNNING;
+    return executor_state;
   }
 
   ~GoalAction() = default;
