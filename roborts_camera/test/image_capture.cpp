@@ -24,7 +24,7 @@
 #include "image_transport/image_transport.h"
 #include "cv_bridge/cv_bridge.h"
 
-std::string topic_name = "back_camera";
+std::string topic_name = "front_camera";
 cv::VideoWriter writer(topic_name+".avi", CV_FOURCC('M', 'J', 'P', 'G'), 25.0, cv::Size(640, 360));
 cv::Mat src_img;
 
