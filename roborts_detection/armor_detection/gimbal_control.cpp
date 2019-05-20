@@ -61,10 +61,15 @@ float GimbalContrl::GetPitch(float x, float y, float v) {
 }
 
 void GimbalContrl::Transform(cv::Point3f &postion, float &pitch, float &yaw) {
-  pitch = GetPitch((postion.z + offset_.z) / 1000, -(postion.y - offset_.y) / 1000, 15) + (float)(offset_pitch_ * 3.1415926535 / 180);
+  pitch =
+      -GetPitch((postion.z + offset_.z) / 1000, -(postion.y + offset_.y) / 1000, 15) + (float)(offset_pitch_ * 3.1415926535 / 180);
+  //yaw positive direction :anticlockwise
+  yaw = -(float) (atan2(postion.x + offset_.x, postion.z + offset_.z)) + (float)(offset_yaw_ * 3.1415926535 / 180);
+
+  // pitch = GetPitch((postion.z + offset_.z) / 1000, -(postion.y - offset_.y) / 1000, 15) + (float)(offset_pitch_ * 3.1415926535 / 180);
   //yaw positive direction :anticlockwise
   //yaw = -(float) (atan2(postion.x + 320, postion.z - offset_.z )) + (float)(0 * 3.1415926535 / 180);
-  yaw = (float) (atan2(postion.x + offset_.x, postion.z + offset_.z)) + (float)(offset_yaw_ * 3.1415926535 / 180);
+  // yaw = (float) (atan2(postion.x + offset_.x, postion.z + offset_.z)) + (float)(offset_yaw_ * 3.1415926535 / 180);
 std::cout << postion.x  << " " << postion.y << " " << postion.z << std::endl;
 std::cout << pitch << " " << yaw << std::endl;
 }
