@@ -16,6 +16,7 @@
 #include "hop_behavior/goal_action.h"
 #include "hop_behavior/reload_action.h"
 #include "hop_behavior/bonus_action.h"
+#include "hop_behavior/countdown_action.h"
 
 namespace roborts_decision
 {
@@ -41,10 +42,11 @@ public:
         actions_["action_chase"] = std::make_shared<ChaseAction>(blackboard_ptr_);
         actions_["action_search"] = std::make_shared<SearchAction>(blackboard_ptr_);
         actions_["action_escape"] = std::make_shared<EscapeAction>(blackboard_ptr_);
-        actions_["action_patrol"] = std::make_shared<PatrolAction>(blackboard_ptr_); //Done
-        actions_["action_goal"] = std::make_shared<GoalAction>(blackboard_ptr_);     //Done
-        actions_["action_reload"] = std::make_shared<ReloadAction>(blackboard_ptr_); //Done
-        actions_["action_bonus"] = std::make_shared<BonusAction>(blackboard_ptr_);   //TODO
+        actions_["action_patrol"] = std::make_shared<PatrolAction>(blackboard_ptr_);       //Done
+        actions_["action_goal"] = std::make_shared<GoalAction>(blackboard_ptr_);           //Done
+        actions_["action_reload"] = std::make_shared<ReloadAction>(blackboard_ptr_);       //Done
+        actions_["action_bonus"] = std::make_shared<BonusAction>(blackboard_ptr_);         //TODO
+        actions_["action_countdown"] = std::make_shared<CountdownAction>(blackboard_ptr_); //Done
     }
 
     void InitConditions()

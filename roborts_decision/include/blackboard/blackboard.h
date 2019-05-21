@@ -163,14 +163,14 @@ public:
   void Supply()
   {
     roborts_msgs::ProjectileSupply sup_msg;
-    sup_msg.number = 100;
+    sup_msg.number = 50;
     if (robot_name_ == "robot_0")
       robot_master_supply_pub_.publish(sup_msg);
     else
       robot_wing_supply_pub_.publish(sup_msg);
   }
 
-  void TurnOnFricWheel()
+  bool TurnOnFricWheel()
   {
     roborts_msgs::FricWhl srv;
     srv.request.open = true;
@@ -181,12 +181,12 @@ public:
       {
         ROS_INFO("Fric received: %d", (int)srv.response.received);
         if (srv.response.received)
-          return;
+          return true;
       }
       else
       {
         ROS_ERROR("Failed to turn on fric wheel");
-        return;
+        return false;
       }
     }
     ROS_ERROR("Failed to turn on fric wheel");
@@ -211,8 +211,7 @@ public:
       }
   }
 
-  void
-  Shoot(int num)
+  bool Shoot(int num)
   {
     roborts_msgs::ShootCmd srv;
     srv.request.mode = 1; //0 1 2 stop once continuous
@@ -225,13 +224,13 @@ public:
         if (srv.response.received)
         {
           bullet_count_ -= num;
-          return;
+          return true;
         }
       }
       else
       {
-        ROS_ERROR("Failed to turn on fric wheel");
-        return;
+        ROS_ERROR("Failed to call shoot service");
+        return false;
       }
     }
   }

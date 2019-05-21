@@ -21,7 +21,7 @@ public:
 
 	void OnInitialize()
 	{
-		chase_goal_.header.frame_id = "map";
+		chase_goal_.header.frame_id = "/map";
 		chase_goal_.pose.orientation.x = 0;
 		chase_goal_.pose.orientation.y = 0;
 		chase_goal_.pose.orientation.z = 0;
@@ -47,6 +47,9 @@ public:
 			chase_buffer_[chase_count_++ % 2] = blackboard_ptr_->GetEnemy();
 
 			chase_count_ = chase_count_ % 2;
+
+			// auto linear_distance = blackboard_ptr_->GetDistance(chase_buffer_[(chase_count_ + 2 - 1) % 2], robot_map_pose);
+			// auto angular_distance = blackboard_ptr_->GetAngle(chase_buffer_[(chase_count_ + 2 - 1) % 2], robot_map_pose);
 
 			auto dx = chase_buffer_[(chase_count_ + 2 - 1) % 2].pose.position.x - robot_map_pose.pose.position.x;
 			auto dy = chase_buffer_[(chase_count_ + 2 - 1) % 2].pose.position.y - robot_map_pose.pose.position.y;
@@ -128,7 +131,7 @@ public:
 					{
 						cancel_goal_ = true;
 						chassis_executor_->Execute(reduce_goal);
-						return BehaviorState::SUCCESS;
+						return BehaviorState::RUNNING;
 					}
 					else
 					{
@@ -144,7 +147,6 @@ public:
 				{
 					cancel_goal_ = true;
 					chassis_executor_->Execute(reduce_goal);
-					return BehaviorState::FAILURE;
 				}
 			}
 		}

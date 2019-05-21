@@ -8,8 +8,6 @@
 #include "blackboard/blackboard.h"
 #include "behavior_tree/behavior_state.h"
 
-#include "utils/line_iterator.h"
-
 namespace roborts_decision
 {
 class EscapeAction : public ActionNode
@@ -27,6 +25,10 @@ public:
     whirl_vel_.accel.linear.x = 0;
     whirl_vel_.accel.linear.y = 0;
     whirl_vel_.accel.linear.z = 0;
+
+    whirl_vel_.accel.angular.x = 0;
+    whirl_vel_.accel.angular.y = 0;
+    whirl_vel_.accel.angular.z = 0;
 
     left_x_limit_ = blackboard_ptr_->decision_config.escape().left_x_limit();
     right_x_limit_ = blackboard_ptr_->decision_config.escape().right_x_limit();
@@ -97,7 +99,7 @@ public:
         if (!get_enemy_cell)
         {
           chassis_executor_->Execute(whirl_vel_);
-          return BehaviorState::FAILURE;
+          return BehaviorState::RUNNING;
         }
 
         while (true)

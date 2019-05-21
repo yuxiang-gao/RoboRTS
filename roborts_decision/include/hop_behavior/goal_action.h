@@ -6,7 +6,6 @@
 
 #include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
-#include "utils/line_iterator.h"
 
 namespace roborts_decision
 {

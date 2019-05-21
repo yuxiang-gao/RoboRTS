@@ -19,7 +19,7 @@ public:
 
   void OnInitialize()
   {
-    last_position_.header.frame_id = "map";
+    last_position_.header.frame_id = "/map";
     last_position_.pose.orientation.x = 0;
     last_position_.pose.orientation.y = 0;
     last_position_.pose.orientation.z = 0;
@@ -36,7 +36,7 @@ public:
     for (int i = 0; i != blackboard_ptr_->decision_config.search_region_1().size(); i++)
     {
       geometry_msgs::PoseStamped search_point;
-      search_point.header.frame_id = "map";
+      search_point.header.frame_id = "/map";
       search_point.pose.position.x = blackboard_ptr_->decision_config.search_region_1(i).x();
       search_point.pose.position.y = blackboard_ptr_->decision_config.search_region_1(i).y();
       search_point.pose.position.z = blackboard_ptr_->decision_config.search_region_1(i).z();
@@ -51,7 +51,7 @@ public:
     for (int i = 0; i != blackboard_ptr_->decision_config.search_region_2().size(); i++)
     {
       geometry_msgs::PoseStamped search_point;
-      search_point.header.frame_id = "map";
+      search_point.header.frame_id = "/map";
       search_point.pose.position.x = blackboard_ptr_->decision_config.search_region_2(i).x();
       search_point.pose.position.y = blackboard_ptr_->decision_config.search_region_2(i).y();
       search_point.pose.position.z = blackboard_ptr_->decision_config.search_region_2(i).z();
@@ -66,7 +66,7 @@ public:
     for (int i = 0; i != blackboard_ptr_->decision_config.search_region_3().size(); i++)
     {
       geometry_msgs::PoseStamped search_point;
-      search_point.header.frame_id = "map";
+      search_point.header.frame_id = "/map";
       search_point.pose.position.x = blackboard_ptr_->decision_config.search_region_3(i).x();
       search_point.pose.position.y = blackboard_ptr_->decision_config.search_region_3(i).y();
       search_point.pose.position.z = blackboard_ptr_->decision_config.search_region_3(i).z();
@@ -81,7 +81,7 @@ public:
     for (int i = 0; i != blackboard_ptr_->decision_config.search_region_4().size(); i++)
     {
       geometry_msgs::PoseStamped search_point;
-      search_point.header.frame_id = "map";
+      search_point.header.frame_id = "/map";
       search_point.pose.position.x = blackboard_ptr_->decision_config.search_region_4(i).x();
       search_point.pose.position.y = blackboard_ptr_->decision_config.search_region_4(i).y();
       search_point.pose.position.z = blackboard_ptr_->decision_config.search_region_4(i).z();

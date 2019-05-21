@@ -131,6 +131,7 @@ whirl_vel {
   angle_y_vel: 0
   angle_z_vel: 1
 }
+
 wing_bot_task_point {
   x: 4.2
   y: 0.87

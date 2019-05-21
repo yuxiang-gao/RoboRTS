@@ -14,13 +14,16 @@
 // Added by Thomas to make without errors
 #include <random>
 
-namespace roborts_decision{
-class EscapeBehavior {
- public:
-  EscapeBehavior(ChassisExecutor* &chassis_executor,
-                 Blackboard* &blackboard,
-                 const std::string & proto_file_path) : chassis_executor_(chassis_executor),
-                                                        blackboard_(blackboard) {
+namespace roborts_decision
+{
+class EscapeBehavior
+{
+public:
+  EscapeBehavior(ChassisExecutor *&chassis_executor,
+                 Blackboard *&blackboard,
+                 const std::string &proto_file_path) : chassis_executor_(chassis_executor),
+                                                       blackboard_(blackboard)
+  {
 
     // init whirl velocity
     whirl_vel_.accel.linear.x = 0;
@@ -32,19 +35,22 @@ class EscapeBehavior {
     whirl_vel_.accel.angular.y = 0;
     whirl_vel_.accel.angular.z = 0;
 
-    if (!LoadParam(proto_file_path)) {
+    if (!LoadParam(proto_file_path))
+    {
       ROS_ERROR("%s can't open file", __FUNCTION__);
     }
-
   }
 
-  void Run() {
+  void Run()
+  {
 
     auto executor_state = Update();
 
-    if (executor_state != BehaviorState::RUNNING) {
+    if (executor_state != BehaviorState::RUNNING)
+    {
 
-      if (blackboard_->IsEnemyDetected()) {
+      if (blackboard_->IsEnemyDetected())
+      {
 
         geometry_msgs::PoseStamped enemy;
         enemy = blackboard_->GetEnemy();
@@ -57,20 +63,25 @@ class EscapeBehavior {
 
         auto robot_map_pose = blackboard_->GetRobotMapPose();
         float x_min, x_max;
-        if (enemy.pose.position.x < left_x_limit_) {
+        if (enemy.pose.position.x < left_x_limit_)
+        {
           x_min = right_random_min_x_;
           x_max = right_random_max_x_;
-
-        } else if (enemy.pose.position.x > right_x_limit_) {
+        }
+        else if (enemy.pose.position.x > right_x_limit_)
+        {
           x_min = left_random_min_x_;
           x_max = left_random_max_x_;
-
-        } else {
-          if ((robot_x_limit_ - robot_map_pose.pose.position.x) >= 0) {
+        }
+        else
+        {
+          if ((robot_x_limit_ - robot_map_pose.pose.position.x) >= 0)
+          {
             x_min = left_random_min_x_;
             x_max = left_random_max_x_;
-
-          } else {
+          }
+          else
+          {
             x_min = right_random_min_x_;
             x_max = right_random_max_x_;
           }
@@ -81,17 +92,18 @@ class EscapeBehavior {
         //std::uniform_real_distribution<float> yaw_uni_dis(-M_PI, M_PI);
 
         auto get_enemy_cell = blackboard_->GetCostMap2D()->World2Map(enemy.pose.position.x,
-                                               enemy.pose.position.y,
-                                               enemy_cell_x,
-                                               enemy_cell_y);
+                                                                     enemy.pose.position.y,
+                                                                     enemy_cell_x,
+                                                                     enemy_cell_y);
 
-        if (!get_enemy_cell) {
+        if (!get_enemy_cell)
+        {
           chassis_executor_->Execute(whirl_vel_);
           return;
         }
 
-
-        while (true) {
+        while (true)
+        {
           goal_x = x_uni_dis(gen);
           goal_y = y_uni_dis(gen);
           auto get_goal_cell = blackboard_->GetCostMap2D()->World2Map(goal_x,
@@ -99,34 +111,38 @@ class EscapeBehavior {
                                                                       goal_cell_x,
                                                                       goal_cell_y);
 
-          if (!get_goal_cell) {
+          if (!get_goal_cell)
+          {
             continue;
           }
 
           auto index = blackboard_->GetCostMap2D()->GetIndex(goal_cell_x, goal_cell_y);
-//          costmap_2d_->GetCost(goal_cell_x, goal_cell_y);
-          if (blackboard_->GetCharMap()[index] >= 253) {
+          //          costmap_2d_->GetCost(goal_cell_x, goal_cell_y);
+          if (blackboard_->GetCharMap()[index] >= 253)
+          {
             continue;
           }
 
           unsigned int obstacle_count = 0;
-          for(FastLineIterator line( goal_cell_x, goal_cell_y, enemy_cell_x, enemy_cell_y); line.IsValid(); line.Advance()) {
+          for (FastLineIterator line(goal_cell_x, goal_cell_y, enemy_cell_x, enemy_cell_y); line.IsValid(); line.Advance())
+          {
             auto point_cost = blackboard_->GetCostMap2D()->GetCost((unsigned int)(line.GetX()), (unsigned int)(line.GetY())); //current point's cost
 
-            if(point_cost > 253){
+            if (point_cost > 253)
+            {
               obstacle_count++;
             }
-
           }
 
-          if (obstacle_count > 5) { //TODO:  this should write in the proto file
+          if (obstacle_count > 5)
+          { //TODO:  this should write in the proto file
             break;
           }
         }
         Eigen::Vector2d pose_to_enemy(enemy.pose.position.x - robot_map_pose.pose.position.x,
                                       enemy.pose.position.y - robot_map_pose.pose.position.y);
-        goal_yaw = static_cast<float > (std::atan2(pose_to_enemy.coeffRef(1), pose_to_enemy.coeffRef(0)));
-        auto quaternion = tf::createQuaternionMsgFromRollPitchYaw(0,0,goal_yaw);
+        goal_yaw = static_cast<float>(std::atan2(pose_to_enemy.coeffRef(1), pose_to_enemy.coeffRef(0)));
+        auto quaternion = tf::createQuaternionMsgFromRollPitchYaw(0, 0, goal_yaw);
 
         geometry_msgs::PoseStamped escape_goal;
         escape_goal.header.frame_id = "map";
@@ -136,25 +152,30 @@ class EscapeBehavior {
         escape_goal.pose.orientation = quaternion;
         //return exploration_goal;
         chassis_executor_->Execute(escape_goal);
-      } else {
+      }
+      else
+      {
         chassis_executor_->Execute(whirl_vel_);
         return;
       }
     }
-
   }
 
-  void Cancel() {
+  void Cancel()
+  {
     chassis_executor_->Cancel();
   }
 
-  BehaviorState Update() {
+  BehaviorState Update()
+  {
     return chassis_executor_->Update();
   }
 
-  bool LoadParam(const std::string &proto_file_path) {
+  bool LoadParam(const std::string &proto_file_path)
+  {
     roborts_decision::DecisionConfig decision_config;
-    if (!roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config)) {
+    if (!roborts_common::ReadProtoFromTextFile(proto_file_path, &decision_config))
+    {
       return false;
     }
 
@@ -173,13 +194,13 @@ class EscapeBehavior {
     return true;
   }
 
-  ~EscapeBehavior() {
-
+  ~EscapeBehavior()
+  {
   }
 
- private:
+private:
   //! executor
-  ChassisExecutor* const chassis_executor_;
+  ChassisExecutor *const chassis_executor_;
 
   float left_x_limit_, right_x_limit_;
   float robot_x_limit_;
@@ -187,13 +208,12 @@ class EscapeBehavior {
   float right_random_min_x_, right_random_max_x_;
 
   //! perception information
-  Blackboard* const blackboard_;
+  Blackboard *const blackboard_;
 
   //! whirl velocity
-//  geometry_msgs::Twist whirl_vel_;
+  //  geometry_msgs::Twist whirl_vel_;
   roborts_msgs::TwistAccel whirl_vel_;
-  
 };
-}
+} // namespace roborts_decision
 
 #endif //ROBORTS_DECISION_ESCAPEBEHAVIOR_H
