@@ -25,7 +25,7 @@
       <param name="angle_compensate" type="bool" value="true"/>
     </node>
 
-        <!-- Run the camera node -->
+    <!-- Run the camera node -->
     <node name="roborts_camera" pkg="roborts_camera" type="roborts_camera_node"/>
   </group>
 
@@ -35,7 +35,7 @@
     <arg name="initial_pose_y" value="0.5"/>
   </include>
 
-  <node ns="$(arg robot_name)" pkg="roborts_decision" type="hop_decision_node" />
+  <node ns="$(arg robot_name)" name="decision_tree" pkg="roborts_decision" type="hop_decision_node" />
 
 </launch>
 

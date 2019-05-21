@@ -47,6 +47,7 @@ public:
         actions_["action_reload"] = std::make_shared<ReloadAction>(blackboard_ptr_);       //Done
         actions_["action_bonus"] = std::make_shared<BonusAction>(blackboard_ptr_);         //TODO
         actions_["action_countdown"] = std::make_shared<CountdownAction>(blackboard_ptr_); //Done
+        actions_["action_shoot"] = std::make_shared<ShootAction>(blackboard_ptr_);
     }
 
     void InitConditions()
