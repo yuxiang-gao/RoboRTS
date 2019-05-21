@@ -3,7 +3,7 @@
 using namespace roborts_decision;
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "hop_decision_test_node");
+  ros::init(argc, argv, "hop_decision_node");
   std::string full_path = ros::package::getPath("roborts_decision") + "/config/decision.prototxt";
 
   auto blackboard = std::make_shared<Blackboard>(full_path);
