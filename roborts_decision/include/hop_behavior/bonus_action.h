@@ -21,11 +21,19 @@ public:
     bonus_position_.header.frame_id = "/map";
     bonus_position_.pose.orientation.x = 0;
     bonus_position_.pose.orientation.y = 0;
-    bonus_position_.pose.orientation.z = 0;
-    bonus_position_.pose.orientation.w = 1.0;
+    bonus_position_.pose.orientation.z = 0.7071068; // yaw = 90
+    bonus_position_.pose.orientation.w = 0.7071068; // yaw = 90
     bonus_position_.pose.position.x = 6.3;
     bonus_position_.pose.position.y = 1.75;
     bonus_position_.pose.position.z = 0;
+    bonus_right_ = bonus_position_; // yaw = 45 degree
+    bonus_left_ = bonus_position_;  // yaw = 135 degree
+
+    bonus_right_.pose.orientation.z = 0.3826834;
+    bonus_right_.pose.orientation.w = 0.9238795;
+
+    bonus_left_.pose.orientation.z = 0.9238795;
+    bonus_left_.pose.orientation.w = 0.3826834;
     chassis_cmd_sent_ = false;
     bonus_start_time_ = 0;
     sentry_ori_ = true;
@@ -74,7 +82,7 @@ public:
         if (bonus_status == 1)
         {
           ROS_INFO_STREAM("occuplying bonux");
-          Sentry(bonus_position_);
+          Sentry(bonus_position_, bonus_right_, bonus_left_, sentry_ori_);
 
           if (bonus_start_time_ == 0)
           {
@@ -99,68 +107,68 @@ public:
         }
       }
     }
-  }
-  return BehaviorState::RUNNING;
-}
 
-~BonusAction() = default;
+    return BehaviorState::RUNNING;
+  }
+
+  ~BonusAction() = default;
 
 private:
-//! executor
-const ChassisExecutor::Ptr chassis_executor_;
+  //! executor
+  const ChassisExecutor::Ptr chassis_executor_;
 
-std::string robot_name_;
+  std::string robot_name_;
 
-//! reload goal
-geometry_msgs::PoseStamped bonus_position_;
+  //! reload goal
+  geometry_msgs::PoseStamped bonus_position_;
+  geometry_msgs::PoseStamped bonus_right_;
+  geometry_msgs::PoseStamped bonus_left_;
 
-bool chassis_cmd_sent_;
-double bonus_start_time_;
-bool sentry_ori_;
+  bool chassis_cmd_sent_;
+  double bonus_start_time_;
+  bool sentry_ori_;
 
-void Sentry(const geometry_msgs::PoseStamped bonus_position)
-{
-  auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
-  auto angle_diff = GetAngle(robot_map_pose, bonus_position);
-  float target_diff = 1.0472; // 60 degree
+  void Sentry(const geometry_msgs::PoseStamped bonus_position, const geometry_msgs::PoseStamped bonus_right, const geometry_msgs::PoseStamped bonus_left, bool sentry_ori)
+  {
+    auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
+    float target_diff = 0.08; // 5 degree
                               // tf::createQuaternionMsgFromRollPitchYaw(0, 0, );
-  auto quat_diff = tf::createQuaternionMsgFromRollPitchYaw(0, 0, target_diff);
+    auto quat_diff = tf::createQuaternionMsgFromRollPitchYaw(0, 0, target_diff);
 
-  auto target_pose = bonus_position;
+    auto target_pose = bonus_position;
 
-  if (sentri_ori_)
-  {
-    if (angle_diff < target_diff)
+    if (sentry_ori)
     {
-      taget_pose.pose.orientation = taget_pose.pose.orientation + quat_diff;
-      chassis_executor_->Execute(taget_pose);
-    }
+      auto angle_diff = blackboard_ptr_->GetAngle(robot_map_pose, bonus_right);
 
+      if (std::abs(angle_diff) > target_diff)
+      {
+        chassis_executor_->Execute(bonus_right);
+      }
+      else
+      {
+        chassis_executor_->Execute(bonus_left);
+        sentry_ori = false;
+      }
+    }
     else
     {
-      taget_pose.pose.orientation = taget_pose.pose.orientation - quat_diff;
-      chassis_executor_->Execute(taget_pose);
-      senstry_ori_ = false;
+      auto angle_diff = blackboard_ptr_->GetAngle(robot_map_pose, bonus_left);
+
+      if (std::abs(angle_diff) > target_diff)
+      {
+        chassis_executor_->Execute(bonus_left);
+      }
+      else
+      {
+        chassis_executor_->Execute(bonus_right);
+        sentry_ori = true;
+      }
     }
   }
-  else
-  {
-    if (angle_diff > target_diff)
-    {
-      taget_pose.pose.orientation = taget_pose.pose.orientation - quat_diff;
-      chassis_executor_->Execute(taget_pose);
-    }
+};
 
-    else
-    {
-      taget_pose.pose.orientation = taget_pose.pose.orientation + quat_diff;
-      chassis_executor_->Execute(taget_pose);
-      senstry_ori_ = true;
-    }
-  }
-}
-
-}; // namespace roborts_decision
 } // namespace roborts_decision
+// namespace roborts_decision
 
 #endif //ROBORTS_DECISION_bonus_ACTION_H
