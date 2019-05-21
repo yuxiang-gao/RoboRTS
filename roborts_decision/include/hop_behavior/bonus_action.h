@@ -81,7 +81,7 @@ public:
         // }
         if (bonus_status == 1)
         {
-          ROS_INFO_STREAM("occuplying bonux");
+          ROS_INFO_STREAM("occupying bonus");
           Sentry(bonus_position_, bonus_right_, bonus_left_, sentry_ori_);
 
           if (bonus_start_time_ == 0)
