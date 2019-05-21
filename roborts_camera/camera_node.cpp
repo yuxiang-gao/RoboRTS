@@ -69,7 +69,7 @@ void CameraNode::Update(const unsigned int index)
     if (!img.empty())
     {
       sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();
-      img_msg->header.frame_id = camera_param_.GetCameraParam()[index].camera_name;
+      img_msg->header.frame_id = "/" + tf_prefix + "/" + camera_param_.GetCameraParam()[index].camera_name;
       img_msg->header.stamp = ros::Time::now();
 
       camera_param_.GetCameraParam()[index].ros_camera_info->header.stamp = img_msg->header.stamp;
