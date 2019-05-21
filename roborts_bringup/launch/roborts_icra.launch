@@ -2,6 +2,8 @@
   <master auto="start"/>
   <arg name="map" value="icra2019"/>
   <arg name="robot_name"/>
+  <arg name="initial_pose_x" />
+  <arg name="initial_pose_y"/>
 
   <!-- Run the map server -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find roborts_bringup)/maps/$(arg map).yaml" respawn="false" />
@@ -34,8 +36,8 @@
 
   <include file="$(find roborts_bringup)/launch/roborts_multi_base.launch">
     <arg name="robot_name" value="$(arg robot_name)" />
-    <arg name="initial_pose_x" value="7.5"/>
-    <arg name="initial_pose_y" value="0.5"/>
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
   </include>
 
   <node ns="$(arg robot_name)" name="decision_tree" pkg="roborts_decision" type="hop_decision_node" />
