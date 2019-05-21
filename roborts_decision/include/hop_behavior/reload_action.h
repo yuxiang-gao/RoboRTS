@@ -90,7 +90,7 @@ public:
         else if (ros::Time::now().toSec() - supply_start_time_ > 30)
         {
           ROS_WARN("Reloading time out! LEAVE");
-          return BehaviorState::SUCCESS;
+          return BehaviorState::FAILURE;
         }
       }
     }
