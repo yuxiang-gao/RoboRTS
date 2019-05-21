@@ -4,22 +4,22 @@ camera: {
   camera_path: "/dev/v4l/by-path/platform-3530000.xhci-usb-0:2.1:1.0-video-index0"
 
   camera_matrix {
-    data: 564.982507
+    data: 550.389432
     data: 0.0
-    data: 300.668544
+    data: 357.726833
     data: 0.0
-    data: 566.106387
-    data: 238.913635
+    data: 554.240435
+    data: 247.739548
     data: 0.0
     data: 0.0
     data: 1.0  
   }
 
   camera_distortion {
-    data: -0.428340
-    data: 0.203736
-    data: 0.001143
-    data: -0.001132
+    data: -0.419141
+    data: 0.168239
+    data: 0.002925
+    data: -0.001492
     data: 0.0
   }
 
@@ -48,22 +48,22 @@ camera: {
   camera_path: "/dev/v4l/by-path/platform-3530000.xhci-usb-0:2.4:1.0-video-index0"
 
   camera_matrix {
-    data: 585.633475
+    data: 551.702771
     data: 0.0
-    data: 321.305132
+    data: 314.097682
     data: 0.0
-    data: 587.654172
-    data: 267.398450
+    data: 554.030469
+    data: 211.596171
     data: 0.0
     data: 0.0
     data: 1.0  
   }
 
   camera_distortion {
-    data: -0.445039
-    data: 0.246725
-    data: 0.000294
-    data: 0.000445
+    data: -0.454969
+    data: 0.236073
+    data: -0.001090
+    data: 0.002414
     data: 0.0
   }
 

@@ -24,6 +24,9 @@
       <param name="inverted" type="bool" value="false"/>
       <param name="angle_compensate" type="bool" value="true"/>
     </node>
+
+        <!-- Run the camera node -->
+    <node name="roborts_camera" pkg="roborts_camera" type="roborts_camera_node"/>
   </group>
 
   <include file="$(find roborts_bringup)/launch/roborts_multi_base.launch">

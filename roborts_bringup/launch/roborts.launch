@@ -1,6 +1,6 @@
 <launch>
   <master auto="start"/>
-  <arg name="map" value="icra2019"/>
+  <arg name="map" value="ffu_map"/>
 
   <!--Load parameters for localization node  -->
   <rosparam command="load" file="$(find roborts_localization)/config/localization.yaml" />
@@ -32,6 +32,9 @@
 
   <!-- Run the local planner node -->
   <node pkg="roborts_planning" type="local_planner_node" name="local_planner_node" respawn="false" />
+
+  <!-- Open RVIZ config file -->
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find roborts_bringup)/rviz/roborts.rviz"/>
 
 </launch>
 

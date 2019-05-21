@@ -74,6 +74,10 @@ class CameraNode{
   std::vector<image_transport::CameraPublisher> img_pubs_;
   //! whether flip the image
   std::vector<bool> isFlips_;
+  //! rooooonode handle
+  ros::NodeHandle nh;
+  //! camera name
+  std::string tf_prefix;
 };
 } //namespace roborts_camera
 

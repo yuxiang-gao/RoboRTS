@@ -17,7 +17,7 @@ message ProjectileModelInfo {
 message ArmorDetectionAlgorithms {
     repeated string name = 1;
     optional string selected_algorithm = 2;
-    optional uint32 undetected_armor_delay = 3;
+    optional uint32 undetected_armor_delay = 10;
     optional string camera_name = 4;
     required CameraGimbalTransform camera_gimbal_transform= 5;
     optional ProjectileModelInfo projectile_model_info = 6;
