@@ -40,13 +40,15 @@
 #include "armor_detection_algorithms.h"
 #include "gimbal_control.h"
 
-namespace roborts_detection {
+namespace roborts_detection
+{
 
-using roborts_common::NodeState;
 using roborts_common::ErrorInfo;
+using roborts_common::NodeState;
 
-class ArmorDetectionNode {
- public:
+class ArmorDetectionNode
+{
+public:
   explicit ArmorDetectionNode();
   /**
    * @brief Initializing armor detection algorithm.
@@ -79,8 +81,9 @@ class ArmorDetectionNode {
    */
   void PublishMsgs();
   ~ArmorDetectionNode();
- protected:
- private:
+
+protected:
+private:
   std::shared_ptr<ArmorDetectionBase> armor_detector_;
   std::thread armor_detection_thread_;
   unsigned int max_rotating_fps_;

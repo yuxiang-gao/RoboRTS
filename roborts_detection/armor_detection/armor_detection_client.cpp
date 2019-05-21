@@ -20,7 +20,8 @@
 #include "roborts_msgs/ArmorDetectionAction.h"
 #include <actionlib/client/terminal_state.h>
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   ros::init(argc, argv, "armor_detection_node_test_client");
 
   // create the action client
@@ -33,7 +34,8 @@ int main(int argc, char **argv) {
 
   char command = '0';
 
-  while (command != '4') {
+  while (command != '4')
+  {
     std::cout << "**************************************************************************************" << std::endl;
     std::cout << "*********************************please send a command********************************" << std::endl;
     std::cout << "1: start the action" << std::endl
@@ -43,32 +45,34 @@ int main(int argc, char **argv) {
     std::cout << "**************************************************************************************" << std::endl;
     std::cout << "> ";
     std::cin >> command;
-    if (command != '1' && command != '2' && command != '3' && command != '4') {
+    if (command != '1' && command != '2' && command != '3' && command != '4')
+    {
       std::cout << "please inpugain!" << std::endl;
       std::cout << "> ";
       std::cin >> command;
     }
 
-    switch (command) {
-      //start thread.
-      case '1':
-        goal.command = 1;
-        ROS_INFO("I am running the request");
-        ac.sendGoal(goal);
-        break;
-        //pause thread.
-      case '2':
-        goal.command = 2;
-        ROS_INFO("Action server will pause.");
-        ac.sendGoal(goal);
-        //stop thread.
-      case '3':
-        goal.command = 3;
-        ROS_INFO("I am cancelling the request");
-        ac.cancelGoal();
-        break;
-      default:
-        break;
+    switch (command)
+    {
+    //start thread.
+    case '1':
+      goal.command = 1;
+      ROS_INFO("I am running the request");
+      ac.sendGoal(goal);
+      break;
+      //pause thread.
+    case '2':
+      goal.command = 2;
+      ROS_INFO("Action server will pause.");
+      ac.sendGoal(goal);
+      //stop thread.
+    case '3':
+      goal.command = 3;
+      ROS_INFO("I am cancelling the request");
+      ac.cancelGoal();
+      break;
+    default:
+      break;
     }
   }
   return 0;
