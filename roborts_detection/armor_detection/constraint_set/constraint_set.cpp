@@ -465,13 +465,18 @@ ArmorInfo ConstraintSet::SlectFinalArmor(std::vector<ArmorInfo> &armors) {
 void ConstraintSet::CalcControlInfo(const ArmorInfo & armor, cv::Point3f &target_3d) {
   cv::Mat rvec;
   cv::Mat tvec;
+  std::cout << " Printing Armor points " << std::endl;
+  std::cout <<armor_points_[0] << "   and  " <<armor.vertex[0] << std::endl;  
+  std::cout <<armor_points_[1] << "   and  " <<armor.vertex[1] << std::endl;
+  std::cout <<armor_points_[2] << "   and  " <<armor.vertex[2] << std::endl;
+  std::cout <<armor_points_[3] << "   and  " <<armor.vertex[3] << std::endl;
   cv::solvePnP(armor_points_,
                armor.vertex,
                intrinsic_matrix_,
                distortion_coeffs_,
                rvec,
                tvec);
-  //std::cout << "tvec:" << tvec << std::endl; 
+  std::cout << "tvec:" << tvec << std::endl; 
   target_3d = cv::Point3f(tvec);
 
 }
