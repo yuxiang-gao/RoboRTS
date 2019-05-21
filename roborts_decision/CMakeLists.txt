@@ -39,6 +39,7 @@ add_executable(behavior_test_node
   ${DecisionProtoSrc}
   behavior_test.cpp
   executor/chassis_executor.cpp
+  executor/gimbal_executor.cpp
   )
 
 target_link_libraries(behavior_test_node
@@ -56,6 +57,7 @@ add_executable(hop_behavior_test_node
   ${DecisionProtoSrc}
   src/hop_behavior_test.cpp
   executor/chassis_executor.cpp
+  executor/gimbal_executor.cpp
 )
 
 target_link_libraries(hop_behavior_test_node
@@ -66,4 +68,40 @@ target_link_libraries(hop_behavior_test_node
 )
 
 add_dependencies(hop_behavior_test_node
+  roborts_msgs_generate_messages)
+
+add_executable(hop_decision_node
+  ${DecisionProtoHds}
+  ${DecisionProtoSrc}
+  src/hop_decision_tree.cpp
+  executor/chassis_executor.cpp
+  executor/gimbal_executor.cpp
+)
+
+target_link_libraries(hop_decision_node
+  PRIVATE
+  roborts_costmap
+  ${catkin_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
+)
+
+add_dependencies(hop_decision_node
+  roborts_msgs_generate_messages)
+
+add_executable(hop_decision_test_node
+  ${DecisionProtoHds}
+  ${DecisionProtoSrc}
+  src/hop_decision_test.cpp
+  executor/chassis_executor.cpp
+  executor/gimbal_executor.cpp
+)
+
+target_link_libraries(hop_decision_test_node
+  PRIVATE
+  roborts_costmap
+  ${catkin_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
+)
+
+add_dependencies(hop_decision_test_node
   roborts_msgs_generate_messages)

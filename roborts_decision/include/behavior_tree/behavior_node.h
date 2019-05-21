@@ -227,6 +227,7 @@ protected:
 class ActionNode : public BehaviorNode
 {
 public:
+  typedef std::shared_ptr<ActionNode> Ptr;
   /**
    * @brief Constructor of ActionNode
    * @param name Name of the behavior node
@@ -257,6 +258,7 @@ protected:
 class DecoratorNode : public BehaviorNode
 {
 public:
+  typedef std::shared_ptr<DecoratorNode> Ptr;
   /**
    * @brief Constructor of DecoratorNode
    * @param name Name of the behavior node
@@ -418,6 +420,7 @@ protected:
 class CompositeNode : public BehaviorNode
 {
 public:
+  typedef std::shared_ptr<CompositeNode> Ptr;
   /**
    * @brief Constructor of CompositeNode
    * @param name Name of the behavior node

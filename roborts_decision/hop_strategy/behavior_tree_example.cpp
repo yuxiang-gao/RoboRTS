@@ -17,9 +17,9 @@ namespace roborts_decision
 
 class BackBootAreaAction : public ActionNode
 {
-  public:
+public:
     BackBootAreaAction(ChassisExecutor *&chassis_executor,
-                       const Blackboard::Ptr &blackboard) : ActionNode("BackBootArea", blackboard),
+                       const Blackboard::Ptr &blackboard) : ActionNode("action_back_boot_area", blackboard),
                                                             chassis_executor_(chassis_executor)
 
     {
@@ -74,7 +74,7 @@ class BackBootAreaAction : public ActionNode
 
     ~BackBootAreaBehavior() = default;
 
-  private:
+private:
     //! executor
     const ChassisExecutor::Ptr chassis_executor_;
     //! boot position

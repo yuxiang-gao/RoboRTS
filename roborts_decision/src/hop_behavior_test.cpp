@@ -18,16 +18,15 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "hop_behavior_test_node");
   std::string full_path = ros::package::getPath("roborts_decision") + "/config/decision.prototxt";
 
-  auto chassis_executor = std::make_shared<roborts_decision::ChassisExecutor>();
   auto blackboard = std::make_shared<roborts_decision::Blackboard>(full_path);
 
-  roborts_decision::BackBootAreaAction back_boot_area_action(chassis_executor, blackboard);
-  roborts_decision::ChaseAction chase_action(chassis_executor, blackboard);
-  roborts_decision::SearchAction search_action(chassis_executor, blackboard);
-  roborts_decision::EscapeAction escape_action(chassis_executor, blackboard);
-  roborts_decision::PatrolAction patrol_action(chassis_executor, blackboard);
-  roborts_decision::GoalAction goal_action(chassis_executor, blackboard);
-  roborts_decision::ReloadAction reload_action(chassis_executor, blackboard);
+  roborts_decision::BackBootAreaAction back_boot_area_action(blackboard);
+  roborts_decision::ChaseAction chase_action(blackboard);
+  roborts_decision::SearchAction search_action(blackboard);
+  roborts_decision::EscapeAction escape_action(blackboard);
+  roborts_decision::PatrolAction patrol_action(blackboard);
+  roborts_decision::GoalAction goal_action(blackboard);
+  roborts_decision::ReloadAction reload_action(blackboard);
 
   auto act_lambda = [](auto act) { ROS_INFO_STREAM_COND((int)act.Run() == 1, act.GetName().c_str() << " SUCCESS"); };
   // act_lambda(reload_action);

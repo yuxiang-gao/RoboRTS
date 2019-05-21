@@ -1,7 +1,7 @@
 simulate: true
 master: true
 
-wing_bot {
+master_bot {
   start_position {
     x: 7.23 #1.25 # 
     y: 4.32 #1.17 # 
@@ -13,7 +13,7 @@ wing_bot {
   }
 }
 
-master_bot {
+wing_bot {
   start_position {
     x: 0.56 # 7.68
     y: 0.56 # 4.77

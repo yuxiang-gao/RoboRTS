@@ -2,7 +2,6 @@
 #define ROBORTS_DECISION_BACK_BOOT_AREA_ACTION_H
 #include <ros/ros.h>
 
-#include "executor/chassis_executor.h"
 #include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 
@@ -12,9 +11,8 @@ namespace roborts_decision
 class BackBootAreaAction : public ActionNode
 {
 public:
-    BackBootAreaAction(const ChassisExecutor::Ptr &chassis_executor,
-                       const Blackboard::Ptr &blackboard) : ActionNode("back_boot_area_action", blackboard),
-                                                            chassis_executor_(chassis_executor)
+    BackBootAreaAction(const Blackboard::Ptr &blackboard) : ActionNode("action_back_boot_area", blackboard),
+                                                            chassis_executor_(blackboard->chassis_executor)
 
     {
     }

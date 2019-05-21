@@ -4,7 +4,6 @@
 #include "io/io.h"
 #include <ros/ros.h>
 
-#include "executor/chassis_executor.h"
 #include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 #include "utils/line_iterator.h"
@@ -14,9 +13,8 @@ namespace roborts_decision
 class BonusAction : public ActionNode
 {
 public:
-  BonusAction(const ChassisExecutor::Ptr &chassis_executor,
-              const Blackboard::Ptr &blackboard) : ActionNode("bonus_action", blackboard),
-                                                   chassis_executor_(chassis_executor) {}
+  BonusAction(const Blackboard::Ptr &blackboard) : ActionNode("action_bonus", blackboard),
+                                                   chassis_executor_(blackboard->chassis_executor) {}
 
   void OnInitialize()
   {
@@ -25,18 +23,16 @@ public:
     bonus_position_.pose.orientation.y = 0;
     bonus_position_.pose.orientation.z = -0.7071;
     bonus_position_.pose.orientation.w = 0.7071;
-    bonus_position_.pose.position.x = 4;
-    bonus_position_.pose.position.y = 0.5;
+    bonus_position_.pose.position.x = 6.3;
+    bonus_position_.pose.position.y = 1.75;
     bonus_position_.pose.position.z = 0;
-    chasis_cmd_sent_ = false;
-    supply_cmd_sent_ = false;
-    supply_start_time_ = 0;
+    chassis_cmd_sent_ = false;
   }
 
   void OnTerminate(BehaviorState state)
   {
     chassis_executor_->Cancel();
-    chasis_cmd_sent_ = false;
+    chassis_cmd_sent_ = false;
     supply_cmd_sent_ = false;
     supply_start_time_ = 0;
     LogState(state);
@@ -46,17 +42,17 @@ public:
   {
     auto executor_state = chassis_executor_->Update();
     // ROS_INFO_STREAM_THROTTLE(1, "Executor State: " << (int)executor_state);
-    // ROS_INFO_STREAM("cond " << (int)executor_state << " " << (int)chasis_cmd_sent_);
-    if (executor_state != BehaviorState::RUNNING && !chasis_cmd_sent_)
+    // ROS_INFO_STREAM("cond " << (int)executor_state << " " << (int)chassis_cmd_sent_);
+    if (executor_state != BehaviorState::RUNNING && !chassis_cmd_sent_)
     {
-      chasis_cmd_sent_ = true;
+      chassis_cmd_sent_ = true;
       chassis_executor_->Execute(bonus_position_);
     }
-    else if (chasis_cmd_sent_ && executor_state == BehaviorState::FAILURE)
+    else if (chassis_cmd_sent_ && executor_state == BehaviorState::FAILURE)
     {
       return BehaviorState::FAILURE;
     }
-    else if (chasis_cmd_sent_ && executor_state == BehaviorState::SUCCESS)
+    else if (chassis_cmd_sent_ && executor_state == BehaviorState::SUCCESS)
     {
       int supplier_status = blackboard_ptr_->GetSupplierStatus();
       auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
@@ -110,7 +106,7 @@ private:
   //! reload goal
   geometry_msgs::PoseStamped bonus_position_;
 
-  bool chasis_cmd_sent_;
+  bool chassis_cmd_sent_;
   bool supply_cmd_sent_;
   double supply_start_time_;
 };

@@ -49,6 +49,11 @@
 #include "../../proto/decision.pb.h"
 #include "costmap/costmap_interface.h"
 
+#include "executor/chassis_executor.h"
+#include "executor/gimbal_executor.h"
+
+#include "utils/line_iterator.h"
+
 namespace roborts_decision
 {
 //! structure to store msg from referee system
@@ -90,6 +95,9 @@ public:
   // dictionary, used to store referee info for each robot
   std::map<std::string /*robot_name*/, std::shared_ptr<RefereeSystemInfo>> referee_info;
 
+  ChassisExecutor::Ptr chassis_executor;
+  GimbalExecutor::Ptr gimbal_executor;
+
   // RefereeSystemInfo wing_status;
   // RefereeSystemInfo master_status;
   explicit Blackboard(const std::string &proto_file_path) : enemy_detected_(false),
@@ -107,6 +115,9 @@ public:
     charmap_ = costmap_ptr_->GetCostMap()->GetCharMap();
 
     costmap_2d_ = costmap_ptr_->GetLayeredCostmap()->GetCostMap();
+
+    chassis_executor = std::make_shared<ChassisExecutor>();
+    gimbal_executor = std::make_shared<GimbalExecutor>();
 
     // Enemy fake pose
     ros::NodeHandle rviz_nh("move_base_simple");
@@ -228,6 +239,11 @@ public:
   bool IsNeedReload()
   {
     return (bullet_count_ <= 10);
+  }
+
+  bool IsReloadAvailable()
+  {
+    return (referee_info[robot_name_]->supplier_status.status == 1); //preparing
   }
 
   void RefereeSubscribe(std::string robot_name)
@@ -509,6 +525,13 @@ public:
   {
     if (GetBonusStatus() == 2)
       return true;
+  }
+
+  //! True if nonus not occupied and bonus not activated
+  bool IsBonusAvailable()
+  {
+    // return false;
+    return IsBonusUnoccupied() && !IsBonusActivated();
   }
 
   bool IsEnemyDetected() const

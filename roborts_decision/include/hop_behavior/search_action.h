@@ -5,18 +5,15 @@
 #include <ros/ros.h>
 
 #include "blackboard/blackboard.h"
-#include "executor/chassis_executor.h"
 #include "behavior_tree/behavior_state.h"
-
-#include "utils/line_iterator.h"
 
 namespace roborts_decision
 {
 class SearchAction : public ActionNode
 {
 public:
-  SearchAction(const ChassisExecutor::Ptr &chassis_executor,
-               Blackboard::Ptr &blackboard) : ActionNode("search_act", blackboard), chassis_executor_(chassis_executor)
+  SearchAction(const Blackboard::Ptr &blackboard) : ActionNode("action_search", blackboard),
+                                                    chassis_executor_(blackboard->chassis_executor)
   {
   }
 
@@ -172,8 +169,6 @@ public:
   {
     chassis_executor_->Cancel();
   }
-
-
 
   void SetLastPosition(geometry_msgs::PoseStamped last_position)
   {

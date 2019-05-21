@@ -4,7 +4,6 @@
 #include "io/io.h"
 #include <ros/ros.h>
 
-#include "executor/chassis_executor.h"
 #include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 #include "utils/line_iterator.h"
@@ -14,9 +13,8 @@ namespace roborts_decision
 class GoalAction : public ActionNode
 {
 public:
-  GoalAction(const ChassisExecutor::Ptr &chassis_executor,
-             const Blackboard::Ptr &blackboard) : ActionNode("goal_action", blackboard),
-                                                  chassis_executor_(chassis_executor) {}
+  GoalAction(const Blackboard::Ptr &blackboard) : ActionNode("action_goal", blackboard),
+                                                  chassis_executor_(blackboard->chassis_executor) {}
 
   void OnInitialize()
   {

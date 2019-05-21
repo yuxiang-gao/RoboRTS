@@ -5,7 +5,6 @@
 #include <ros/ros.h>
 #include <ros/console.h>
 
-#include "executor/chassis_executor.h"
 #include "behavior_tree/behavior_tree.h"
 #include "blackboard/blackboard.h"
 #include "utils/line_iterator.h"
@@ -15,9 +14,8 @@ namespace roborts_decision
 class ChaseAction : public ActionNode
 {
 public:
-	ChaseAction(const ChassisExecutor::Ptr &chassis_executor,
-				const Blackboard::Ptr &blackboard) : ActionNode("chase_action", blackboard),
-													 chassis_executor_(chassis_executor)
+	ChaseAction(const Blackboard::Ptr &blackboard) : ActionNode("action_chase", blackboard),
+													 chassis_executor_(blackboard->chassis_executor)
 	{
 	}
 

@@ -4,7 +4,6 @@
 #include "io/io.h"
 
 #include "blackboard/blackboard.h"
-#include "executor/chassis_executor.h"
 #include "behavior_tree/behavior_state.h"
 
 #include "utils/line_iterator.h"
@@ -14,8 +13,8 @@ namespace roborts_decision
 class PatrolAction : public ActionNode
 {
 public:
-  PatrolAction(const ChassisExecutor::Ptr &chassis_executor,
-               const Blackboard::Ptr &blackboard) : ActionNode("patrol_act", blackboard), chassis_executor_(chassis_executor)
+  PatrolAction(const Blackboard::Ptr &blackboard) : ActionNode("action_patrol", blackboard),
+                                                    chassis_executor_(blackboard->chassis_executor)
   {
   }
 
@@ -43,7 +42,7 @@ public:
     }
     start_time_ = 0;
     patrol_time_limit_ = 10;
-    blackboard_ptr_->TurnOnFricWheel();
+    // blackboard_ptr_->TurnOnFricWheel();
   }
 
   BehaviorState Update()
