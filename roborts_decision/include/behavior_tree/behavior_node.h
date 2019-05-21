@@ -583,7 +583,7 @@ protected:
     //Reevaluation
     for (unsigned int index = 0; index < children_node_index_; index++)
     {
-      ROS_INFO("Reevaluation");
+      ROS_INFO("Reevaluation, index %d", index);
       if (children_node_reevaluation_.at(index))
       {
         BehaviorState state = children_node_ptr_.at(index)->Run();

@@ -55,9 +55,9 @@ public:
     {
         AddCondition("condition_countdown", [=]() { return blackboard_ptr_->IsFiveSecondCD(); }, AbortType::LOW_PRIORITY);
         AddCondition("condition_game_start", [=]() { return blackboard_ptr_->IsGameStart(); }, AbortType::LOW_PRIORITY);
-        AddCondition("condition_bonus", [=]() { return blackboard_ptr_->IsBonusAvailable(); }, AbortType::LOW_PRIORITY);
-        AddCondition("condition_enemy_detected", [=]() { return blackboard_ptr_->IsEnemyDetected(); }, AbortType::LOW_PRIORITY);
-        AddCondition("condition_reload", [=]() { return (blackboard_ptr_->IsNeedReload() && blackboard_ptr_->IsReloadAvailable()); }, AbortType::LOW_PRIORITY);
+        AddCondition("condition_bonus", [=]() { return blackboard_ptr_->IsBonusAvailable(); }, AbortType::BOTH);
+        AddCondition("condition_enemy_detected", [=]() { return blackboard_ptr_->IsEnemyDetected(); }, AbortType::BOTH);
+        AddCondition("condition_reload", [=]() { return (blackboard_ptr_->IsNeedReload() && blackboard_ptr_->IsReloadAvailable()); }, AbortType::BOTH);
     }
 
     void AddCondition(std::string name,

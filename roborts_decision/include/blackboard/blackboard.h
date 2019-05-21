@@ -237,6 +237,7 @@ public:
 
   bool IsNeedReload()
   {
+    ROS_INFO("Bullet count: %d", bullet_count_);
     return (bullet_count_ <= 10);
   }
 
@@ -507,6 +508,7 @@ public:
   //! True if nonus not occupied and bonus not activated
   bool IsBonusAvailable()
   {
+    ROS_INFO("bonus occupied %d, bonus activated %d", (int)IsBonusUnoccupied(), (int)IsBonusActivated());
     // return false;
     return IsBonusUnoccupied() && !IsBonusActivated();
   }

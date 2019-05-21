@@ -63,7 +63,7 @@ public:
     {
       return BehaviorState::FAILURE;
     }
-    else if (chassis_cmd_sent_ && executor_state != BehaviorState::RUNNING)
+    else
     {
       int bonus_status = blackboard_ptr_->GetBonusStatus();
       auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
@@ -72,6 +72,10 @@ public:
       // ROS_INFO_STREAM_THROTTLE(1, "distance: " << linear_distance);
       // ROS_INFO_STREAM_THROTTLE(1, "Supply Status: " << bonus_status);
 
+      if (bonus_status == 2)
+      {
+        return BehaviorState::SUCCESS;
+      }
       if (linear_distance <= 0.1)
       {
         // else if (bonus_status == 0)
@@ -97,10 +101,6 @@ public:
           {
             ROS_INFO("OCCUPYINF TIME %f", ros::Time::now().toSec() - bonus_start_time_);
           }
-        }
-        else if (bonus_status == 2)
-        {
-          return BehaviorState::SUCCESS;
         }
         else if (ros::Time::now().toSec() - bonus_start_time_ > 30)
         {
@@ -139,9 +139,12 @@ private:
 
     auto target_pose = bonus_position;
 
+    auto angle_diff = blackboard_ptr_->GetAngle(robot_map_pose, bonus_right);
+
+    ROS_INFO("ANGLE DIFF %f", angle_diff);
+
     if (sentry_ori_)
     {
-      auto angle_diff = blackboard_ptr_->GetAngle(robot_map_pose, bonus_right);
 
       if (std::abs(angle_diff) > target_diff)
       {
@@ -155,7 +158,6 @@ private:
     }
     else
     {
-      auto angle_diff = blackboard_ptr_->GetAngle(robot_map_pose, bonus_left);
 
       if (std::abs(angle_diff) > target_diff)
       {
