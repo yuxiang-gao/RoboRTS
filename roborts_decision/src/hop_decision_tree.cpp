@@ -21,8 +21,8 @@ int main(int argc, char **argv)
                                             "condition_bonus",
                                             "condition_enemy_detected",
                                             "action_patrol"});
-  tree_manager->Connect("sequence_countdown", {"action_countdown",
-                                               "action_back_boot_area"});
+  tree_manager->Connect("sequence_countdown", {"action_countdown"});
+  //  "action_back_boot_area"});
   tree_manager->Connect("selector_main", {"condition_game_start", "condition_countdown"});
 
   tree_manager->Connect("parallel_engage", {"action_shoot",
