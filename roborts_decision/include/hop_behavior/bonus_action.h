@@ -63,7 +63,7 @@ public:
     {
       return BehaviorState::FAILURE;
     }
-    else if (chassis_cmd_sent_ && executor_state == BehaviorState::SUCCESS)
+    else if (chassis_cmd_sent_ && executor_state != BehaviorState::RUNNING)
     {
       int bonus_status = blackboard_ptr_->GetBonusStatus();
       auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
@@ -79,6 +79,8 @@ public:
         //   ROS_INFO_STREAM("looking for bonux");
         //   blackboard_ptr_->MoveAround();
         // }
+        if (bonus_status == 0)
+          bonus_start_time_ = 0;
         if (bonus_status == 1)
         {
           ROS_INFO_STREAM("occuplying bonux");

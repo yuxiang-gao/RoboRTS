@@ -361,36 +361,12 @@ public:
 
   bool IsBlue()
   {
-    switch (referee_info[robot_name_]->robot_status.id)
-    {
-    case 3:
-      ROS_DEBUG("Team: BLUE, Master Robot");
-      // is_master = true;
-      return true;
-      break;
-    case 4:
-      ROS_DEBUG("Team: BLUE, wing Robot");
-      // is_master = false;
-      return true;
-      break;
-    case 13:
-      ROS_DEBUG("Team: BLUE, Master Robot");
-      // is_master = true;
-      return false;
-      break;
-    case 14:
-      ROS_DEBUG("Team: BLUE, Master Robot");
-      // is_master = false;
-      return false;
-      break;
-    default:
-      ROS_ERROR("For AI challenge, please set robot id to Blue3/4 or Red3/4 in the referee system main control module");
-    }
+    return (robot_color_ == 1);
   }
 
   bool IsRed()
   {
-    return !IsBlue();
+    return (robot_color_ == 0);
   }
 
   void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, const std::string id)
@@ -425,6 +401,8 @@ public:
   void RobotStatusCallback(const roborts_msgs::RobotStatusConstPtr &data, const std::string id)
   {
     referee_info[id]->robot_status = *data;
+    robot_color_ = (referee_info[id]->robot_status.id < 10) ? 0 : 1;
+    ROS_INFO("robot color %d", robot_color_);
   }
   void RobotDamageCallback(const roborts_msgs::RobotDamageConstPtr &data, const std::string id)
   {
@@ -747,6 +725,8 @@ private:
 
   std::string robot_name_;
   int robot_id_;
-}; // namespace roborts_decision
+
+  int robot_color_; //0 red, 1 blue
+};                  // namespace roborts_decision
 } //namespace roborts_decision
 #endif //ROBORTS_DECISION_BLACKBOARD_H

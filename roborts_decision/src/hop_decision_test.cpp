@@ -27,8 +27,8 @@ int main(int argc, char **argv)
   auto tree_manager = std::make_shared<BehaviorTreeManager>(blackboard);
   tree_manager->AddCompositeNodes({"sequence_reload", "selector_patrol"});
   tree_manager->Connect("condition_game_start", "selector_patrol");
-  tree_manager->Connect("condition_reload", "action_reload");
-  tree_manager->Connect("selector_patrol", {"condition_reload", "action_patrol"});
+  tree_manager->Connect("condition_bonus", "action_bonus");
+  tree_manager->Connect("selector_patrol", {"condition_bonus", "action_patrol"});
   tree_manager->Run("condition_game_start");
 
   // std::map<std::string, BehaviorNode::Ptr> conditions;

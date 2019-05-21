@@ -35,5 +35,7 @@
     <arg name="initial_pose_y" value="0.5"/>
   </include>
 
+  <node ns="$(arg robot_name)" pkg="roborts_decision" type="hop_decision_node" />
+
 </launch>
 
