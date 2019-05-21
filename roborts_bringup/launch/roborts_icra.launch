@@ -31,7 +31,7 @@
     <!-- Run the camera node -->
     <node name="roborts_camera" pkg="roborts_camera" type="roborts_camera_node" respawn="true"/>
 
-    <node name="roborts_detection" pkg="roborts_detection" type="armor_detection_nodearmor_detection_node" respawn="true"/>
+    <node name="roborts_detection" pkg="roborts_detection" type="armor_detection_node" respawn="true"/>
 
     <rosparam command="load" file="$(find roborts_localization)/config/localization.yaml" />
     <rosparam command="load" file="$(find roborts_localization)/amcl/config/amcl.yaml" />
