@@ -1,5 +1,5 @@
-#ifndef ROBORTS_DECISION_BONUS_ACTION_H
-#define ROBORTS_DECISION_BONUS_ACTION_H
+#ifndef ROBORTS_DECISION_SHOOT_ACTION_H
+#define ROBORTS_DECISION_SHOOT_ACTION_H
 #include <chrono>
 #include "io/io.h"
 #include <ros/ros.h>
