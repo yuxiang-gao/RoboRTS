@@ -4,22 +4,22 @@ camera: {
   camera_path: "/dev/v4l/by-path/platform-3530000.xhci-usb-0:2.1:1.0-video-index0"
 
   camera_matrix {
-    data: 1133.004071
+    data: 564.982507
     data: 0.0
-    data: 588.836892
+    data: 300.668544
     data: 0.0
-    data: 1133.374806
-    data: 482.119570
+    data: 566.106387
+    data: 238.913635
     data: 0.0
     data: 0.0
     data: 1.0  
   }
 
   camera_distortion {
-    data: -0.443043
-    data: 0.186436
-    data: 0.001221
-    data: 0.005431
+    data: -0.428340
+    data: 0.203736
+    data: 0.001143
+    data: -0.001132
     data: 0.0
   }
 
@@ -38,7 +38,7 @@ camera: {
   auto_white_balance: 0
   auto_gain: 0
   contrast: 20
-  flip: 1
+  flip: 0
 }
 
 
@@ -48,22 +48,22 @@ camera: {
   camera_path: "/dev/v4l/by-path/platform-3530000.xhci-usb-0:2.4:1.0-video-index0"
 
   camera_matrix {
-    data: 1133.004071
+    data: 585.633475
     data: 0.0
-    data: 588.836892
+    data: 321.305132
     data: 0.0
-    data: 1133.374806
-    data: 482.119570
+    data: 587.654172
+    data: 267.398450
     data: 0.0
     data: 0.0
     data: 1.0  
   }
 
   camera_distortion {
-    data: -0.443043
-    data: 0.186436
-    data: 0.001221
-    data: 0.005431
+    data: -0.445039
+    data: 0.246725
+    data: 0.000294
+    data: 0.000445
     data: 0.0
   }
 
