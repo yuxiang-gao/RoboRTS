@@ -23,7 +23,8 @@
     <arg name="initial_pose_x" value="0.5"/>
     <arg name="initial_pose_y" value="0.5"/>
   </include>
-
+  <node ns="robot_0" name="decision_tree" pkg="roborts_decision" type="hop_decision_node" output="screen"/>
+  <node ns="robot_1" name="decision_tree" pkg="roborts_decision" type="hop_decision_node" />
   <!-- Run the rviz -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find roborts_bringup)/rviz/roborts-multi.rviz" />
 </launch>

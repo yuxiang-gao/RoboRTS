@@ -9,7 +9,7 @@ int main(int argc, char **argv)
   auto blackboard = std::make_shared<Blackboard>(full_path);
 
   auto tree_manager = std::make_shared<BehaviorTreeManager>(blackboard);
-  tree_manager->AddCompositeNodes({"selector_patrol", "sequence_countdown", "parallel_engage"});
+  tree_manager->AddCompositeNodes({"selector_main", "selector_patrol", "sequence_countdown", "parallel_engage"});
 
   tree_manager->Connect("condition_countdown", "sequence_countdown");
   tree_manager->Connect("condition_game_start", "selector_patrol");
@@ -22,12 +22,13 @@ int main(int argc, char **argv)
                                             "condition_enemy_detected",
                                             "action_patrol"});
   tree_manager->Connect("sequence_countdown", {"action_countdown",
-                                               "action_back_boot_area",
-                                               "condition_game_start"});
+                                               "action_back_boot_area"});
+  tree_manager->Connect("selector_main", {"condition_game_start", "condition_countdown"});
+
   tree_manager->Connect("parallel_engage", {"action_shoot",
                                             "action_chase"});
 
-  tree_manager->Run("condition_countdown");
+  tree_manager->Run("selector_main");
 
   return 0;
 }

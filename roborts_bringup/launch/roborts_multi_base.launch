@@ -51,7 +51,7 @@
         <node pkg="roborts_planning" type="vel_converter" name="vel_converter_node" respawn="false" />
 
         <!-- Run expcted_scan_generator -->
-        <include file="$(find expected_scan_generator)launch/novel_object_detection.launch" />
+        <!-- <include file="$(find expected_scan_generator)launch/novel_object_detection.launch" /> -->
 
     </group>
 </launch>

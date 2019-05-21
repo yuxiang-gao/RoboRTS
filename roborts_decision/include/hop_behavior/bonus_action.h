@@ -84,7 +84,7 @@ public:
         if (bonus_status == 1)
         {
           ROS_INFO_STREAM("occupying bonus");
-          Sentry(bonus_position_, bonus_right_, bonus_left_, sentry_ori_);
+          Sentry(bonus_position_, bonus_right_, bonus_left_);
 
           if (bonus_start_time_ == 0)
           {
@@ -130,16 +130,16 @@ private:
   double bonus_start_time_;
   bool sentry_ori_;
 
-  void Sentry(const geometry_msgs::PoseStamped bonus_position, const geometry_msgs::PoseStamped bonus_right, const geometry_msgs::PoseStamped bonus_left, bool sentry_ori)
+  void Sentry(const geometry_msgs::PoseStamped bonus_position, const geometry_msgs::PoseStamped bonus_right, const geometry_msgs::PoseStamped bonus_left)
   {
     auto robot_map_pose = blackboard_ptr_->GetRobotMapPose();
-    float target_diff = 0.08; // 5 degree
-                              // tf::createQuaternionMsgFromRollPitchYaw(0, 0, );
+    float target_diff = 0.2; //
+                             // tf::createQuaternionMsgFromRollPitchYaw(0, 0, );
     auto quat_diff = tf::createQuaternionMsgFromRollPitchYaw(0, 0, target_diff);
 
     auto target_pose = bonus_position;
 
-    if (sentry_ori)
+    if (sentry_ori_)
     {
       auto angle_diff = blackboard_ptr_->GetAngle(robot_map_pose, bonus_right);
 
@@ -150,7 +150,7 @@ private:
       else
       {
         chassis_executor_->Execute(bonus_left);
-        sentry_ori = false;
+        sentry_ori_ = false;
       }
     }
     else
@@ -164,7 +164,7 @@ private:
       else
       {
         chassis_executor_->Execute(bonus_right);
-        sentry_ori = true;
+        sentry_ori_ = true;
       }
     }
   }
