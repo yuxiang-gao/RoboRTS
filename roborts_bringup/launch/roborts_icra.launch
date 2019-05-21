@@ -72,7 +72,7 @@
     <!-- Run the velocity converter node -->
     <node pkg="roborts_planning" type="vel_converter" name="vel_converter_node" respawn="false" />
 
-    <node ns="$(arg robot_name)" name="decision_tree" pkg="roborts_decision" type="hop_decision_node" respawn="true"/>
+    <node name="decision_tree" pkg="roborts_decision" type="hop_decision_node" respawn="true"/>
   </group>
 
 </launch>
