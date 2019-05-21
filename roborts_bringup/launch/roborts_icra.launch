@@ -1,0 +1,44 @@
+<launch>
+  <master auto="start"/>
+  <arg name="map" value="icra2019"/>
+  <arg name="robot_name"/>
+
+  <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find roborts_bringup)/maps/$(arg map).yaml" respawn="false" />
+
+  <group ns="$(arg robot_name)">
+    <!-- Run the robot sdk interface -->
+    <param name="tf_prefix" value="$(arg robot_name)"/>
+    <include file="$(find roborts_bringup)/launch/base.launch"/>
+
+    <!-- Publish static tf -->
+    <include file="$(find roborts_bringup)/launch/static_tf.launch">
+      <arg name="robot_name" value="$(arg robot_name)" />
+    </include>
+
+    <!-- Run the lidar node -->
+    <node name="rplidar_node" pkg="rplidar_ros" type="rplidarNode">
+      <param name="serial_port" type="string" value="/dev/rplidar"/>
+      <param name="serial_baudrate" type="int" value="115200"/>
+      <param name="frame_id" type="string" value="/$(arg robot_name)/base_laser_link"/>
+      <param name="inverted" type="bool" value="false"/>
+      <param name="angle_compensate" type="bool" value="true"/>
+    </node>
+
+    <!-- Run the camera node -->
+    <node name="roborts_camera" pkg="roborts_camera" type="roborts_camera_node"/>
+
+    <node name="roborts_detection" pkg="roborts_detection" type="armor_detection_nodearmor_detection_node"/>
+    
+  </group>
+
+  <include file="$(find roborts_bringup)/launch/roborts_multi_base.launch">
+    <arg name="robot_name" value="$(arg robot_name)" />
+    <arg name="initial_pose_x" value="7.5"/>
+    <arg name="initial_pose_y" value="0.5"/>
+  </include>
+
+  <node ns="$(arg robot_name)" name="decision_tree" pkg="roborts_decision" type="hop_decision_node" />
+
+</launch>
+
