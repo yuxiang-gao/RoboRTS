@@ -18,7 +18,7 @@ int main(int argc, char **argv)
   tree_manager->Connect("condition_enemy_detected", "action_chase");
 
   tree_manager->Connect("selector_patrol", {"condition_reload", "condition_bonus", "condition_enemy_detected", "action_patrol"});
-  tree_manager->Connect("sequence_countdown", {"action_countdown", "condition_game_start"});
+  tree_manager->Connect("sequence_countdown", {"action_countdown", "action_back_boot_area", "condition_game_start"});
 
   tree_manager->Run("condition_countdown");
 

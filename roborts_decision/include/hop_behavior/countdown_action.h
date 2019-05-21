@@ -11,8 +11,7 @@ namespace roborts_decision
 class CountdownAction : public ActionNode
 {
 public:
-    CountdownAction(const Blackboard::Ptr &blackboard) : ActionNode("action_countdown", blackboard),
-                                                         chassis_executor_(blackboard->chassis_executor) {}
+    CountdownAction(const Blackboard::Ptr &blackboard) : ActionNode("action_countdown", blackboard) {}
 
     void OnInitialize()
     {
