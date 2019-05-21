@@ -128,7 +128,7 @@ void ArmorDetectionNode::ActionCB(const roborts_msgs::ArmorDetectionGoal::ConstP
         feedback.error_code = error_info_.error_code();
         feedback.error_msg = error_info_.error_msg();
 
-        feedback.enemy_pos.header.frame_id = "camera0";
+        feedback.enemy_pos.header.frame_id = "front_camera";
         feedback.enemy_pos.header.stamp = ros::Time::now();
 
         feedback.enemy_pos.pose.position.x = x_;
@@ -144,7 +144,7 @@ void ArmorDetectionNode::ActionCB(const roborts_msgs::ArmorDetectionGoal::ConstP
         feedback.error_code = error_info_.error_code();
         feedback.error_msg = error_info_.error_msg();
 
-        feedback.enemy_pos.header.frame_id = "camera0";
+        feedback.enemy_pos.header.frame_id = "front_camera";
         feedback.enemy_pos.header.stamp = ros::Time::now();
 
         feedback.enemy_pos.pose.position.x = 0;
