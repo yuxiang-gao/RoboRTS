@@ -2,3 +2,4 @@
 *.pb.h
 *.swp
 .vscode
+.pyc
