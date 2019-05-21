@@ -17,6 +17,7 @@
 #include "hop_behavior/reload_action.h"
 #include "hop_behavior/bonus_action.h"
 #include "hop_behavior/countdown_action.h"
+#include "hop_behavior/shoot_action.h"
 
 namespace roborts_decision
 {
