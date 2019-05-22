@@ -61,7 +61,7 @@ public:
       auto linear_distance = blackboard_ptr_->GetDistance(robot_map_pose, reload_position_);
 
       // ROS_INFO_STREAM_THROTTLE(1, "distance: " << linear_distance);
-      // ROS_INFO_STREAM_THROTTLE(1, "Supply Status: " << supplier_status);
+      ROS_INFO_STREAM_THROTTLE(1, "Supply Status: " << supplier_status);
 
       if (!supply_cmd_sent_)
       {
@@ -82,15 +82,18 @@ public:
       }
       else if (supply_cmd_sent_ && supply_start_time_ != 0)
       {
+
         ROS_INFO("LOADING TIME %f", ros::Time::now().toSec() - supply_start_time_);
         if (supplier_status == 0)
         {
+          blackboard_ptr_->AddBullet(50);
           return BehaviorState::SUCCESS;
         }
         else if (ros::Time::now().toSec() - supply_start_time_ > 30)
         {
+          blackboard_ptr_->AddBullet(50);
           ROS_WARN("Reloading time out! LEAVE");
-          return BehaviorState::FAILURE;
+          return BehaviorState::SUCCESS;
         }
       }
     }

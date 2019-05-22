@@ -243,7 +243,7 @@ public:
 
   bool IsReloadAvailable()
   {
-    return (referee_info[robot_name_]->supplier_status.status == 1); //preparing
+    return (referee_info[robot_name_]->supplier_status.status != 2); //preparing
   }
 
   void RefereeSubscribe(std::string robot_name)
@@ -425,6 +425,7 @@ public:
   // Enemy
   void ArmorDetectionFeedbackCallback(const roborts_msgs::ArmorDetectionFeedbackConstPtr &feedback)
   {
+    ROS_INFO("Armor detection feed back: %d, error: %d, error_msg: %s", (int)feedback->detected, (int)feedback->error_code, feedback->error_msg.c_str());
     if (feedback->detected)
     {
       enemy_detected_ = true;
