@@ -101,7 +101,7 @@ public:
   // RefereeSystemInfo wing_status;
   // RefereeSystemInfo master_status;
   explicit Blackboard(const std::string &proto_file_path) : enemy_detected_(false),
-                                                            armor_detection_actionlib_client_("armor_detection_node_action", true),
+                                                            // armor_detection_actionlib_client_("armor_detection_node_action", true),
                                                             nh_priv_("~")
   {
 
@@ -129,6 +129,8 @@ public:
 
     nh_.getParam("tf_prefix", robot_name_);
     ROS_INFO("Robot Name: %s", robot_name_.c_str());
+
+    armor_detection_actionlib_client_ = actionlib::SimpleActionClient<roborts_msgs::ArmorDetectionAction>("/" + robot_name_ + "/" + "armor_detection_node_action", true);
 
     // init bullet count
     bullet_count_ = (robot_name_ == robot_0_) ? 40 : 0;

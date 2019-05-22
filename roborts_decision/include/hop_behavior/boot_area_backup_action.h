@@ -32,7 +32,7 @@ public:
         boot_position_.pose.orientation = master_quaternion;
 
         ros::NodeHandle n;
-        ros::Publisher vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+        ros::Publisher vel_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
         geometry_msgs::Twist vel_msg;
         vel_msg.linear.x = 0;
         vel_msg.linear.y = -0.1;
