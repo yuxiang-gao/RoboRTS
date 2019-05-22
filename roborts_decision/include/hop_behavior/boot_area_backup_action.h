@@ -11,7 +11,7 @@ namespace roborts_decision
 class BackBootAreaAction : public ActionNode
 {
 public:
-    BackBootAreaAction(const Blackboard::Ptr &blackboard) : ActionNode("action_back_boot_area_backup", blackboard),
+    BackBootAreaAction(const Blackboard::Ptr &blackboard) : ActionNode("action_boot_backup", blackboard),
                                                             chassis_executor_(blackboard->chassis_executor)
 
     {
@@ -31,8 +31,13 @@ public:
             blackboard_ptr_->decision_config.master_bot().start_position().yaw());
         boot_position_.pose.orientation = master_quaternion;
         
-        
-
+        ros::NodeHandle n;
+        ros::Publisher vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1000);
+        geometry_msgs::Twist vel_msg;
+        vel_msg.linear.x = ;
+        vel_msg.linear.y = ;
+        vel_msg.linear.z = ;
+        // ros::Publisher vel_pub_1 = n.advertise<geometry_msgs::Twist>("/robot_1/cmd_vel", 1000);
         ROS_INFO("quatw  %f", boot_position_.pose.orientation.w);
 
     }
@@ -51,22 +56,20 @@ public:
             auto robot_yaw = tf::getYaw(obot_map_pose.orientation) * 180 / 3.1415926;
             if (robot_yaw <0) robot_yaw += 360;
             
-            if (boot_position_.pose.position.x > 7.5) // robot0
+            if (boot_position_.pose.position.x > 7.5 && boot_position_.pose.position.y < 0.5) // robot0
             {
-                if (robot_yaw < 110 && robot_yaw >250) // if robot is facing the wall 
-                {
-                    // TODO
-                    // BACK UP
+                if (robot_yaw < 110 && robot_yaw >250 ) // if robot is facing the wall 
+                {   
+                    vel_pub.publish(vel_msg);    
                     return BehaviorState::RUNNING;
                 }
                 else return BehaviorState::SUCCESS;
             }
-            else if (boot_position_.pose.position.x < 0.5)
+            else if (boot_position_.pose.position.x < 0.5 && boot_position_.pose.position.y < 0.5) // robot1
             {
                 if (robot_yaw > 150 && robot_yaw <200) // if robot is facing the wall 
                 {
-                    // TO DO
-                    // BACK UP
+                    vel_pub.publish(vel_msg);    
                     return BehaviorState::RUNNING;
                 }
                 else return BehaviorState::SUCCESS;
@@ -75,7 +78,6 @@ public:
                 {
                     return BehaviorState::SUCCESS;
                 }
-            
         }
         return executor_state;
     }

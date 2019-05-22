@@ -177,6 +177,7 @@ double SensorLaser::LikelihoodFieldModelProb(SensorLaserData *sensor_laser_data_
         int cell_ind = this->map_ptr_->ComputeCellIndexByMap(mi, mj);
         z = this->map_ptr_->GetCellOccDistByIndex(cell_ind);
         if (z < beam_skip_distance) {
+                 
           obs_count[beam_ind] += 1;
         }
         pz += this->z_hit_ * std::exp(-(z * z) / z_hit_denom);
