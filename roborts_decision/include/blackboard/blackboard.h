@@ -373,6 +373,14 @@ public:
   void GameStatusCallback(const roborts_msgs::GameStatusConstPtr &data, const std::string id)
   {
     referee_info[id]->game_status = *data;
+
+    if (referee_info[id]->game_status.game_status == 3)
+      game_status_ = 3;
+    else if (referee_info[id]->game_status.game_status == 4)
+      game_status_ = 4;
+
+    // ROS_INFO("rcev  game status %d", game_status_);
+    // ROS_INFO("rcev  game status %d", referee_info[id]->game_status.game_status);
   }
 
   void GameResultCallback(const roborts_msgs::GameResultConstPtr &data, const std::string id)
@@ -522,18 +530,22 @@ public:
   // game status
   bool IsFiveSecondCD()
   {
-    if (referee_info[robot_name_]->game_status.game_status == 3)
-      return true;
-    else
-      return false;
+    ROS_INFO("game status %d", game_status_);
+    return (game_status_ == 3);
+    // if (referee_info[robot_name_]->game_status.game_status == 3)
+    //   return true;
+    // else
+    //   return false;
   }
 
   bool IsGameStart()
   {
-    if (referee_info[robot_name_]->game_status.game_status == 4)
-      return true;
-    else
-      return false;
+    ROS_INFO("game status %d", game_status_);
+    return (game_status_ == 4);
+    // if (referee_info[robot_name_]->game_status.game_status == 4)
+    //   return true;
+    // else
+    //   return false;
   }
 
   int GetRemainTime()
@@ -676,6 +688,7 @@ private:
   ros::Publisher robot_wing_supply_pub_;
   ros::Publisher robot_master_supply_pub_;
   bool is_blue;
+  int game_status_;
 
   void UpdateRobotPose(std::string robot_name)
   {

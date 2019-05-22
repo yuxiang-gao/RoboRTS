@@ -1,0 +1,10 @@
+<launch>
+  <master auto="start"/>
+  <include file="$(find roborts_bringup)/launch/roborts_no_decision.launch">
+    <arg name="robot_name" value="robot_0" />
+    <arg name="initial_pose_x" value="7.5"/>
+    <arg name="initial_pose_y" value="0.5"/>
+  </include>
+</launch>
+
+ 

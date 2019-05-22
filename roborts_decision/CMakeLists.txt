@@ -105,3 +105,21 @@ target_link_libraries(hop_decision_test_node
 
 add_dependencies(hop_decision_test_node
   roborts_msgs_generate_messages)
+
+  add_executable(hop_tree_shooting_node
+  ${DecisionProtoHds}
+  ${DecisionProtoSrc}
+  src/hop_tree_shooting.cpp
+  executor/chassis_executor.cpp
+  executor/gimbal_executor.cpp
+)
+
+target_link_libraries(hop_tree_shooting_node
+  PRIVATE
+  roborts_costmap
+  ${catkin_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
+)
+
+add_dependencies(hop_tree_shooting_node
+  roborts_msgs_generate_messages)
