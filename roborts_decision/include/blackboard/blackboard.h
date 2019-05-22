@@ -243,7 +243,7 @@ public:
 
   bool IsReloadAvailable()
   {
-    return (referee_info[robot_name_]->supplier_status.status == 1); //preparing
+    return (referee_info[robot_name_]->supplier_status.status != 2); //preparing
   }
 
   void RefereeSubscribe(std::string robot_name)

@@ -57,7 +57,7 @@ public:
         AddCondition("condition_game_start", [=]() { return blackboard_ptr_->IsGameStart(); }, AbortType::BOTH);
         AddCondition("condition_bonus", [=]() { return blackboard_ptr_->IsBonusAvailable(); }, AbortType::BOTH);
         AddCondition("condition_enemy_detected", [=]() { return blackboard_ptr_->IsEnemyDetected(); }, AbortType::BOTH);
-        AddCondition("condition_reload", [=]() { return (blackboard_ptr_->IsNeedReload() && blackboard_ptr_->IsReloadAvailable()); }, AbortType::BOTH);
+        AddCondition("condition_reload", [=]() { return (blackboard_ptr_->IsNeedReload() && blackboard_ptr_->IsReloadAvailable()); }, AbortType::LOW_PRIORITY);
     }
 
     void AddCondition(std::string name,
