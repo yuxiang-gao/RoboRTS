@@ -9,6 +9,7 @@
 #include "blackboard/blackboard.h"
 
 #include "hop_behavior/back_boot_area_action.h"
+#include "hop_behavior/boot_area_backup_action.h"
 #include "hop_behavior/escape_action.h"
 #include "hop_behavior/chase_action.h"
 #include "hop_behavior/search_action.h"
@@ -49,6 +50,7 @@ public:
         actions_["action_bonus"] = std::make_shared<BonusAction>(blackboard_ptr_);         //TODO
         actions_["action_countdown"] = std::make_shared<CountdownAction>(blackboard_ptr_); //Done
         actions_["action_shoot"] = std::make_shared<ShootAction>(blackboard_ptr_);
+        actions_["action_boot_area_backup"] = std::make_shared<BootAreaBackupAction>(blackboard_ptr_); //Done
     }
 
     void InitConditions()
