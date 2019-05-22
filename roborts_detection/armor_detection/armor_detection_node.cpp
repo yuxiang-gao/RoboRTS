@@ -32,6 +32,7 @@ ArmorDetectionNode::ArmorDetectionNode() : node_state_(roborts_common::IDLE),
   enemy_nh_ = ros::NodeHandle();
   if (enemy_nh_.hasParam("tf_prefix"))
   {
+    // ROS_INFO("armor detection get tf_prefix");
     enemy_nh_.getParam("tf_prefix", tf_prefix_);
   }
 
