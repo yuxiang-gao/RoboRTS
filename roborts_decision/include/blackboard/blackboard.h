@@ -425,6 +425,7 @@ public:
   // Enemy
   void ArmorDetectionFeedbackCallback(const roborts_msgs::ArmorDetectionFeedbackConstPtr &feedback)
   {
+    ROS_INFO("Armor detection feed back: %d, error: %d", (int)feedback->detected, feedback->error_code);
     if (feedback->detected)
     {
       enemy_detected_ = true;
