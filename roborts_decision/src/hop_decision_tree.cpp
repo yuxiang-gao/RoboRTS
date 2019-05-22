@@ -18,8 +18,8 @@ int main(int argc, char **argv)
   tree_manager->Connect("condition_enemy_detected", "parallel_engage");
 
   tree_manager->Connect("selector_patrol", {"condition_reload",
-                                            "condition_bonus",
                                             "condition_enemy_detected",
+                                            "condition_bonus",
                                             "action_patrol"});
   tree_manager->Connect("sequence_countdown", {"action_countdown"});
   //  "action_back_boot_area"});
