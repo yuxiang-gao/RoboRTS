@@ -16,6 +16,7 @@ public:
     ShootAction(const Blackboard::Ptr &blackboard) : ActionNode("action_shoot", blackboard) {}
     void OnInitialize()
     {
+        blackboard_ptr_->TurnOnFricWheel();
     }
 
     void OnTerminate(BehaviorState state)

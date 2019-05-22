@@ -488,7 +488,7 @@ public:
   }
 
   // True if bonus is activated for this robot
-  int IsBonusActivated()
+  bool IsBonusActivated()
   {
     return referee_info[robot_name_]->robot_bonus.bonus;
   }

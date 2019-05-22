@@ -72,7 +72,7 @@ public:
       // ROS_INFO_STREAM_THROTTLE(1, "distance: " << linear_distance);
       // ROS_INFO_STREAM_THROTTLE(1, "Supply Status: " << bonus_status);
 
-      if (bonus_status == 2)
+      if (bonus_status == 2 && blackboard_ptr_->IsBonusActivated())
       {
         return BehaviorState::SUCCESS;
       }
