@@ -30,6 +30,11 @@ ArmorDetectionNode::ArmorDetectionNode() : node_state_(roborts_common::IDLE),
 {
   initialized_ = false;
   enemy_nh_ = ros::NodeHandle();
+  if (enemy_nh_.hasParam("tf_prefix"))
+  {
+    enemy_nh_.getParam("tf_prefix", tf_prefix_);
+  }
+
   if (Init().IsOK())
   {
     initialized_ = true;
@@ -66,7 +71,11 @@ ErrorInfo ArmorDetectionNode::Init()
   //create the selected algorithms
   std::string selected_algorithm = armor_detection_param.selected_algorithm();
   // create image receiver
-  cv_toolbox_ = std::make_shared<CVToolbox>(armor_detection_param.camera_name());
+  if (tf_prefix_.empty())
+    cv_toolbox_ = std::make_shared<CVToolbox>(armor_detection_param.camera_name());
+  else
+    cv_toolbox_ = std::make_shared<CVToolbox>("/" + tf_prefix_ + "/" + armor_detection_param.camera_name());
+
   // create armor detection algorithm
   armor_detector_ = roborts_common::AlgorithmFactory<ArmorDetectionBase, std::shared_ptr<CVToolbox>>::CreateAlgorithm(selected_algorithm, cv_toolbox_);
 
@@ -127,8 +136,10 @@ void ArmorDetectionNode::ActionCB(const roborts_msgs::ArmorDetectionGoal::ConstP
         feedback.detected = true;
         feedback.error_code = error_info_.error_code();
         feedback.error_msg = error_info_.error_msg();
-
-        feedback.enemy_pos.header.frame_id = "front_camera";
+        if (tf_prefix_.empty())
+          feedback.enemy_pos.header.frame_id = "front_camera";
+        else
+          feedback.enemy_pos.header.frame_id = "/" + tf_prefix_ + "/" + "front_camera";
         feedback.enemy_pos.header.stamp = ros::Time::now();
 
         feedback.enemy_pos.pose.position.x = x_;
@@ -144,7 +155,10 @@ void ArmorDetectionNode::ActionCB(const roborts_msgs::ArmorDetectionGoal::ConstP
         feedback.error_code = error_info_.error_code();
         feedback.error_msg = error_info_.error_msg();
 
-        feedback.enemy_pos.header.frame_id = "front_camera";
+        if (tf_prefix_.empty())
+          feedback.enemy_pos.header.frame_id = "front_camera";
+        else
+          feedback.enemy_pos.header.frame_id = "/" + tf_prefix_ + "/" + "front_camera";
         feedback.enemy_pos.header.stamp = ros::Time::now();
 
         feedback.enemy_pos.pose.position.x = 0;

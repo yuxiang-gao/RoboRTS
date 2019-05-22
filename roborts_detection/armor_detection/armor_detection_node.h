@@ -113,6 +113,7 @@ private:
   std::shared_ptr<CVToolbox> cv_toolbox_;
   actionlib::SimpleActionServer<roborts_msgs::ArmorDetectionAction> as_;
   roborts_msgs::GimbalAngle gimbal_angle_;
+  std::string tf_prefix_;
 
   //! control model
   GimbalContrl gimbal_control_;
